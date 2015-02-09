@@ -7,30 +7,30 @@ import (
 /**
  * Channels/Threads/Groups etc
  */
-type SimpleChannel struct {
-	Cls         Channel
-	team        Team
+type Channel struct {
+	Cls         IChannel
+	team        ITeam
 	channelType string
 	name        string
 	created     time.Time
 	status      string
 
 	// A channel can be created by forking out of a message (like a seperate thread)
-	parent Message
+	parent *Message
 }
 
-type SimpleMessage struct {
-	Cls Message
+type Message struct {
+	Cls IMessage
 
 	/**
 	 * Channel to which this message belongs.
 	 */
-	channel Channel
+	channel *Channel
 
 	/**
 	 * Whether the message is in reply to another message.
 	 */
-	inReplyTo Message
+	inReplyTo *Message
 
 	/**
 	 * Type of message - eg, "invite", "status", "command", "event" etc
@@ -40,17 +40,17 @@ type SimpleMessage struct {
 	/**
 	 * Sender of the message
 	 */
-	sender User
+	sender *User
 
 	/**
 	 * All the message fragments.
 	 */
-	fragments []MessageFragment
+	fragments []*MessageFragment
 
 	/**
 	 * Receipts of the messages indicating status of the recipients of the message.
 	 */
-	receipts []MessageReceipt
+	receipts []*MessageReceipt
 
 	/**
 	 * When the message was sent.
@@ -61,49 +61,111 @@ type SimpleMessage struct {
 /**
  * Keeps track of a message between the sender and the receiver.
  */
-type SimpleMessageReceipt struct {
-	Receiver *User
-	Status   int
-	Received time.Time
-	Error    error
+type MessageReceipt struct {
+	status     int
+	receiver   *User
+	receivedAt time.Time
+	error      error
 }
 
-type SimpleMessageFragment struct {
-	MimeType string
-	Body     []byte
-	Size     int64
+type MessageFragment struct {
+	mimeType string
+	body     []byte
+	size     int64
 }
 
-func (c *SimpleMessage) Self() Message {
+func (c *Message) Self() IMessage {
 	return c.Cls
 }
 
-func NewMessage() (*SimpleMessage, error) {
-	msg := SimpleMessage{}
+func NewMessage() (*Message, error) {
+	msg := Message{}
 	msg.Cls = &msg
 	return &msg, nil
 }
 
-func (m *SimpleMessage) Channel() Channel {
+func (m *Message) Channel() IChannel {
 	return m.channel
 }
 
-func (m *SimpleMessage) Type() string {
+func (m *Message) Type() string {
 	return m.msgType
 }
 
-func (m *SimpleMessage) Sender() User {
+func (m *Message) Sender() IUser {
 	return m.sender
 }
 
-func (m *SimpleMessage) Fragments() []MessageFragment {
-	return m.fragments
+func (m *Message) NumFragments() int {
+	return len(m.fragments)
 }
 
-func (m *SimpleMessage) Receipts() []MessageReceipt {
-	return m.receipts
+func (m *Message) Fragment(index int) IMessageFragment {
+	return m.fragments[index]
 }
 
-func (m *SimpleMessage) Sent() time.Time {
+func (m *Message) NumReceipts() int {
+	return len(m.receipts)
+}
+
+func (m *Message) Receipt(index int) IMessageReceipt {
+	return m.receipts[index]
+}
+
+func (m *Message) Sent() time.Time {
 	return m.sentAt
+}
+
+func (m *MessageReceipt) Receiver() IUser {
+	return m.receiver
+}
+
+func (m *MessageReceipt) Status() int {
+	return m.status
+}
+
+func (m *MessageReceipt) Received() time.Time {
+	return m.receivedAt
+}
+
+func (m *MessageReceipt) Error() error {
+	return m.error
+}
+
+func (m *MessageFragment) MimeType() string {
+	return m.mimeType
+}
+
+func (m *MessageFragment) Body() []byte {
+	return m.body
+}
+
+func (m *MessageFragment) Size() int64 {
+	return m.size
+}
+
+////////// Channel related methods
+
+func (c *Channel) Team() ITeam {
+	return c.team
+}
+
+func (c *Channel) Type() string {
+	return c.channelType
+}
+
+func (c *Channel) Name() string {
+	return c.name
+}
+
+func (c *Channel) Created() time.Time {
+	return c.created
+}
+
+func (c *Channel) Status() string {
+	return c.status
+}
+
+func (c *Channel) Parent() IMessage {
+	return c.parent
 }

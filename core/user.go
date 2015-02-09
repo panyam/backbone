@@ -4,8 +4,8 @@ import (
 	"time"
 )
 
-type SimpleTeam struct {
-	Cls Team
+type Team struct {
+	Cls ITeam
 
 	id string
 
@@ -24,8 +24,8 @@ type SimpleTeam struct {
  * from anywhere (eg a chat application, a github commit, a FB notification, an
  * email etc.
  */
-type SimpleUser struct {
-	Cls User
+type User struct {
+	Cls IUser
 
 	id string
 
@@ -41,50 +41,50 @@ type SimpleUser struct {
 	 */
 	teams []*Team
 
-	addresses []Address
+	addresses []IAddress
 }
 
-type SimpleAddress struct {
-	Cls    Address
+type Address struct {
+	Cls    IAddress
 	label  string
 	domain string
 	id     string
 }
 
-func NewUser() *SimpleUser {
-	user := SimpleUser{}
+func NewUser() *User {
+	user := User{}
 	user.Cls = &user
 	return &user
 }
 
-func (u *SimpleUser) UserId() string {
+func (u *User) UserId() string {
 	return u.id
 }
 
-func (u *SimpleUser) Username() string {
+func (u *User) Username() string {
 	return u.username
 }
 
-func (u *SimpleUser) SetUsername(value string) {
+func (u *User) SetUsername(value string) {
 	u.username = value
 }
 
-func (u *SimpleUser) Addresses() []Address {
+func (u *User) Addresses() []IAddress {
 	return u.addresses
 }
 
-func (u *SimpleUser) AddAddress(address *Address) {
+func (u *User) AddAddress(address IAddress) {
 }
 
-func (u *SimpleUser) GetMetaData(key string) interface{} {
+func (u *User) GetMetaData(key string) interface{} {
 	return nil
 }
 
-func (u *SimpleUser) SetMetaData(key string, value interface{}) {
+func (u *User) SetMetaData(key string, value interface{}) {
 }
 
-func NewAddress(domain string, id string, label string) *SimpleAddress {
-	address := SimpleAddress{}
+func NewAddress(domain string, id string, label string) *Address {
+	address := Address{}
 	address.Cls = &address
 	address.domain = domain
 	address.id = id
@@ -92,46 +92,46 @@ func NewAddress(domain string, id string, label string) *SimpleAddress {
 	return &address
 }
 
-func (u *SimpleUser) Self() User {
+func (u *User) Self() IUser {
 	return u.Cls
 }
 
-func (a *SimpleAddress) Self() Address {
+func (a *Address) Self() IAddress {
 	return a.Cls
 }
 
-func (t *SimpleTeam) Self() Team {
+func (t *Team) Self() ITeam {
 	return t.Cls
 }
 
-func (a *SimpleAddress) Label() string {
+func (a *Address) Label() string {
 	return a.label
 }
 
-func (a *SimpleAddress) SetLabel(label string) {
+func (a *Address) SetLabel(label string) {
 	a.label = label
 }
 
-func (a *SimpleAddress) Domain() string {
+func (a *Address) Domain() string {
 	return a.domain
 }
 
-func (a *SimpleAddress) ID() string {
+func (a *Address) ID() string {
 	return a.id
 }
 
-func (t *SimpleTeam) TeamId() string {
+func (t *Team) TeamId() string {
 	return t.id
 }
 
-func (t *SimpleTeam) GetName() string {
+func (t *Team) GetName() string {
 	return t.name
 }
 
-func (t *SimpleTeam) Created() time.Time {
+func (t *Team) Created() time.Time {
 	return t.created
 }
 
-func (t *SimpleTeam) Status() int {
+func (t *Team) Status() int {
 	return t.status
 }

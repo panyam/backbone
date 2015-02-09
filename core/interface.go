@@ -4,17 +4,17 @@ import (
 	"time"
 )
 
-type User interface {
+type IUser interface {
 	UserId() string
 	Username() string
 	SetUsername(value string)
-	Addresses() []Address
-	AddAddress(address *Address)
+	Addresses() []IAddress
+	AddAddress(address IAddress)
 	GetMetaData(key string) interface{}
 	SetMetaData(key string, value interface{})
 }
 
-type Address interface {
+type IAddress interface {
 	Label() string
 	SetLabel(label string)
 
@@ -24,34 +24,34 @@ type Address interface {
 	Domain() string
 
 	/**
-	 * User's address within the domain.
+	 * IUser's address within the domain.
 	 */
 	ID() string
 }
 
-type Team interface {
+type ITeam interface {
 	TeamId() string
 	GetName() string
 	Created() time.Time
 	Status() int
 }
 
-type Channel interface {
-	Team() *Team
+type IChannel interface {
+	Team() ITeam
 	Type() string
 	Name() string
 	Created() time.Time
 	Status() string
 
 	// A channel can be created by forking out of a message (like a seperate thread)
-	Parent() Message
+	Parent() IMessage
 }
 
-type Message interface {
+type IMessage interface {
 	/**
-	 * Channel to which this message belongs.
+	 * IChannel to which this message belongs.
 	 */
-	Channel() Channel
+	Channel() IChannel
 
 	/**
 	 * Type of message - eg, "invite", "status", "command", "event" etc
@@ -61,17 +61,19 @@ type Message interface {
 	/**
 	 * Sender of the message
 	 */
-	Sender() User
+	Sender() IUser
 
 	/**
-	 * All the message fragments.
+	 * Fragment count and fragment at index.
 	 */
-	Fragments() []MessageFragment
+	NumFragments() int
+	Fragment(index int) IMessageFragment
 
 	/**
-	 * Receipts of the messages indicating status of the recipients of the message.
+	 * Receipt count and receipt at index.
 	 */
-	Receipts() []MessageReceipt
+	NumReceipts() int
+	Receipt(index int) IMessageReceipt
 
 	/**
 	 * When the message was sent.
@@ -82,14 +84,14 @@ type Message interface {
 /**
  * Keeps track of a message between the sender and the receiver.
  */
-type MessageReceipt interface {
-	Receiver() User
+type IMessageReceipt interface {
+	Receiver() IUser
 	Status() int
 	Received() time.Time
 	Error() error
 }
 
-type MessageFragment interface {
+type IMessageFragment interface {
 	MimeType() string
 	Body() []byte
 	Size() int64
