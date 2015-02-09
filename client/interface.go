@@ -1,7 +1,7 @@
 package client
 
 import (
-	"github.com/panyam/backbone/core"
+	"github.com/panyam/backbone/models"
 )
 
 type Client interface {
@@ -9,6 +9,6 @@ type Client interface {
 	Connect() error
 	Login(credentials map[string]string) error
 	Logout() error
-	Teams() ([]core.Team, error)
-	CurrentUser() core.User
+	Teams() ([]models.Team, error)
+	CurrentUser() models.User
 }

@@ -1,13 +1,13 @@
 package client
 
 import (
-	"github.com/panyam/backbone/core"
+	"github.com/panyam/backbone/models"
 )
 
 type NativeClient struct {
 	Cls         Client
 	isConnected bool
-	currentUser core.User
+	currentUser models.User
 }
 
 func (client *NativeClient) IsConnected() bool {
@@ -19,17 +19,17 @@ func (client *NativeClient) Connect() error {
 	return nil
 }
 
-func (client *NativeClient) Teams() ([]core.Team, error) {
+func (client *NativeClient) Teams() ([]models.Team, error) {
 	return nil, nil
 }
 
-func (client *NativeClient) CurrentUser() core.User {
+func (client *NativeClient) CurrentUser() models.User {
 	return client.currentUser
 }
 
 func (client *NativeClient) Login(credentials map[string]string) error {
 	if credentials != nil {
-		client.currentUser = core.NewUser()
+		client.currentUser = models.NewUser()
 		client.currentUser.SetUsername(credentials["username"])
 	}
 	return nil

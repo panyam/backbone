@@ -2,6 +2,7 @@ package service
 
 import (
 	// "code.google.com/p/gomock/gomock"
+	// . "github.com/panyam/backbone/models"
 	. "gopkg.in/check.v1"
 	"testing"
 	// "time"
@@ -26,5 +27,5 @@ func (s *ServiceSuite) TestGetTeams(c *C) {
 // Gaaaaaah.
 
 func (s *ServiceSuite) TestSendMessage(c *C) {
-	u1 := make(User)
+	// u1 := NewUser()
 }

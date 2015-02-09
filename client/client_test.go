@@ -2,7 +2,7 @@ package client
 
 import (
 	// "code.google.com/p/gomock/gomock"
-	"github.com/panyam/backbone/core"
+	"github.com/panyam/backbone/models"
 	. "gopkg.in/check.v1"
 	"testing"
 	// "time"
@@ -59,13 +59,13 @@ func (s *ClientSuite) TestLoginWithNoCredentials(c *C) {
 
 func (s *ClientSuite) TestLoginSuccess(c *C) {
 	client := LoggedInClient("sri")
-	c.Assert(client.CurrentUser(), Not(Equals), core.User(nil))
+	c.Assert(client.CurrentUser(), Not(Equals), models.User(nil))
 	c.Assert(client.CurrentUser().Username(), Equals, "sri")
 }
 
 func (s *ClientSuite) TestLogout(c *C) {
 	client := LoggedInClient("sri")
-	c.Assert(client.CurrentUser(), Not(Equals), core.User(nil))
+	c.Assert(client.CurrentUser(), Not(Equals), models.User(nil))
 	client.Logout()
 	c.Assert(client.CurrentUser(), Equals, nil)
 }
