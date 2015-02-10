@@ -1,4 +1,4 @@
-package service
+package services
 
 import (
 	. "github.com/panyam/backbone/models"
@@ -22,82 +22,54 @@ type IUserService interface {
 
 	/**
 	 * Create a user with the given id and username.
+	 * If the ID or Username already exists an error is thrown.
 	 */
 	CreateUser(id string, username string) (*User, error)
-}
-
-type ITeamService interface {
-	/**
-	 * Retrieve a team by ID.
-	 */
-	GetTeamById(teamId string) (Team, error)
 
 	/**
-	 * Lets a user create a team.
+	 * Saves a user details.
+	 * If the user id or username does not exist an error is thrown.
+	 * If the username or user id already exist and are not the same
+	 * object then an error is thrown.
 	 */
-	CreateTeam(teamName string) (Team, error)
-
-	/**
-	 * Delete a team.
-	 */
-	DeleteTeam(team Team) error
-
-	/**
-	 * Returns the teams the user belongs to.
-	 */
-	ListTeams(user User) ([]Team, error)
-
-	/**
-	 * Lets a user to join a team (if allowed)
-	 */
-	JoinTeam(user User, team Team) error
-
-	/**
-	 * Lets a user leave a team or be kicked out.
-	 */
-	LeaveTeam(user User, team Team, forced bool) error
-
-	/**
-	 * Invite a user to a team.
-	 */
-	InviteToTeam(user User, team Team) error
+	SaveUser(user *User) error
 }
 
 type IChannelService interface {
 	/**
-	 * Lets a user create a channel.
+	 * Lets a user create a channel.  If a channel exists an error is returned.
 	 */
-	CreateChannel(channelName string) (Channel, error)
+	CreateChannel(channelName string) (*Channel, error)
 
 	/**
 	 * Retrieve a channel by ID.
 	 */
-	GetChannelById(channelId string) (Channel, error)
+	GetChannelById(channelId string) (*Channel, error)
 
 	/**
 	 * Delete a channel.
 	 */
-	DeleteChannel(channel Channel) error
+	DeleteChannel(channel *Channel) error
 
 	/**
 	 * Returns the channels the user belongs to.
 	 */
-	ListChannels(user User) ([]Channel, error)
+	ListChannels(user *User) ([]*Channel, error)
 
 	/**
 	 * Lets a user to join a channel (if allowed)
 	 */
-	JoinChannel(user User, channel Channel) error
+	JoinChannel(user *User, channel *Channel) error
 
 	/**
 	 * Lets a user leave a channel or be kicked out.
 	 */
-	LeaveChannel(user User, channel Channel, forced bool) error
+	LeaveChannel(user *User, channel *Channel, forced bool) error
 
 	/**
 	 * Invite a user to a channel.
 	 */
-	InviteToChannel(inviter User, invitee User, channel Channel) error
+	InviteToChannel(inviter *User, invitee *User, channel *Channel) error
 }
 
 type IMessageService interface {

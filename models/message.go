@@ -9,6 +9,7 @@ import (
  */
 type Channel struct {
 	Team        *Team
+	Id          string
 	ChannelType string
 	Name        string
 	Created     time.Time
