@@ -42,9 +42,9 @@ type IChannelService interface {
 	CreateChannel(channelName string) (*Channel, error)
 
 	/**
-	 * Retrieve a channel by ID.
+	 * Retrieve a channel by name.
 	 */
-	GetChannelById(channelId string) (*Channel, error)
+	GetChannelByName(name string) (*Channel, error)
 
 	/**
 	 * Delete a channel.
@@ -59,12 +59,17 @@ type IChannelService interface {
 	/**
 	 * Lets a user to join a channel (if allowed)
 	 */
-	JoinChannel(user *User, channel *Channel) error
+	JoinChannel(channel *Channel, user *User) error
+
+	/**
+	 * Tells if a user belongs to a channel.
+	 */
+	ChannelContains(channel *Channel, user *User) bool
 
 	/**
 	 * Lets a user leave a channel or be kicked out.
 	 */
-	LeaveChannel(user *User, channel *Channel, forced bool) error
+	LeaveChannel(channel *Channel, user *User) error
 
 	/**
 	 * Invite a user to a channel.

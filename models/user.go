@@ -46,8 +46,8 @@ type Address struct {
 	Id     string
 }
 
-func NewUser() *User {
-	user := User{}
+func NewUser(id string, username string) *User {
+	user := User{Id: id, Username: username}
 	return &user
 }
 

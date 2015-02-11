@@ -9,12 +9,14 @@ import (
 type ChannelService struct {
 	Cls            IChannelService
 	channelsByName map[string]*Channel
+	usersById      map[string]*User
 }
 
 func NewChannelService() *ChannelService {
 	svc := ChannelService{}
 	svc.Cls = &svc
 	svc.channelsByName = make(map[string]*Channel)
+	svc.usersById = make(map[string]*User)
 	return &svc
 }
 
@@ -32,17 +34,40 @@ func (c *ChannelService) CreateChannel(channelName string) (*Channel, error) {
 }
 
 /**
- * Retrieve a channel by ID.
+ * Retrieve a channel by Name.
  */
-func (c *ChannelService) GetChannelById(channelId string) (*Channel, error) {
-	return nil, nil
+func (c *ChannelService) GetChannelByName(channelName string) (*Channel, error) {
+	if channel, ok := c.channelsByName[channelName]; ok {
+		return channel, nil
+	}
+	return nil, errors.New("No such channel")
 }
 
 /**
  * Delete a channel.
  */
 func (c *ChannelService) DeleteChannel(channel *Channel) error {
+	if channel, ok := c.channelsByName[channel.Name]; ok {
+		delete(c.channelsByName, channel.Name)
+		return nil
+	}
+	return errors.New("No such channel")
+}
+
+/**
+ * Lets a user to join a channel (if allowed)
+ */
+func (c *ChannelService) JoinChannel(channel *Channel, user *User) error {
+	c.usersById[user.Id] = user
 	return nil
+}
+
+/**
+ * Tells if a user belongs to a channel.
+ */
+func (c *ChannelService) ChannelContains(channel *Channel, user *User) bool {
+	_, ok := c.usersById[user.Id]
+	return ok
 }
 
 /**
@@ -53,16 +78,10 @@ func (c *ChannelService) ListChannels(user *User) ([]*Channel, error) {
 }
 
 /**
- * Lets a user to join a channel (if allowed)
- */
-func (c *ChannelService) JoinChannel(user *User, channel *Channel) error {
-	return nil
-}
-
-/**
  * Lets a user leave a channel or be kicked out.
  */
-func (c *ChannelService) LeaveChannel(user *User, channel *Channel, forced bool) error {
+func (c *ChannelService) LeaveChannel(channel *Channel, user *User) error {
+	delete(c.usersById, user.Id)
 	return nil
 }
 

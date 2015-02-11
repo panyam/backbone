@@ -43,12 +43,10 @@ func (s *UserService) CreateUser(id string, username string) (*User, error) {
 	if _, ok := s.usersByName[username]; ok {
 		return nil, errors.New("User name already exists")
 	}
-	newuser := User{}
-	newuser.Id = id
-	newuser.Username = username
-	s.usersById[id] = &newuser
-	s.usersByName[username] = &newuser
-	return &newuser, nil
+	newuser := NewUser(id, username)
+	s.usersById[id] = newuser
+	s.usersByName[username] = newuser
+	return newuser, nil
 }
 
 func (s *UserService) SaveUser(user *User) error {

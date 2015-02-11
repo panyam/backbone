@@ -1,7 +1,7 @@
 package services
 
 import (
-	// . "github.com/panyam/backbone/models"
+	. "github.com/panyam/backbone/models"
 	. "gopkg.in/check.v1"
 	// "code.google.com/p/gomock/gomock"
 	// "log"
@@ -15,4 +15,53 @@ func CreateChannelService() IChannelService {
 func (s *TestSuite) TestCreateChannelService(c *C) {
 	svc := CreateChannelService()
 	c.Assert(svc, Not(Equals), nil)
+}
+
+func (s *TestSuite) TestCreateChannel(c *C) {
+	svc := CreateChannelService()
+	channel, err := svc.CreateChannel("test")
+	c.Assert(err, Equals, nil)
+	c.Assert(channel, Not(Equals), (*Channel)(nil))
+	c.Assert(channel.Name, Equals, "test")
+	channel, err = svc.GetChannelByName("test")
+	c.Assert(err, Equals, nil)
+	c.Assert(channel, Not(Equals), (*Channel)(nil))
+	c.Assert(channel.Name, Equals, "test")
+}
+
+func (s *TestSuite) TestCreateChannelExistsByName(c *C) {
+	svc := CreateChannelService()
+	channel, err := svc.CreateChannel("test")
+	channel, err = svc.CreateChannel("test")
+	c.Assert(err, Not(Equals), nil)
+	c.Assert(channel, Equals, (*Channel)(nil))
+}
+
+func (s *TestSuite) TestDeleteChannel(c *C) {
+	svc := CreateChannelService()
+	channel, err := svc.CreateChannel("test")
+	c.Assert(err, Equals, nil)
+	c.Assert(channel, Not(Equals), (*Channel)(nil))
+	svc.DeleteChannel(channel)
+	channel, err = svc.GetChannelByName("test")
+	c.Assert(err, Not(Equals), nil)
+	c.Assert(channel, Equals, (*Channel)(nil))
+}
+
+func (s *TestSuite) TestJoinChannel(c *C) {
+	svc := CreateChannelService()
+	channel, _ := svc.CreateChannel("test")
+	user := NewUser("1", "user1")
+	svc.JoinChannel(channel, user)
+	c.Assert(svc.ChannelContains(channel, user), Equals, true)
+}
+
+func (s *TestSuite) TestLeaveChannel(c *C) {
+	svc := CreateChannelService()
+	channel, _ := svc.CreateChannel("test")
+	user := NewUser("1", "user1")
+	svc.JoinChannel(channel, user)
+	c.Assert(svc.ChannelContains(channel, user), Equals, true)
+	svc.LeaveChannel(channel, user)
+	c.Assert(svc.ChannelContains(channel, user), Equals, false)
 }
