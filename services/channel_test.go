@@ -19,11 +19,11 @@ func (s *TestSuite) TestCreateChannelService(c *C) {
 
 func (s *TestSuite) TestCreateChannel(c *C) {
 	svc := CreateChannelService()
-	channel, err := svc.CreateChannel("test")
+	channel, err := svc.CreateChannel("group", "test")
 	c.Assert(err, Equals, nil)
 	c.Assert(channel, Not(Equals), (*Channel)(nil))
 	c.Assert(channel.Name, Equals, "test")
-	channel, err = svc.GetChannelByName("test")
+	channel, err = svc.GetChannelByName("group", "test")
 	c.Assert(err, Equals, nil)
 	c.Assert(channel, Not(Equals), (*Channel)(nil))
 	c.Assert(channel.Name, Equals, "test")
@@ -31,26 +31,26 @@ func (s *TestSuite) TestCreateChannel(c *C) {
 
 func (s *TestSuite) TestCreateChannelExistsByName(c *C) {
 	svc := CreateChannelService()
-	channel, err := svc.CreateChannel("test")
-	channel, err = svc.CreateChannel("test")
+	channel, err := svc.CreateChannel("group", "test")
+	channel, err = svc.CreateChannel("group", "test")
 	c.Assert(err, Not(Equals), nil)
 	c.Assert(channel, Equals, (*Channel)(nil))
 }
 
 func (s *TestSuite) TestDeleteChannel(c *C) {
 	svc := CreateChannelService()
-	channel, err := svc.CreateChannel("test")
+	channel, err := svc.CreateChannel("group", "test")
 	c.Assert(err, Equals, nil)
 	c.Assert(channel, Not(Equals), (*Channel)(nil))
 	svc.DeleteChannel(channel)
-	channel, err = svc.GetChannelByName("test")
+	channel, err = svc.GetChannelByName("group", "test")
 	c.Assert(err, Not(Equals), nil)
 	c.Assert(channel, Equals, (*Channel)(nil))
 }
 
 func (s *TestSuite) TestJoinChannel(c *C) {
 	svc := CreateChannelService()
-	channel, _ := svc.CreateChannel("test")
+	channel, _ := svc.CreateChannel("group", "test")
 	user := NewUser("1", "user1")
 	svc.JoinChannel(channel, user)
 	c.Assert(svc.ChannelContains(channel, user), Equals, true)
@@ -58,7 +58,7 @@ func (s *TestSuite) TestJoinChannel(c *C) {
 
 func (s *TestSuite) TestLeaveChannel(c *C) {
 	svc := CreateChannelService()
-	channel, _ := svc.CreateChannel("test")
+	channel, _ := svc.CreateChannel("group", "test")
 	user := NewUser("1", "user1")
 	svc.JoinChannel(channel, user)
 	c.Assert(svc.ChannelContains(channel, user), Equals, true)

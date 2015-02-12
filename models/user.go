@@ -5,16 +5,20 @@ import (
 )
 
 type Team struct {
+	/**
+	 * This system is unique system wide and is not settable by the client.
+	 */
 	Id string
 
 	/**
-	 * Name of the team - must be unique?
+	 * Organization this team belongs to.
+	 */
+	Organization string
+
+	/**
+	 * Name of this team.
 	 */
 	Name string
-
-	Created time.Time
-
-	Status int
 }
 
 /**
@@ -23,38 +27,37 @@ type Team struct {
  * email etc.
  */
 type User struct {
+	/**
+	 * This system is unique system wide and is not settable by the client.
+	 */
 	Id string
 
+	/**
+	 * The user name for the user.
+	 */
 	Username string
 
 	/**
-	 * General purpose meta data.
+	 * The team the user belongs to.
+	 * The combination of Team/Username *has* to be unique.
+	 * This gets set by the creator/owner of the team/org.  Why is the team a
+	 * big deal?  We could have a "sri" in two different teams.
 	 */
-	MetaData map[string]interface{}
+	Team *Team
 
 	/**
-	 * List of teams to which this user belongs.
+	 * When the user was created.
 	 */
-	Teams []*Team
+	Created time.Time
 
-	Addresses []Address
-}
-
-type Address struct {
-	Label  string
-	Domain string
-	Id     string
+	/**
+	 * General purpose meta data for the user (may not be required as we are
+	 * *just* focussing on messaging).
+	 */
+	MetaData map[string]interface{}
 }
 
 func NewUser(id string, username string) *User {
 	user := User{Id: id, Username: username}
 	return &user
-}
-
-func NewAddress(domain string, id string, label string) *Address {
-	address := Address{}
-	address.Domain = domain
-	address.Id = id
-	address.Label = label
-	return &address
 }

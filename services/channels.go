@@ -8,14 +8,16 @@ import (
 
 type ChannelService struct {
 	Cls            IChannelService
-	channelsByName map[string]*Channel
+	channelCounter int64
+	channelsByKey  map[string]*Channel
 	usersById      map[string]*User
 }
 
 func NewChannelService() *ChannelService {
 	svc := ChannelService{}
 	svc.Cls = &svc
-	svc.channelsByName = make(map[string]*Channel)
+	svc.channelCounter = 1
+	svc.channelsByKey = make(map[string]*Channel)
 	svc.usersById = make(map[string]*User)
 	return &svc
 }
@@ -23,21 +25,31 @@ func NewChannelService() *ChannelService {
 /**
  * Lets a user create a channel.
  */
-func (c *ChannelService) CreateChannel(channelName string) (*Channel, error) {
-	if _, ok := c.channelsByName[channelName]; ok {
+func (c *ChannelService) CreateChannel(channelGroup string, channelName string) (*Channel, error) {
+	key := channelGroup + ":" + channelName
+	if _, ok := c.channelsByKey[key]; ok {
 		return nil, errors.New("Channel already exists")
 	}
-	channel := Channel{Name: channelName}
-	channel.Id = fmt.Sprintf("%d", len(c.channelsByName))
-	c.channelsByName[channelName] = &channel
-	return &channel, nil
+	id := fmt.Sprintf("%d", c.channelCounter)
+	channel := NewChannel(id, channelGroup, channelName)
+	c.channelsByKey[key] = channel
+	c.channelCounter++
+	return channel, nil
+}
+
+/**
+ * Retrieve channels in a group
+ */
+func (c *ChannelService) GetChannelsInGroup(group string, offset int, count int) ([]*Channel, error) {
+	return nil, nil
 }
 
 /**
  * Retrieve a channel by Name.
  */
-func (c *ChannelService) GetChannelByName(channelName string) (*Channel, error) {
-	if channel, ok := c.channelsByName[channelName]; ok {
+func (c *ChannelService) GetChannelByName(channelGroup string, channelName string) (*Channel, error) {
+	key := channelGroup + ":" + channelName
+	if channel, ok := c.channelsByKey[key]; ok {
 		return channel, nil
 	}
 	return nil, errors.New("No such channel")
@@ -47,8 +59,9 @@ func (c *ChannelService) GetChannelByName(channelName string) (*Channel, error) 
  * Delete a channel.
  */
 func (c *ChannelService) DeleteChannel(channel *Channel) error {
-	if channel, ok := c.channelsByName[channel.Name]; ok {
-		delete(c.channelsByName, channel.Name)
+	key := channel.Group + ":" + channel.Name
+	if _, ok := c.channelsByKey[key]; ok {
+		delete(c.channelsByKey, key)
 		return nil
 	}
 	return errors.New("No such channel")
