@@ -23,4 +23,6 @@ _testmain.go
 *.test
 *.prof
 
+clients/web/bower_components/
+clients/web/node_modules/
 app/
