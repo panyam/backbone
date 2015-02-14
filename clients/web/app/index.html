@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en" ng-app="slackApp">
+<head>
+  <meta charset="utf-8">
+  <title>Slack Demo</title>
+  <link rel="stylesheet" href="/webapp/bower_components/bootstrap/dist/css/bootstrap.css">
+  <link rel="stylesheet" href="/webapp/css/app.css">
+  <script src="/webapp/bower_components/angular/angular.js"></script>
+  <script src="/webapp/js/controllers.js"></script>
+</head>
+<body>
+	<div ng-controller="ChannelListCtrl">
+		Channels
+		<ul>
+			<li ng-repeat = "channel in channels">
+			<span># {{channel.name}}
+			</li>
+		</ul>
+	</div>
+</body>
+</html>
