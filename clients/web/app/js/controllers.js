@@ -1,15 +1,16 @@
 
-var slackApp = angular.module("slackApp", []);
+var slackAppControllers = angular.module("slackAppControllers", []);
 
-slackApp.controller("ChannelListCtrl", function($scope) {
-		$scope.currentTeam = {
-			"teamId": "team1",
-			"teamName": "Backbone"
-		};
-		$scope.channels = [
-			{"name": "Channel 1"},
-			{"name": "Channel 2"},
-			{"name": "Channel 3"},
-			{"name": "Channel 4"},
-		];
-});
+slackAppControllers.controller("ChannelListCtrl", ["$scope", "Channel", function($scope, Channel) {
+	$scope.channels = Channel.query();
+}]);
+
+slackAppControllers.controller("ChannelDetailsCtrl", ["$scope", "$routeParams", "Channel", function($scope, Channel) {
+	$scope.Channel = Channel.get({channelId: $routeParams.channelId},
+			function(channel) {
+			});
+}]);
+
+slackAppControllers.controller("MessageListCtrl", ["$scope", "Channel", function($scope, Channel) {
+	$scope.channels = []; // Channel.query();
+}]);
