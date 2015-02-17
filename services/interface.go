@@ -48,15 +48,34 @@ type IUserService interface {
 	/**
 	 * Create a user with the given id and username.
 	 * If the ID or Username already exists an error is thrown.
+	 * If the ID is empty, then it is upto the backend to decide whether to
+	 * throw an error or auto assign an ID.
+	 * A valid User object on return WILL have an ID if the backend can
+	 * auto generate IDs
 	 */
 	CreateUser(id string, username string) (*User, error)
+}
+
+type TeamService interface {
+	/**
+	 * Create a team.
+	 * If the ID is empty, then it is upto the backend to decide whether to
+	 * throw an error or auto assign an ID.
+	 * A valid Team object on return WILL have an ID if the backend can
+	 * auto generate IDs
+	 */
+	CreateTeam(id string, org string, name string) (*Team, error)
 }
 
 type IChannelService interface {
 	/**
 	 * Lets a user create a channel.  If a channel exists an error is returned.
+	 * If the ID is empty, then it is upto the backend to decide whether to
+	 * throw an error or auto assign an ID.
+	 * A valid Channel object on return WILL have an ID if the backend can
+	 * auto generate IDs
 	 */
-	CreateChannel(channelGroup string, channelName string) (*Channel, error)
+	CreateChannel(id string, channelGroup string, channelName string) (*Channel, error)
 
 	/**
 	 * Retrieve all channels in a particular group.
@@ -109,6 +128,10 @@ type IMessageService interface {
 	 * Creates a message to particular recipients in this channel.  This is
 	 * called "Create" instead of "Send" so as to not confuse with the delivery
 	 * details.
+	 * If message ID is empty then the backend can auto generate one if it is
+	 * capable of doing so.
+	 * A valid Message object on return WILL have a non empty ID if the backend can
+	 * auto generate IDs
 	 */
 	CreateMessage(message *Message) error
 

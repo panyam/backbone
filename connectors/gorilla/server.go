@@ -13,6 +13,8 @@ type Server struct {
 	messageService services.IMessageService
 }
 
+type HandlerFunc func(http.ResponseWriter, *http.Request)
+
 func NewServer() *Server {
 	return &Server{}
 }
@@ -29,52 +31,6 @@ func (s *Server) SetMessageService(svc services.IMessageService) {
 	s.messageService = svc
 }
 
-type HandlerFunc func(http.ResponseWriter, *http.Request)
-
-func (s *Server) GetChannelsHandler() HandlerFunc {
-	return func(http.ResponseWriter, *http.Request) {
-		log.Println("Get Channels")
-	}
-}
-
-func (s *Server) CreateChannelHandler() HandlerFunc {
-	return func(http.ResponseWriter, *http.Request) {
-		log.Println("Create Channels")
-	}
-}
-
-func (s *Server) ChannelDetailsHandler() HandlerFunc {
-	return func(http.ResponseWriter, *http.Request) {
-		log.Println("GetChannelDetails")
-	}
-}
-
-func (s *Server) UpdateChannelHandler() HandlerFunc {
-	return func(http.ResponseWriter, *http.Request) {
-		log.Println("UpdateChannel")
-	}
-}
-
-func (s *Server) DeleteChannelHandler() HandlerFunc {
-	return func(http.ResponseWriter, *http.Request) {
-		log.Println("DeleteChannel")
-	}
-}
-
-func (s *Server) createApiRouter(parent *mux.Router) *mux.Router {
-	apiRouter := parent.Path("/api").Subrouter()
-	channelsRouter := apiRouter.Path("/channels/").Subrouter()
-	channelsRouter.Methods("GET").HandlerFunc(s.GetChannelsHandler())
-	channelsRouter.Methods("POST").HandlerFunc(s.CreateChannelHandler())
-
-	channelRouter := apiRouter.PathPrefix("/posts/{id}").Subrouter()
-	channelRouter.Methods("GET").HandlerFunc(s.ChannelDetailsHandler())
-	channelRouter.Methods("PUT", "POST").HandlerFunc(s.UpdateChannelHandler())
-	channelRouter.Methods("DELETE").HandlerFunc(s.DeleteChannelHandler())
-
-	return apiRouter
-}
-
 func (s *Server) Run() {
 	r := mux.NewRouter()
 
@@ -87,4 +43,36 @@ func (s *Server) Run() {
 	apiRouter := s.createApiRouter(r)
 	http.Handle("/api/", apiRouter)
 	log.Fatal(http.ListenAndServe(":3000", nil))
+}
+
+func (s *Server) createApiRouter(parent *mux.Router) *mux.Router {
+	apiRouter := parent.Path("/api").Subrouter()
+
+	// Users/Login API
+	accountRouter := apiRouter.PathPrefix("/account").Subrouter()
+	accountRouter.HandleFunc("/register", s.AccountRegisterHandler())
+	accountRouter.HandleFunc("/login", s.AccountLoginHandler())
+	accountRouter.HandleFunc("/logout", s.AccountLogoutHandler())
+
+	// Teams API
+	teamsRouter := apiRouter.Path("/teams/").Subrouter()
+	teamsRouter.Methods("GET").HandlerFunc(s.GetTeamsHandler())
+	teamsRouter.Methods("POST").HandlerFunc(s.CreateTeamHandler())
+
+	teamRouter := apiRouter.PathPrefix("/teams/{id}").Subrouter()
+	teamRouter.Methods("GET").HandlerFunc(s.TeamDetailsHandler())
+	teamRouter.Methods("PUT", "POST").HandlerFunc(s.UpdateTeamHandler())
+	teamRouter.Methods("DELETE").HandlerFunc(s.DeleteTeamHandler())
+
+	// Channels API
+	channelsRouter := apiRouter.Path("/channels/").Subrouter()
+	channelsRouter.Methods("GET").HandlerFunc(s.GetChannelsHandler())
+	channelsRouter.Methods("POST").HandlerFunc(s.CreateChannelHandler())
+
+	channelRouter := apiRouter.PathPrefix("/channels/{id}").Subrouter()
+	channelRouter.Methods("GET").HandlerFunc(s.ChannelDetailsHandler())
+	channelRouter.Methods("PUT", "POST").HandlerFunc(s.UpdateChannelHandler())
+	channelRouter.Methods("DELETE").HandlerFunc(s.DeleteChannelHandler())
+
+	return apiRouter
 }

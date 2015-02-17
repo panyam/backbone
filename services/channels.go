@@ -25,12 +25,14 @@ func NewChannelService() *ChannelService {
 /**
  * Lets a user create a channel.
  */
-func (c *ChannelService) CreateChannel(channelGroup string, channelName string) (*Channel, error) {
+func (c *ChannelService) CreateChannel(id string, channelGroup string, channelName string) (*Channel, error) {
 	key := channelGroup + ":" + channelName
 	if _, ok := c.channelsByKey[key]; ok {
 		return nil, errors.New("Channel already exists")
 	}
-	id := fmt.Sprintf("%d", c.channelCounter)
+	if id == "" {
+		id = fmt.Sprintf("%d", c.channelCounter)
+	}
 	channel := NewChannel(id, channelGroup, channelName)
 	c.channelsByKey[key] = channel
 	c.channelCounter++
