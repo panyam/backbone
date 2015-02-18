@@ -8,6 +8,7 @@ import (
 
 type Server interface {
 	Run()
+	SetTeamService(svc services.ITeamService)
 	SetUserService(svc services.IUserService)
 	SetChannelService(svc services.IChannelService)
 	SetMessageService(svc services.IMessageService)

@@ -8,11 +8,40 @@ import (
  * Channels/Threads/Groups etc
  */
 type Channel struct {
-	Id          string
+	/**
+	 * Globally unique Channel ID.
+	 */
+	Id string
+
+	/**
+	 * Type of channel.
+	 */
 	ChannelType string
-	Name        string
-	Created     time.Time
-	Status      string
+
+	/**
+	 * Name/Label of this channel.
+	 */
+	Name string
+
+	/**
+	 * Channel creation time.
+	 */
+	Created time.Time
+
+	/**
+	 * When the last message was posted on this channel.
+	 */
+	LastMessageAt time.Time
+
+	/**
+	 * Number of users in this channel.
+	 */
+	NumUsers int
+
+	/**
+	 * Status of this channel.
+	 */
+	Status string
 
 	// A channel can be created by forking out of a message (like a seperate thread)
 	Parent *Message

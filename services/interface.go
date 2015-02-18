@@ -56,7 +56,7 @@ type IUserService interface {
 	CreateUser(id string, username string) (*User, error)
 }
 
-type TeamService interface {
+type ITeamService interface {
 	/**
 	 * Create a team.
 	 * If the ID is empty, then it is upto the backend to decide whether to
@@ -65,6 +65,36 @@ type TeamService interface {
 	 * auto generate IDs
 	 */
 	CreateTeam(id string, org string, name string) (*Team, error)
+
+	/**
+	 * Retrieve teams in a org
+	 */
+	GetTeamsInOrg(org string, offset int, count int) ([]*Team, error)
+
+	/**
+	 * Retrieve a team by Name.
+	 */
+	GetTeamByName(org string, name string) (*Team, error)
+
+	/**
+	 * Delete a team.
+	 */
+	DeleteTeam(team *Team) error
+
+	/**
+	 * Lets a user to join a team (if allowed)
+	 */
+	JoinTeam(team *Team, user *User) error
+
+	/**
+	 * Tells if a user belongs to a team.
+	 */
+	TeamContains(team *Team, user *User) bool
+
+	/**
+	 * Lets a user leave a team or be kicked out.
+	 */
+	LeaveTeam(team *Team, user *User) error
 }
 
 type IChannelService interface {

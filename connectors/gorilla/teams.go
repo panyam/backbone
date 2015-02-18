@@ -8,6 +8,7 @@ import (
 
 func (s *Server) CreateTeamHandler() HandlerFunc {
 	return func(http.ResponseWriter, *http.Request) {
+		s.teamService.Create
 		log.Println("Create Teams")
 	}
 }

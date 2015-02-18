@@ -37,6 +37,14 @@ func (s *TestSuite) TestCreateChannelExistsByName(c *C) {
 	c.Assert(channel, Equals, (*Channel)(nil))
 }
 
+func (s *TestSuite) TestCreateChannelExistsById(c *C) {
+	svc := CreateChannelService()
+	channel, err := svc.CreateChannel("1", "group", "test")
+	channel, err = svc.CreateChannel("1", "group2", "test2")
+	c.Assert(err, Not(Equals), nil)
+	c.Assert(channel, Equals, (*Channel)(nil))
+}
+
 func (s *TestSuite) TestDeleteChannel(c *C) {
 	svc := CreateChannelService()
 	channel, err := svc.CreateChannel("", "group", "test")

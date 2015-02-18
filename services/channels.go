@@ -9,6 +9,7 @@ import (
 type ChannelService struct {
 	Cls            IChannelService
 	channelCounter int64
+	channelsById   map[string]*Channel
 	channelsByKey  map[string]*Channel
 	usersById      map[string]*User
 }
@@ -17,6 +18,7 @@ func NewChannelService() *ChannelService {
 	svc := ChannelService{}
 	svc.Cls = &svc
 	svc.channelCounter = 1
+	svc.channelsById = make(map[string]*Channel)
 	svc.channelsByKey = make(map[string]*Channel)
 	svc.usersById = make(map[string]*User)
 	return &svc
@@ -32,9 +34,12 @@ func (c *ChannelService) CreateChannel(id string, channelGroup string, channelNa
 	}
 	if id == "" {
 		id = fmt.Sprintf("%d", c.channelCounter)
+	} else if _, ok := c.channelsById[id]; ok {
+		return nil, errors.New("Channel already exists by ID")
 	}
 	channel := NewChannel(id, channelGroup, channelName)
 	c.channelsByKey[key] = channel
+	c.channelsById[id] = channel
 	c.channelCounter++
 	return channel, nil
 }
@@ -64,7 +69,10 @@ func (c *ChannelService) DeleteChannel(channel *Channel) error {
 	key := channel.Group + ":" + channel.Name
 	if _, ok := c.channelsByKey[key]; ok {
 		delete(c.channelsByKey, key)
-		return nil
+		if _, ok := c.channelsById[channel.Id]; ok {
+			delete(c.channelsById, channel.Id)
+			return nil
+		}
 	}
 	return errors.New("No such channel")
 }

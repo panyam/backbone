@@ -8,6 +8,7 @@ import (
 )
 
 type Server struct {
+	teamService    services.ITeamService
 	userService    services.IUserService
 	channelService services.IChannelService
 	messageService services.IMessageService
@@ -17,6 +18,10 @@ type HandlerFunc func(http.ResponseWriter, *http.Request)
 
 func NewServer() *Server {
 	return &Server{}
+}
+
+func (s *Server) SetTeamService(svc services.ITeamService) {
+	s.teamService = svc
 }
 
 func (s *Server) SetUserService(svc services.IUserService) {

@@ -61,3 +61,8 @@ func NewUser(id string, username string) *User {
 	user := User{Id: id, Username: username}
 	return &user
 }
+
+func NewTeam(id string, org string, name string) *Team {
+	team := Team{Id: id, Organization: org, Name: name}
+	return &team
+}
