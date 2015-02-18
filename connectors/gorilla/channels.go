@@ -6,32 +6,32 @@ import (
 	"net/http"
 )
 
-func (s *Server) GetChannelsHandler() HandlerFunc {
-	return func(rw http.ResponseWriter, request *http.Request) {
+func (s *Server) GetChannelsHandler() RequestHandlerFunc {
+	return func(rw http.ResponseWriter, request *http.Request, context *RequestContext) {
 		log.Println("Get Channels")
 	}
 }
 
-func (s *Server) CreateChannelHandler() HandlerFunc {
-	return func(http.ResponseWriter, *http.Request) {
+func (s *Server) CreateChannelHandler() RequestHandlerFunc {
+	return func(rw http.ResponseWriter, request *http.Request, context *RequestContext) {
 		log.Println("Create Channels")
 	}
 }
 
-func (s *Server) ChannelDetailsHandler() HandlerFunc {
-	return func(http.ResponseWriter, *http.Request) {
+func (s *Server) ChannelDetailsHandler() RequestHandlerFunc {
+	return func(rw http.ResponseWriter, request *http.Request, context *RequestContext) {
 		log.Println("GetChannelDetails")
 	}
 }
 
-func (s *Server) UpdateChannelHandler() HandlerFunc {
-	return func(http.ResponseWriter, *http.Request) {
+func (s *Server) UpdateChannelHandler() RequestHandlerFunc {
+	return func(rw http.ResponseWriter, request *http.Request, context *RequestContext) {
 		log.Println("UpdateChannel")
 	}
 }
 
-func (s *Server) DeleteChannelHandler() HandlerFunc {
-	return func(http.ResponseWriter, *http.Request) {
+func (s *Server) DeleteChannelHandler() RequestHandlerFunc {
+	return func(rw http.ResponseWriter, request *http.Request, context *RequestContext) {
 		log.Println("DeleteChannel")
 	}
 }

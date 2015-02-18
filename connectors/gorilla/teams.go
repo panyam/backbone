@@ -6,33 +6,32 @@ import (
 	"net/http"
 )
 
-func (s *Server) CreateTeamHandler() HandlerFunc {
-	return func(http.ResponseWriter, *http.Request) {
-		s.teamService.Create
+func (s *Server) CreateTeamHandler() RequestHandlerFunc {
+	return func(rw http.ResponseWriter, request *http.Request, context *RequestContext) {
 		log.Println("Create Teams")
 	}
 }
 
-func (s *Server) GetTeamsHandler() HandlerFunc {
-	return func(rw http.ResponseWriter, request *http.Request) {
+func (s *Server) GetTeamsHandler() RequestHandlerFunc {
+	return func(rw http.ResponseWriter, request *http.Request, context *RequestContext) {
 		log.Println("Get Teams")
 	}
 }
 
-func (s *Server) TeamDetailsHandler() HandlerFunc {
-	return func(http.ResponseWriter, *http.Request) {
+func (s *Server) TeamDetailsHandler() RequestHandlerFunc {
+	return func(rw http.ResponseWriter, request *http.Request, context *RequestContext) {
 		log.Println("GetTeamDetails")
 	}
 }
 
-func (s *Server) UpdateTeamHandler() HandlerFunc {
-	return func(http.ResponseWriter, *http.Request) {
+func (s *Server) UpdateTeamHandler() RequestHandlerFunc {
+	return func(rw http.ResponseWriter, request *http.Request, context *RequestContext) {
 		log.Println("UpdateTeam")
 	}
 }
 
-func (s *Server) DeleteTeamHandler() HandlerFunc {
-	return func(http.ResponseWriter, *http.Request) {
+func (s *Server) DeleteTeamHandler() RequestHandlerFunc {
+	return func(rw http.ResponseWriter, request *http.Request, context *RequestContext) {
 		log.Println("DeleteTeam")
 	}
 }
