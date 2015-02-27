@@ -7,7 +7,7 @@ import (
 )
 
 type MessageService struct {
-	Cls               IMessageService
+	Cls               interface{}
 	messageCounter    int64
 	messagesInChannel map[string][]*Message
 }

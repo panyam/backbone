@@ -8,10 +8,6 @@ import (
 	// "time"
 )
 
-func CreateMessageService() IMessageService {
-	return NewMessageService()
-}
-
 func (s *TestSuite) TestCreateMessageService(c *C) {
 	svc := CreateMessageService()
 	c.Assert(svc, Not(Equals), nil)

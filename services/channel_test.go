@@ -8,10 +8,6 @@ import (
 	// "time"
 )
 
-func CreateChannelService() IChannelService {
-	return NewChannelService()
-}
-
 func (s *TestSuite) TestCreateChannelService(c *C) {
 	svc := CreateChannelService()
 	c.Assert(svc, Not(Equals), nil)

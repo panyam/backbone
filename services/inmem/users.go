@@ -6,7 +6,7 @@ import (
 )
 
 type UserService struct {
-	Cls         IUserService
+	Cls         interface{}
 	usersById   map[string]*User
 	usersByName map[string]*User
 }

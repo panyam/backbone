@@ -7,7 +7,7 @@ import (
 )
 
 type TeamService struct {
-	Cls         ITeamService
+	Cls         interface{}
 	teamCounter int64
 	teamsById   map[string]*Team
 	teamsByKey  map[string]*Team

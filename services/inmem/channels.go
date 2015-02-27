@@ -7,7 +7,7 @@ import (
 )
 
 type ChannelService struct {
-	Cls            IChannelService
+	Cls            interface{}
 	channelCounter int64
 	channelsById   map[string]*Channel
 	channelsByKey  map[string]*Channel

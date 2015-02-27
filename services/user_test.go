@@ -5,10 +5,6 @@ import (
 	. "gopkg.in/check.v1"
 )
 
-func CreateUserService() IUserService {
-	return NewUserService()
-}
-
 func (s *TestSuite) TestCreateUserService(c *C) {
 	svc := CreateUserService()
 	c.Assert(svc, Not(Equals), nil)
