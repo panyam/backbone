@@ -301,7 +301,8 @@ All channels in the team that are visible to the current user.
 **Return:** HTTP Status 200 and message details:
 
 ```
-{'id': "messageid", 'sender': "senderuserid", 'sentAt': "sent at date",
+{
+ 'id': "messageid", 'sender': "senderuserid", 'sentAt': "sent at date",
  'type': "messagetype", 'metadata': {...}, 'channel': "channelid",
  'fragments': [
     <Fragment1>,
@@ -309,4 +310,5 @@ All channels in the team that are visible to the current user.
     ...
     <FragmentN>
  ]
+}
 ```
