@@ -22,6 +22,95 @@ API is divided into following sections:
 ## Teams API
 Handles team management.
 
+### List Teams
+**Endpoints:** 
+    GET /users/&lt;userid&gt;/teams/
+    
+**Auth Required:** YES
+
+**Return:**
+
+A list of teams that the given user is subscribed to.  If the userid is not specified then the currently logged in user is queried, eg:
+
+```
+[ {"id": "123", "name": "Dream Team", "organization": "Dream Owner"} ]
+```
+
+### Create a team
+
+**Endpoints:** 
+    POST /teams/
+    
+**Auth Required:** YES
+
+**Parameters:**
+    organization: Organization the team belongs to (optional)
+    name: Name of the team (required and must be unique within the organization).
+    
+**Return:**
+    HTTP Status 200 on success along with team details, eg:
+```
+{"id": "123", "name": "Dream Team", "organization": "Dream Owner"}
+```
+
+### Get team details
+
+**Endpoints:** 
+    GET /teams/&lt;teamid&gt;/
+    
+**Auth Required:** NO
+
+**Return:**
+    HTTP Status 200 with team details, eg:
+```
+{"id": "123", "name": "Dream Team", "organization": "Dream Owner"}
+```
+
+### Invite user to a team
+
+**Endpoints:** 
+    POST /teams/&lt;teamid&gt;/
+    
+**Auth Required:** YES.  User must also be permitted to invite users to a group (see user registration API)
+
+**Parameters:**
+    address: Invitee's address (can be a phone or email address).  
+    If address is a phone number then the invitee is sent a verification code that is valid for 5 minutes.  The invitee can join (see Join API) with the given phone number and the verification code.
+    If the address is an email then the invitee is sent a verification link that must be accessed to continue the joining process.
+    Similar schemes will be used to allow other login methods (such as FB, Google and other OAuth).
+    
+**Return:**
+    HTTP Status 200 with invitation ID.
+```
+{"id": "Invite101"}
+```
+
+### Accept an invite to join a team
+
+**Endpoints:** 
+    GET /teams/&lt;teamid&gt;/join/&lt;invitationid&gt;
+    
+**Auth Required:** NO
+
+**Parameters:**
+    verification_code: If a verification code was sent then this MUST be present and match the invitation.
+    
+**Return:**
+    HTTP Status 200 if invitation was successfully accepted.
+    HTTP Status 401 if invitation id was invalid or if it has expired or if verification code did not match.
+
+
+### List channels in a team
+
+**Endpoints:** 
+    GET /teams/&lt;teamid&gt;/channels/
+    
+**Auth Required:** YES and current user must belong to the team.
+
+**Return:**
+
+All channels in the team that are visible to the current user.
+
 ## Users API
 Handles user management, settings and auths.
 
