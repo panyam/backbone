@@ -29,55 +29,61 @@ API is divided into following sections:
 **Auth Required:** NO
 
 **Parameters:**
-    username: Must be unique
-    address: An address the user can be sent the verification details to (similar the invite flow above).
-    password: Optional password.  If a password is provided than username/password based logins will be allowed otherwise all calls that require an authentication MUST be with access token and secret key.  These can be used to change the password later on.  Also even if a password is not set, with a successful confirmation the access token and secret keys will be returned to the user.
+- username: Must be unique
+- address: An address the user can be sent the verification details to (similar the invite flow above).
+- password: Optional password.  If a password is provided than username/password based logins will be allowed otherwise all calls that require an authentication MUST be with access token and secret key.  These can be used to change the password later on.  Also even if a password is not set, with a successful confirmation the access token and secret keys will be returned to the user.
     
 **Return:**
-    HTTP Status 200 on success and a registration ID that is valid for 5 minutes.
+
+HTTP Status 200 on success and a registration ID that is valid for 5 minutes.
 
 ### Confirm a registration
 
 **Endpoints:** 
-    POST /users/&lt;username&gt;/confirm/&lt;registrationid&gt;
+
+POST /users/&lt;username&gt;/confirm/&lt;registrationid&gt;
     
 **Auth Required:** NO
 
 **Parameters:**
-    verification_code: A verification code if it was present.
+
+- verification_code: A verification code if it was present.
 
 **Return:**
-    HTTP Status 200 on success along with user details:
-    ```
-    {'id': "userid", 'username': "username", 'token': "api_access_token", 'secret': "api_secret_key"}
-    ```
+HTTP Status 200 on success along with user details:
+    
+```
+{'id': "userid", 'username': "username", 'token': "api_access_token", 'secret': "api_secret_key"}
+```
 
 ### Logging in
 
 **Endpoints:** 
-    POST /users/&lt;username&gt;/login/
+
+POST /users/&lt;username&gt;/login/
     
 **Auth Required:** NO
 
 **Parameters:**
-    password: Password associated with the account (if present).
+- password: Password associated with the account (if present).
     
 **Return:**
-    HTTP Status 200 along with the sessionid cookie set that can be used in subsequent requests that require authentication.
+
+HTTP Status 200 along with the sessionid cookie set that can be used in subsequent requests that require authentication.
 
 ### Logging out
 
-**Endpoints:** 
-    POST /users/logout/
+**Endpoints:** POST /users/logout/
     
 **Auth Required:** NO
 
 **Return:**
-    HTTP Status 200 and the session ID cookies are cleared.
+HTTP Status 200 and the session ID cookies are cleared.
 
 ## Teams API
 
 ### List Teams
+
 **Endpoints:** 
     GET /users/&lt;userid&gt;/teams/
     
@@ -99,7 +105,9 @@ A list of teams that the given user is subscribed to.  If the userid is not spec
 **Auth Required:** YES
 
 **Parameters:**
+
     organization: Organization the team belongs to (optional)
+    
     name: Name of the team (required and must be unique within the organization).
     
 **Return:**
@@ -129,6 +137,7 @@ A list of teams that the given user is subscribed to.  If the userid is not spec
 **Auth Required:** YES.  User must also be permitted to invite users to a group (see user registration API)
 
 **Parameters:**
+
     address: Invitee's address (can be a phone or email address).  
     If address is a phone number then the invitee is sent a verification code that is valid for 5 minutes.  The invitee can join (see Join API) with the given phone number and the verification code.
     If the address is an email then the invitee is sent a verification link that must be accessed to continue the joining process.
@@ -148,6 +157,7 @@ A list of teams that the given user is subscribed to.  If the userid is not spec
 **Auth Required:** NO
 
 **Parameters:**
+
     verification_code: If a verification code was sent then this MUST be present and match the invitation.
     
 **Return:**
