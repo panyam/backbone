@@ -38,6 +38,7 @@ API is divided into following sections:
 **Auth Required:** NO
 **Parameters:**
 - verification_code: A verification code if it was present.
+
 **Return:**
 HTTP Status 200 on success along with user details:
     
