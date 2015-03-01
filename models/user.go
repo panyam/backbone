@@ -6,7 +6,7 @@ import (
 
 type Team struct {
 	/**
-	 * This system is unique system wide and is not settable by the client.
+	 * Unique system wide ID
 	 */
 	Id string
 
