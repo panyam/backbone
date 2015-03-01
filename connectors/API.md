@@ -263,5 +263,50 @@ All channels in the team that are visible to the current user.
 - HTTP stauts 200 - If successful
 
 ## Messages API
-Message sending, recetion, creation, updates, notification etc
 
+### Send a message in a channel
+
+**Endpoints:** POST /channels/&lt;channelid&gt;/messages/
+
+**Auth Required:** YES and the user must be authorized to send messages.
+
+**Parameters:**
+- type: Type of message
+- body: Body of the message (as list of message parts).
+- metadata: Metadata for the message.
+- persist: Whether message is to be persisted or not.
+
+**Return:** List of messages in the channel.
+
+### Get messages in the channel
+
+**Endpoints:** GET /channels/&lt;channelid&gt;/messages/
+
+**Auth Required:** YES
+
+**Parameters:**
+- sender: Filter messages by sender
+- type: Filter by message type.
+- metadata.&lt;keypath&gt;: Filter by predicates on metadata entries.  See metadata filtering.
+- text: Message content filtering.
+
+**Return:** List of messages in the channel.
+
+### Get message details
+
+**Endpoints:** GET /messages/&lt;messageid&gt;/
+
+**Auth Required:** YES and user must be able to read the message
+
+**Return:** HTTP Status 200 and message details:
+
+```
+{'id': "messageid", 'sender': "senderuserid", 'sentAt': "sent at date",
+ 'type': "messagetype", 'metadata': {...}, 'channel': "channelid",
+ 'fragments': [
+    <Fragment1>,
+    <Fragment2>,
+    ...
+    <FragmentN>
+ ]
+```
