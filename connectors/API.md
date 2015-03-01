@@ -153,12 +153,114 @@ A list of teams that the given user is subscribed to.  If the userid is not spec
     
 **Auth Required:** YES and current user must belong to the team.
 
+**Parameters:**
+- participants: Comma seperated list of userids of which atleast one user is a participant.
+- status: Filter by channel status
+- metadata.&lt;keypath&gt;: Filter by predicates on metadata entries.  See metadata filtering.
+- order_by: Order by fields (prefixed by - indicates descending order):
+    -   name - order name of the group
+    -   created - order by created date
+    -   updated - order by last updated
+    -   last_messaged - order by last message date
+
 **Return:**
 
 All channels in the team that are visible to the current user.
 
 ## Channels API
-Channel management and control
+
+### List channels for a user
+
+**Endpoints:** GET /channels/
+
+**Auth Required:** YES
+
+**Parameters:**
+- is_owner: Return channels user is an owner of
+- participants: Comma seperated list of userids of which atleast one user is a participant.
+- status: Filter by channel status
+- metadata.&lt;keypath&gt;: Filter by predicates on metadata entries.  See metadata filtering.
+- order_by: Order by fields (prefixed by - indicates descending order):
+    -   name - order name of the group
+    -   created - order by created date
+    -   updated - order by last updated
+    -   last_messaged - order by last message date
+**Return:** List of channels that the user belongs to.
+
+### Create new channel
+
+**Endpoints:** POST /channels/
+
+**Auth Required:** YES
+
+**Parameters:**
+- public: Whether the channel is public or private (default = true)
+- participants: comma seperated list of user IDs.
+- metadata: Dictionary of key value pairs.
+
+**Returns:**
+- HTTP stauts 200 with the channel details.
+
+
+### Get channel details
+
+**Endpoints:** GET /channels/&lt;channelid&gt;/
+
+**Auth Required:** NO
+
+**Returns:**
+- HTTP Status 403 - if channel is not visible to the current user
+- HTTP stauts 200 - If the channel is visible to the current user or is public and the channel details are returned, eg:
+
+```
+{
+ 'id': "channelid", 'name': "Channel Name", 'creator': "creatorid",
+ 'participants': [ "user1", "user2", "user3" ], 'status': 0
+}
+```
+
+### Invite users to a channel
+
+**Endpoints:** PUT /channels/&lt;channelid&gt;/invite/
+
+**Auth Required:** YES and user must have permission to invite users.
+
+**Parameters:**
+- participants: comma seperated list of user IDs
+
+**Returns:**
+- HTTP Status 403 - if user does not have permissions to invite users.
+- HTTP stauts 200 - If successful
+
+### Join a channel
+
+**Endpoints:** PUT /channels/&lt;channelid&gt;/join/
+
+**Auth Required:** YES
+
+**Returns:**
+- HTTP Status 403 - if channel is private and user has not been sent an invitation
+- HTTP stauts 200 - If successful
+
+### Leave a channel
+
+**Endpoints:** PUT /channels/&lt;channelid&gt;/leave/
+
+**Auth Required:** YES and user must be a participant in the channel.
+
+**Returns:**
+- HTTP Status 403 - if not allowed.
+- HTTP stauts 200 - If successful
+
+### Delete a channel
+
+**Endpoints:** PUT /channels/&lt;channelid&gt;/delete/
+
+**Auth Required:** YES and user must be the owner of the channel.
+
+**Returns:**
+- HTTP Status 403 - if not allowed.
+- HTTP stauts 200 - If successful
 
 ## Messages API
 Message sending, recetion, creation, updates, notification etc
