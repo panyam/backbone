@@ -23,32 +23,21 @@ API is divided into following sections:
 
 ### Register a User
 
-**Endpoints:** 
-    POST /users/register/
-    
+**Endpoints:** POST /users/register/
 **Auth Required:** NO
-
 **Parameters:**
 - username: Must be unique
 - address: An address the user can be sent the verification details to (similar the invite flow above).
 - password: Optional password.  If a password is provided than username/password based logins will be allowed otherwise all calls that require an authentication MUST be with access token and secret key.  These can be used to change the password later on.  Also even if a password is not set, with a successful confirmation the access token and secret keys will be returned to the user.
     
-**Return:**
-
-HTTP Status 200 on success and a registration ID that is valid for 5 minutes.
+**Return:** HTTP Status 200 on success and a registration ID that is valid for 5 minutes.
 
 ### Confirm a registration
 
-**Endpoints:** 
-
-POST /users/&lt;username&gt;/confirm/&lt;registrationid&gt;
-    
+**Endpoints:** POST /users/&lt;username&gt;/confirm/&lt;registrationid&gt;
 **Auth Required:** NO
-
 **Parameters:**
-
 - verification_code: A verification code if it was present.
-
 **Return:**
 HTTP Status 200 on success along with user details:
     
