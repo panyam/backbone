@@ -15,6 +15,7 @@
 		107218451AA2FD340081D416 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 107218441AA2FD340081D416 /* Images.xcassets */; };
 		107218481AA2FD340081D416 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 107218461AA2FD340081D416 /* LaunchScreen.xib */; };
 		107218541AA2FD340081D416 /* BackboneDemoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 107218531AA2FD340081D416 /* BackboneDemoTests.m */; };
+		1072185F1AA2FDB90081D416 /* TeamsTableVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 1072185E1AA2FDB90081D416 /* TeamsTableVC.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,6 +44,8 @@
 		1072184D1AA2FD340081D416 /* BackboneDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BackboneDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		107218521AA2FD340081D416 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		107218531AA2FD340081D416 /* BackboneDemoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BackboneDemoTests.m; sourceTree = "<group>"; };
+		1072185D1AA2FDB90081D416 /* TeamsTableVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TeamsTableVC.h; path = Sources/TeamsTableVC.h; sourceTree = "<group>"; };
+		1072185E1AA2FDB90081D416 /* TeamsTableVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TeamsTableVC.m; path = Sources/TeamsTableVC.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +97,8 @@
 				107218441AA2FD340081D416 /* Images.xcassets */,
 				107218461AA2FD340081D416 /* LaunchScreen.xib */,
 				107218341AA2FD340081D416 /* Supporting Files */,
+				1072185D1AA2FDB90081D416 /* TeamsTableVC.h */,
+				1072185E1AA2FDB90081D416 /* TeamsTableVC.m */,
 			);
 			path = BackboneDemo;
 			sourceTree = "<group>";
@@ -224,6 +229,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1072185F1AA2FDB90081D416 /* TeamsTableVC.m in Sources */,
 				1072183A1AA2FD340081D416 /* AppDelegate.m in Sources */,
 				1072183D1AA2FD340081D416 /* MasterViewController.m in Sources */,
 				107218371AA2FD340081D416 /* main.m in Sources */,

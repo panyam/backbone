@@ -2,6 +2,7 @@ package gorilla
 
 import (
 	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 	"github.com/panyam/backbone/models"
 	"github.com/panyam/backbone/services"
 	"log"
@@ -13,6 +14,7 @@ type Server struct {
 	userService    services.IUserService
 	channelService services.IChannelService
 	messageService services.IMessageService
+	store          *sessions.CookieStore
 }
 
 type HttpHandlerFunc func(http.ResponseWriter, *http.Request)
@@ -20,6 +22,10 @@ type RequestHandlerFunc func(http.ResponseWriter, *http.Request, *RequestContext
 
 func NewServer() *Server {
 	return &Server{}
+}
+
+func (s *Server) SetCookieStore(cs *sessions.CookieStore) {
+	s.store = sessions.NewCookieStore([]byte("something-very-secret"))
 }
 
 func (s *Server) SetTeamService(svc services.ITeamService) {
@@ -39,7 +45,11 @@ func (s *Server) SetMessageService(svc services.IMessageService) {
 }
 
 func (s *Server) DefaultMiddleware(requiresUser bool) *MiddlewareChain {
-	return NewMiddlewareChain()
+	out := NewMiddlewareChain()
+	// middleware to create jj
+	if requiresUser {
+	}
+	return out
 }
 
 func (s *Server) Run() {

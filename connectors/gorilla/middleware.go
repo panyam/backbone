@@ -7,28 +7,9 @@ import (
 )
 
 /**
- * Request context stores all data related to a request handling sessions.
- */
-type RequestContext struct {
-	errors []error
-	data   map[string]interface{}
-}
-
-func NewRequestContext() *RequestContext {
-	rc := RequestContext{data: make(map[string]interface{})}
-	return &rc
-}
-
-func (rc *RequestContext) AddError(err error) {
-	rc.errors = append(rc.errors, err)
-}
-
-/**
  * Middleware functions can be applied to request in a modular fashion.
  *
  * Params:
- * forward	-	Indicates whether the middleware is being applied in the forward
- * 				(request processing) or reverse (response processing) direction.
  * rw		-	The response writer for the request
  * request	-	The request being handled.
  * context	-	The request context that keeps track of state across middleware
@@ -37,50 +18,42 @@ func (rc *RequestContext) AddError(err error) {
  * Returns:
  * A MiddlewareResult object.
  */
-type MiddlewareFunc func(forward bool,
-	rw http.ResponseWriter,
-	request *http.Request,
-	context *RequestContext) MiddlewareResult
+type MiddlewareFunc func(rw http.ResponseWriter, request *http.Request, context *RequestContext) MiddlewareResult
+
+type Middleware interface {
+	ProcessRequest(rw http.ResponseWriter, request *http.Request, context *RequestContext) MiddlewareResult
+	ProcessResponse(rw http.ResponseWriter, request *http.Request, context *RequestContext) MiddlewareResult
+}
+
+type FunctionMiddleware struct {
+	requestMiddleware  MiddlewareFunc
+	responseMiddleware MiddlewareFunc
+}
+
+func (fm *FunctionMiddleware) ProcessRequest(rw http.ResponseWriter, request *http.Request, context *RequestContext) MiddlewareResult {
+	if fm.requestMiddleware != nil {
+		return fm.requestMiddleware(rw, request, context)
+	}
+	return NewMiddlewareResult(nil, nil)
+}
+
+func (fm *FunctionMiddleware) ProcessResponse(rw http.ResponseWriter, request *http.Request, context *RequestContext) MiddlewareResult {
+	if fm.responseMiddleware != nil {
+		return fm.responseMiddleware(rw, request, context)
+	}
+	return NewMiddlewareResult(nil, nil)
+}
 
 /**
  * Stores result of a middleware function application.
- * status = 0	=>	Then middleware returned synchronously WITH A SUCCESS with
- * 					an optional result value stored (stored in the result member).
- *
- * status = -1  =>  Middleware returned synchronously WITH A FAILURE with the
- * 					optional error  in the error parameter (and any other
- * 					details in the result value)
- *
- * status = 1 	=>	Middleware is performing an asynch operation and will
- * 					eventually return.  The second return value will be a
- * 					channel of type MessageResult in which the eventual result
- * 					(success or failure) will be passed.
  */
 type MiddlewareResult struct {
-	/**
-	 * Tells if the result is synchronous or asynchronous.
-	 * If the value is synchronous then value and error are valid now.
-	 * Otherwise, value is a channel of type MiddlewareResult.
-	 */
-	status int
-	error  error
-	value  interface{}
+	error error
+	value interface{}
 }
 
-func MiddlewareResultSync(value interface{}, error error) MiddlewareResult {
-	status := 0
-	if error != nil {
-		status = -1
-	}
-	return MiddlewareResult{status: status, value: value, error: error}
-}
-
-func MiddlewareResultAsync(channel chan MiddlewareResult) MiddlewareResult {
-	return MiddlewareResult{status: 1, value: channel}
-}
-
-func (m *MiddlewareResult) IsAsync() bool {
-	return m.status > 0
+func NewMiddlewareResult(value interface{}, error error) MiddlewareResult {
+	return MiddlewareResult{value: value, error: error}
 }
 
 func (m *MiddlewareResult) Error() error {
@@ -92,31 +65,40 @@ func (m *MiddlewareResult) Value() interface{} {
 }
 
 type MiddlewareChain struct {
-	middlewares     []MiddlewareFunc
-	isForwardAsync  []bool
-	isBackwardAsync []bool
-	currIndex       int
+	middlewares []Middleware
+	currIndex   int
 }
 
 func NewMiddlewareChain() *MiddlewareChain {
 	out := MiddlewareChain{}
-	out.middlewares = make([]MiddlewareFunc, 0, 10)
-	out.isForwardAsync = make([]bool, 0, 10)
-	out.isBackwardAsync = make([]bool, 0, 10)
+	out.middlewares = make([]Middleware, 0, 10)
 	return &out
 }
 
-func (m *MiddlewareChain) Current() MiddlewareFunc {
+func (m *MiddlewareChain) Current() Middleware {
+	if m.currIndex >= len(m.middlewares) {
+		return nil
+	}
 	return m.middlewares[m.currIndex]
 }
 
 /**
  * Adds a new middleware to the chain.
  */
-func (mc *MiddlewareChain) Add(m MiddlewareFunc, fwdAsync bool, backAsync bool) {
-	mc.isForwardAsync = append(mc.isForwardAsync, fwdAsync)
-	mc.isBackwardAsync = append(mc.isBackwardAsync, backAsync)
+func (mc *MiddlewareChain) AddMiddleware(m Middleware) {
 	mc.middlewares = append(mc.middlewares, m)
+}
+
+func (mc *MiddlewareChain) AddRequestMiddleware(requestMiddleware MiddlewareFunc) {
+	mc.AddMiddleware(&FunctionMiddleware{requestMiddleware, nil})
+}
+
+func (mc *MiddlewareChain) AddResponseMiddleware(responseMiddleware MiddlewareFunc) {
+	mc.AddMiddleware(&FunctionMiddleware{responseMiddleware, nil})
+}
+
+func (mc *MiddlewareChain) Add(requestMiddleware MiddlewareFunc, responseMiddleware MiddlewareFunc) {
+	mc.AddMiddleware(&FunctionMiddleware{requestMiddleware, responseMiddleware})
 }
 
 func (m *MiddlewareChain) Prev() bool {
@@ -143,17 +125,21 @@ func (mchain *MiddlewareChain) Apply(handler RequestHandlerFunc) HttpHandlerFunc
 	// apply middleware 1
 	// get its result (either sync or async)
 	// if error then stop and start unwinding back the middleware chain
+	if mchain.Current() == nil {
+		return func(rw http.ResponseWriter, request *http.Request) {
+			handler(rw, request, nil)
+		}
+	}
 	return func(rw http.ResponseWriter, request *http.Request) {
 		context := NewRequestContext()
 		forward := true
+		var result MiddlewareResult
 		for {
 			middleware := mchain.Current()
-			result := middleware(forward, rw, request, context)
-
-			// wait for async results
-			for result.IsAsync() {
-				value_chan := result.value.(chan MiddlewareResult)
-				result = <-value_chan
+			if forward {
+				result = middleware.ProcessRequest(rw, request, context)
+			} else {
+				result = middleware.ProcessResponse(rw, request, context)
 			}
 
 			if result.Error() != nil {

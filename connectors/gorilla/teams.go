@@ -8,6 +8,8 @@ import (
 
 func (s *Server) CreateTeamHandler() RequestHandlerFunc {
 	return func(rw http.ResponseWriter, request *http.Request, context *RequestContext) {
+		if context.Get("user") == nil {
+		}
 		log.Println("Create Teams")
 	}
 }

@@ -1,0 +1,30 @@
+package gorilla
+
+/**
+ * Request context stores all data related to a request handling sessions.
+ */
+type RequestContext struct {
+	errors []error
+	data   map[string]interface{}
+}
+
+func NewRequestContext() *RequestContext {
+	rc := RequestContext{data: make(map[string]interface{})}
+	return &rc
+}
+
+func (rc *RequestContext) AddError(err error) {
+	rc.errors = append(rc.errors, err)
+}
+
+func (rc *RequestContext) Set(key string, value interface{}) {
+	rc.data[key] = value
+}
+
+func (rc *RequestContext) Get(key string) interface{} {
+	return rc.data[key]
+}
+
+func (rc *RequestContext) Errors() []error {
+	return rc.errors
+}
