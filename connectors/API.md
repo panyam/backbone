@@ -37,7 +37,9 @@ API is divided into following sections:
 ### Confirm a registration
 
 **Endpoints:** POST /users/&lt;username&gt;/confirm/&lt;registrationid&gt;
+
 **Auth Required:** NO
+
 **Parameters:**
 - verification_code: A verification code if it was present.
 
