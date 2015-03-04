@@ -57,16 +57,18 @@ func (auth *SignedUrlAuthenticator) AuthenticateRequest(req *http.Request) (*htt
 	params["access_token"] = append(make([]string, 0, 0), auth.AccessToken)
 
 	// create an array to sort the params first for normalisation
-	mk := make([]string, len(params))
-	i := 0
+	mk := make([]string, 0, 0)
+	// take keys that dont start with __ and sort them
 	for key := range params {
-		mk[i] = key
-		i++
+		if strings.HasPrefix(key, "__") {
+			mk = append(mk, key)
+		}
 	}
 	sort.Strings(mk)
 
 	for i := range mk {
 		values := params[mk[i]]
+		// does the order matter?
 		sort.Strings(values)
 		joinedValues := strings.Join(values, ",")
 		sigString += mk[i] + joinedValues
@@ -77,7 +79,7 @@ func (auth *SignedUrlAuthenticator) AuthenticateRequest(req *http.Request) (*htt
 	io.WriteString(hasher, sigString)
 	sig := hex.EncodeToString(hasher.Sum(nil))
 
-	returnUrl += "sig=" + sig
+	returnUrl += "__sig=" + sig
 	req.URL, err = url.Parse(baseUrl + returnUrl)
 	return req, err
 }
@@ -88,5 +90,13 @@ type DebugAuthenticator struct {
 
 func (auth *DebugAuthenticator) AuthenticateRequest(req *http.Request) (*http.Request, error) {
 	// Append the username param to a request
-	return req, nil
+	baseUrl := req.URL.Host + "/" + req.URL.Path
+	query = req.URL.RawQuery
+	if query != "" {
+		query += "&"
+	}
+	query += ("__user" + "=" + auth.Username)
+	url = baseUrl + "?" + query
+	req.URL, err = url.Parse(baseUrl + returnUrl)
+	return req, err
 }

@@ -1,10 +1,11 @@
-package gorilla
+package middleware
 
 import (
 	"net/http"
-	// "log"
-	// "time"
 )
+
+type HttpHandlerFunc func(http.ResponseWriter, *http.Request)
+type RequestHandlerFunc func(http.ResponseWriter, *http.Request, *RequestContext)
 
 /**
  * Middleware functions can be applied to request in a modular fashion.

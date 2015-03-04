@@ -17,9 +17,6 @@ type Server struct {
 	store          *sessions.CookieStore
 }
 
-type HttpHandlerFunc func(http.ResponseWriter, *http.Request)
-type RequestHandlerFunc func(http.ResponseWriter, *http.Request, *RequestContext)
-
 func NewServer() *Server {
 	return &Server{}
 }

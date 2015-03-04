@@ -1,23 +1,10 @@
-package auth
+package middleware
 
 import (
-	"github.com/gorilla/sessions"
+	// "github.com/gorilla/sessions"
 	"log"
 	"net/http"
 )
-
-type RequestContext interface {
-	AddError(err error)
-	Set(key string, value interface{})
-	Get(key string) interface{}
-}
-
-/**
- * Applies auth over a few methods to get a User object.
- */
-func AuthMiddleware(forward bool, rw http.ResponseWriter,
-	request *http.Request, context *RequestContext) MiddlewareResult {
-}
 
 func PasswordValidator() {
 }
