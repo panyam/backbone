@@ -53,6 +53,7 @@ func (s *Server) DefaultMiddleware(requiresUser bool) *MiddlewareChain {
 }
 
 func (s *Server) Run() {
+	log.Println("Starting http server...")
 	r := mux.NewRouter()
 
 	mwWithLogin := s.DefaultMiddleware(true)
@@ -71,6 +72,10 @@ func (s *Server) Run() {
 	apiRouter := s.createApiRouter(r)
 	http.Handle("/api/", apiRouter)
 	log.Fatal(http.ListenAndServe(":3000", nil))
+}
+
+func (s *Server) Stop() {
+	log.Println("Stopping http server...")
 }
 
 func (s *Server) createApiRouter(parent *mux.Router) *mux.Router {

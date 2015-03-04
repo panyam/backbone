@@ -14,11 +14,6 @@ type Channel struct {
 	Id string
 
 	/**
-	 * Type of channel.
-	 */
-	ChannelType string
-
-	/**
 	 * Name/Label of this channel.
 	 */
 	Name string
@@ -64,6 +59,9 @@ type Channel struct {
 	// org or a team and have all channels under that group be unique without
 	// worrying about the ownership structure and domain of the channel
 	Group string
+
+	// Metadata associated with the channel
+	MetaData map[string]interface{}
 }
 
 type Message struct {
@@ -83,6 +81,11 @@ type Message struct {
 	Sender *User
 
 	/**
+	 * When the message was sent.
+	 */
+	SentAt time.Time
+
+	/**
 	 * Type of message - eg, "invite", "status", "command", "event" etc
 	 * This is normally only required when we do integrations so these
 	 * messages could be sent by bots or other APIs
@@ -90,36 +93,18 @@ type Message struct {
 	MsgType string
 
 	/**
-	 * Tells how long this message needs to be persisted for.
-	 * This is useful for messages that can expire or destruct after a certain
-	 * time or for status updates that dont even require persistence.
-	 * If this value is 0 then message is not persisted.
-	 * If this is -ve then it is persisted for ever.
+	 * Whether message is to be persisted or not.  When a message is not
+	 * persisted it is only sent to the users that are reachable.
 	 */
-	MaxAge int64
-
-	/**
-	 * 0 = Target all users in the channel (Default)
-	 * 1 = Target only users specified in Recipients list (if empty, no users
-	 * will be targetted)
-	 */
-	TargetPolicy int
+	Persist bool
 
 	/**
 	 * All the message fragments.
 	 */
 	Fragments []*MessageFragment
 
-	/**
-	 * Receivers of this message.   If it is nil or empty it is to all users in
-	 * the channel it is posted to.
-	 */
-	Recipients []*User
-
-	/**
-	 * When the message was sent.
-	 */
-	SentAt time.Time
+	// Metadata associated with the message
+	MetaData map[string]interface{}
 }
 
 /**
@@ -138,12 +123,11 @@ type MessageFragment struct {
 	Size     int64
 }
 
-func NewMessage(channel *Channel, sender *User, recipients []*User) *Message {
+func NewMessage(channel *Channel, sender *User) *Message {
 	msg := Message{
-		Channel:    channel,
-		Sender:     sender,
-		SentAt:     time.Now(),
-		Recipients: recipients}
+		Channel: channel,
+		Sender:  sender,
+		SentAt:  time.Now()}
 	return &msg
 }
 
