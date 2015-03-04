@@ -84,8 +84,8 @@ func (s *Server) createApiRouter(parent *mux.Router) *mux.Router {
 	mwWithoutLogin := s.DefaultMiddleware(false)
 
 	// Users/Login API
-	accountRouter := apiRouter.PathPrefix("/account").Subrouter()
-	accountRouter.HandleFunc("/register", mwWithoutLogin.Apply(s.AccountRegisterHandler()))
+	accountRouter := apiRouter.PathPrefix("/users").Subrouter()
+	accountRouter.HandleFunc("/register/", mwWithoutLogin.Apply(s.AccountRegisterHandler()))
 	accountRouter.HandleFunc("/login", mwWithoutLogin.Apply(s.AccountLoginHandler()))
 	accountRouter.HandleFunc("/logout", mwWithoutLogin.Apply(s.AccountLogoutHandler()))
 

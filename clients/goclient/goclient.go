@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	// "log"
 	// "os"
 	// "os/exec"
@@ -23,18 +24,27 @@ func NewApiClient(url string) *ApiClient {
 	return &client
 }
 
+func (client *ApiClient) url(path string) string {
+	out := client.Url
+	if strings.HasPrefix(path, "/") {
+		return out + path
+	} else {
+		return out + "/" + path
+	}
+}
+
 func (client *ApiClient) RegisterUser(username string, address_type string,
 	address string, password string) (string, error) {
 	params := map[string]string{
-		username:     username,
-		address_type: address_type,
-		address:      address,
+		"username":     username,
+		"address_type": address_type,
+		"address":      address,
 	}
 	if password != "" {
 		params["password"] = password
 	}
 
-	req, err := MakeRequest("POST", "/users/register/", params, nil)
+	req, err := MakeRequest("POST", client.url("/users/register/"), params, nil)
 	resp, err := SendRequest(req, nil)
 	log.Println("Register Response: ", resp)
 	return "", err
@@ -42,7 +52,7 @@ func (client *ApiClient) RegisterUser(username string, address_type string,
 
 func (client *ApiClient) MakeAuthRequest(method, endpoint string,
 	queryParams map[string]string, body io.Reader) (*http.Request, error) {
-	request, err := MakeRequest(method, endpoint, queryParams, body)
+	request, err := MakeRequest(method, client.url(endpoint), queryParams, body)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +64,7 @@ func (client *ApiClient) MakeAuthRequest(method, endpoint string,
 
 func (client *ApiClient) ConfirmRegistration(registrationId string, verificationCode string) error {
 	params := map[string]string{"verification_code": verificationCode}
-	url := fmt.Sprintf("/registrations/%s/confirm/", registrationId)
+	url := client.url(fmt.Sprintf("/registrations/%s/confirm/", registrationId))
 	req, err := MakeRequest("POST", url, params, nil)
 	resp, err := SendRequest(req, nil)
 	log.Println("Confirm Reg Resp: ", resp)

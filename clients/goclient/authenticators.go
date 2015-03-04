@@ -33,8 +33,8 @@ func (auth *LoginAuthenticator) AuthenticateRequest(req *http.Request) (*http.Re
 		log.Println("Logging in...")
 		// settion session ID cookie on the request
 		params := map[string]string{"password": auth.Password}
-		url := fmt.Sprintf("/users/%s/login/", auth.Username)
-		req, err = MakeRequest("POST", url, params, nil)
+		login_url := fmt.Sprintf("/users/%s/login/", auth.Username)
+		req, err = MakeRequest("POST", login_url, params, nil)
 		resp, err := SendRequest(req, nil)
 		log.Println("Login Response: ", resp, err)
 	}
@@ -91,12 +91,12 @@ type DebugAuthenticator struct {
 func (auth *DebugAuthenticator) AuthenticateRequest(req *http.Request) (*http.Request, error) {
 	// Append the username param to a request
 	baseUrl := req.URL.Host + "/" + req.URL.Path
-	query = req.URL.RawQuery
+	query := req.URL.RawQuery
 	if query != "" {
 		query += "&"
 	}
 	query += ("__user" + "=" + auth.Username)
-	url = baseUrl + "?" + query
-	req.URL, err = url.Parse(baseUrl + returnUrl)
+	var err error
+	req.URL, err = url.Parse(baseUrl + "?" + query)
 	return req, err
 }
