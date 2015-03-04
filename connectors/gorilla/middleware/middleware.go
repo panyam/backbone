@@ -1,11 +1,9 @@
 package middleware
 
 import (
+	. "github.com/panyam/backbone/connectors/gorilla/common"
 	"net/http"
 )
-
-type HttpHandlerFunc func(http.ResponseWriter, *http.Request)
-type RequestHandlerFunc func(http.ResponseWriter, *http.Request, *RequestContext)
 
 /**
  * Middleware functions can be applied to request in a modular fashion.

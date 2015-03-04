@@ -1,4 +1,4 @@
-package middleware
+package common
 
 /**
  * Request context stores all data related to a request handling sessions.

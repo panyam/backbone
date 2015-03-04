@@ -38,7 +38,7 @@ func (am *AuthMiddleware) ProcessRequest(rw http.ResponseWriter, request *http.R
 
 	// none of the validators matched so throw a 401 unauthorized response
 	log.Println("Auth Failed")
-	rw.WriteHeader(401)
+	rw.WriteHeader(http.StatusUnauthorized)
 	return NewMiddlewareResult(nil, errors.New("Unauthorized"))
 }
 

@@ -2,6 +2,7 @@ package gorilla
 
 import (
 	// "github.com/panyam/backbone/services"
+	. "github.com/panyam/backbone/connectors/gorilla/common"
 	"log"
 	"net/http"
 )

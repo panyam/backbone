@@ -3,6 +3,7 @@ package gorilla
 import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
+	"github.com/panyam/backbone/connectors/gorilla/middleware"
 	"github.com/panyam/backbone/models"
 	"github.com/panyam/backbone/services"
 	"log"
@@ -41,8 +42,9 @@ func (s *Server) SetMessageService(svc services.IMessageService) {
 	s.messageService = svc
 }
 
-func (s *Server) DefaultMiddleware(requiresUser bool) *MiddlewareChain {
-	out := NewMiddlewareChain()
+func (s *Server) DefaultMiddleware(requiresUser bool) *middleware.MiddlewareChain {
+	out := middleware.NewMiddlewareChain()
+	out.AddRequestMiddleware(middleware.BodyParserMiddleware)
 	// middleware to create jj
 	if requiresUser {
 	}
