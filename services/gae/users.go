@@ -1,6 +1,7 @@
-package inmem
+package gae
 
 import (
+	// "appengine"
 	"errors"
 	. "github.com/panyam/backbone/models"
 )

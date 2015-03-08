@@ -1,4 +1,4 @@
-package inmem
+package gae
 
 import (
 	// "errors"

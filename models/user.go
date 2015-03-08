@@ -6,19 +6,19 @@ import (
 
 type Team struct {
 	/**
-	 * Unique system wide ID
+	 * Unique system wide ID.
 	 */
 	Id string
-
-	/**
-	 * Organization this team belongs to.
-	 */
-	Organization string
 
 	/**
 	 * Name of this team.
 	 */
 	Name string
+
+	/**
+	 * Organization this team belongs to. (Org + Name must be unique)
+	 */
+	Organization string
 }
 
 /**
@@ -49,12 +49,6 @@ type User struct {
 	 * When the user was created.
 	 */
 	Created time.Time
-
-	/**
-	 * General purpose meta data for the user (may not be required as we are
-	 * *just* focussing on messaging).
-	 */
-	MetaData map[string]interface{}
 }
 
 func NewUser(id string, username string) *User {

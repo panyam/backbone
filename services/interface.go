@@ -99,23 +99,21 @@ type ITeamService interface {
 
 type IChannelService interface {
 	/**
-	 * Lets a user create a channel.  If a channel exists an error is returned.
-	 * If the ID is empty, then it is upto the backend to decide whether to
-	 * throw an error or auto assign an ID.
-	 * A valid Channel object on return WILL have an ID if the backend can
-	 * auto generate IDs
+	 * Creates a channel.
+	 * If the channel's ID parameter is not set then a new channel is created.
+	 * If the ID parameter IS set:
+	 * 		if override parameter is true, the channel is upserted (updated if it
+	 * 		existed, otherwise created).
+	 * 		If the override parameter is false, then the channel is only saved
+	 * 		if it does not already exist and returns a ChannelExists error if an
+	 * 		existing channel with the same ID exists.
 	 */
-	CreateChannel(id string, channelGroup string, channelName string) (*Channel, error)
+	SaveChannel(channel *Channel, override bool) error
 
 	/**
-	 * Retrieve all channels in a particular group.
+	 * Get channel by Id
 	 */
-	GetChannelsInGroup(group string, offset int, count int) ([]*Channel, error)
-
-	/**
-	 * Retrieve a channel by name within a particular group if it exists.
-	 */
-	GetChannelByName(group string, name string) (*Channel, error)
+	GetChannelById(id string) (*Channel, error)
 
 	/**
 	 * Delete a channel.
@@ -123,9 +121,9 @@ type IChannelService interface {
 	DeleteChannel(channel *Channel) error
 
 	/**
-	 * Returns the channels the user belongs to.
+	 * Returns the channels the user belongs to in a given team.
 	 */
-	ListChannels(user *User) ([]*Channel, error)
+	ListChannels(user *User, team *Team) ([]*Channel, error)
 
 	/**
 	 * Lets a user to join a channel (if allowed)
@@ -133,19 +131,9 @@ type IChannelService interface {
 	JoinChannel(channel *Channel, user *User) error
 
 	/**
-	 * Tells if a user belongs to a channel.
-	 */
-	ChannelContains(channel *Channel, user *User) bool
-
-	/**
 	 * Lets a user leave a channel or be kicked out.
 	 */
 	LeaveChannel(channel *Channel, user *User) error
-
-	/**
-	 * Invite a user to a channel.
-	 */
-	InviteToChannel(inviter *User, invitee *User, channel *Channel) error
 }
 
 type IMessageService interface {
