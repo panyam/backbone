@@ -1,4 +1,4 @@
-package models
+package core
 
 import (
 	"time"
@@ -57,7 +57,7 @@ type Channel struct {
 	Status string
 
 	// A channel can be created by forking out of a message (like a seperate thread)
-	Parent *Message
+	ParentMessage *Message
 
 	// Metadata associated with the channel
 	MetaData map[string]interface{}

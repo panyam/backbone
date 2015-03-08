@@ -2,12 +2,10 @@ package gae
 
 import (
 	"appengine"
-	"appengine/aetest"
 	"appengine/datastore"
 	"errors"
 	"fmt"
 	. "github.com/panyam/backbone/services/core"
-	"log"
 )
 
 type ChannelService struct {
@@ -20,14 +18,6 @@ func NewChannelService(ctx appengine.Context) *ChannelService {
 	svc.Cls = &svc
 	svc.context = ctx
 	return &svc
-}
-
-func MockChannelService() *ChannelService {
-	ctx, err := aetest.NewContext(nil)
-	if err != nil {
-		log.Println("NewContext error: ", err)
-	}
-	return NewChannelService(ctx)
 }
 
 func (c *ChannelService) SaveChannel(channel *Channel, override bool) error {

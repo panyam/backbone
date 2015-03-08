@@ -1,22 +1,22 @@
 package gae
 
 import (
-	// "appengine"
+	"appengine"
+	"appengine/datastore"
 	"errors"
+	"fmt"
 	. "github.com/panyam/backbone/services/core"
 )
 
 type UserService struct {
-	Cls         interface{}
-	usersById   map[string]*User
-	usersByName map[string]*User
+	Cls     interface{}
+	context appengine.Context
 }
 
-func NewUserService() *UserService {
+func NewUserService(ctx appengine.Context) *UserService {
 	svc := UserService{}
 	svc.Cls = &svc
-	svc.usersById = make(map[string]*User)
-	svc.usersByName = make(map[string]*User)
+	svc.context = ctx
 	return &svc
 }
 

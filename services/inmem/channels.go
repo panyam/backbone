@@ -3,6 +3,7 @@ package inmem
 import (
 	"errors"
 	"fmt"
+	. "github.com/panyam/backbone/services/core"
 )
 
 type ChannelService struct {
