@@ -3,7 +3,7 @@ package gae
 import (
 	// "appengine"
 	"errors"
-	. "github.com/panyam/backbone/models"
+	. "github.com/panyam/backbone/services/core"
 )
 
 type UserService struct {

@@ -2,7 +2,7 @@ package inmem
 
 import (
 	"errors"
-	. "github.com/panyam/backbone/models"
+	. "github.com/panyam/backbone/services/core"
 )
 
 type UserService struct {

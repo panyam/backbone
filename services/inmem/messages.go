@@ -1,10 +1,6 @@
 package inmem
 
-import (
-	// "errors"
-	// "fmt"
-	. "github.com/panyam/backbone/models"
-)
+import ()
 
 type MessageService struct {
 	Cls               interface{}

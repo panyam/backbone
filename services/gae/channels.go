@@ -2,10 +2,12 @@ package gae
 
 import (
 	"appengine"
+	"appengine/aetest"
 	"appengine/datastore"
 	"errors"
 	"fmt"
-	. "github.com/panyam/backbone/models"
+	. "github.com/panyam/backbone/services/core"
+	"log"
 )
 
 type ChannelService struct {
@@ -13,20 +15,23 @@ type ChannelService struct {
 	context appengine.Context
 }
 
-func NewChannelService() *ChannelService {
+func NewChannelService(ctx appengine.Context) *ChannelService {
 	svc := ChannelService{}
 	svc.Cls = &svc
+	svc.context = ctx
 	return &svc
 }
 
-const CHANNEL_ENTITY = "Channel"
-
-func (c *ChannelService) KeyFor(id string) *datastore.Key {
-	return datastore.NewKey(c.context, CHANNEL_ENTITY, id, 0, nil)
+func MockChannelService() *ChannelService {
+	ctx, err := aetest.NewContext(nil)
+	if err != nil {
+		log.Println("NewContext error: ", err)
+	}
+	return NewChannelService(ctx)
 }
 
 func (c *ChannelService) SaveChannel(channel *Channel, override bool) error {
-	key := c.KeyFor(channel.Id)
+	key := ChannelKeyFor(c.context, channel.Id)
 	if channel.Id == "" {
 		key, err := datastore.Put(c.context, key, channel)
 		if err == nil {
@@ -66,7 +71,7 @@ func (c *ChannelService) SaveChannel(channel *Channel, override bool) error {
  */
 func (c *ChannelService) GetChannelById(id string) (*Channel, error) {
 	var channel Channel
-	key := c.KeyFor(id)
+	key := ChannelKeyFor(c.context, id)
 	err := datastore.Get(c.context, key, &channel)
 	return &channel, err
 }
@@ -75,7 +80,7 @@ func (c *ChannelService) GetChannelById(id string) (*Channel, error) {
  * Delete a channel.
  */
 func (c *ChannelService) DeleteChannel(channel *Channel) error {
-	key := c.KeyFor(channel.Id)
+	key := ChannelKeyFor(c.context, channel.Id)
 	return datastore.Delete(c.context, key)
 }
 
@@ -107,7 +112,7 @@ func (c *ChannelService) LeaveChannel(channel *Channel, user *User) error {
  * Returns the channels the user belongs to.
  */
 func (c *ChannelService) ListChannels(user *User, team *Team) ([]*Channel, error) {
-	query := datastore.NewQuery(CHANNEL_ENTITY).Filter("Participants =", user).Filter("Team =", team)
+	query := datastore.NewQuery("Channel").Filter("Participants =", user).Filter("Team =", team)
 	t := query.Run(c.context)
 	out := make([]*Channel, 0, 100)
 	for {

@@ -3,7 +3,6 @@ package inmem
 import (
 	"errors"
 	"fmt"
-	. "github.com/panyam/backbone/models"
 )
 
 type TeamService struct {

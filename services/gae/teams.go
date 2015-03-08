@@ -3,7 +3,7 @@ package gae
 import (
 	"errors"
 	"fmt"
-	. "github.com/panyam/backbone/models"
+	. "github.com/panyam/backbone/services/core"
 )
 
 type TeamService struct {
