@@ -28,20 +28,18 @@ type Team struct {
  */
 type User struct {
 	/**
-	 * This system is unique system wide and is not settable by the client.
+	 * GUID.
 	 */
 	Id string
 
 	/**
-	 * The user name for the user.
+	 * The username that is unique within the team for this user.
 	 */
 	Username string
 
 	/**
 	 * The team the user belongs to.
 	 * The combination of Team/Username *has* to be unique.
-	 * This gets set by the creator/owner of the team/org.  Why is the team a
-	 * big deal?  We could have a "sri" in two different teams.
 	 */
 	Team *Team
 
@@ -49,6 +47,11 @@ type User struct {
 	 * When the user was created.
 	 */
 	Created time.Time
+
+	/**
+	 * Status of the user account.
+	 */
+	Status int
 }
 
 func NewUser(id string, username string) *User {

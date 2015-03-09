@@ -26,17 +26,22 @@ type IUserService interface {
 	GetUserById(id string) (*User, error)
 
 	/**
-	 * Get a user by username.
+	 * Get a user by username in a particular team.
 	 */
-	GetUser(username string) (*User, error)
+	GetUser(username string, team *Team) (*User, error)
 
 	/**
-	 * Saves a user details.
-	 * If the user id or username does not exist an error is thrown.
-	 * If the username or user id already exist and are not the same
-	 * object then an error is thrown.
+	 * Saves a user.
+	 * 	If the ID param is empty:
+	 * 		If username/team does not already exist a new one is created.
+	 * 		otherwise, it is updated and returned if override=true otherwise
+	 * 		false is returned.
+	 * 	Otherwise:
+	 * 		If username/team does not exist then it is written as is (Create or Update)
+	 * 		otherwise if IDs of curr and existing are different errow is thrown,
+	 * 		otherwise object is updated.
 	 */
-	SaveUser(user *User) error
+	SaveUser(user *User, override bool) error
 
 	/**
 	 * Deletes a user from the sytem
