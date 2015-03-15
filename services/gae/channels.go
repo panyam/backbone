@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	. "github.com/panyam/backbone/services/core"
+	"log"
 )
 
 type ChannelService struct {
@@ -116,4 +117,17 @@ func (c *ChannelService) ListChannels(user *User, team *Team) ([]*Channel, error
 		out = append(out, &channel)
 	}
 	return out, nil
+}
+
+/**
+ * Removes all entries.
+ */
+func (svc *ChannelService) RemoveAllChannels() {
+	var objs []Channel
+	q := datastore.NewQuery("Channel").KeysOnly()
+	keys, err := q.GetAll(svc.context, &objs)
+	if err != nil {
+		log.Println("RemoveAll Error: ", err)
+	}
+	datastore.DeleteMulti(svc.context, keys)
 }

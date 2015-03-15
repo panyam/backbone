@@ -1,20 +1,23 @@
 package gae
 
 import (
-	// "errors"
-	// "fmt"
+	"appengine"
+	"appengine/datastore"
 	. "github.com/panyam/backbone/services/core"
+	"log"
 )
 
 type MessageService struct {
 	Cls               interface{}
+	context           appengine.Context
 	messageCounter    int64
 	messagesInChannel map[string][]*Message
 }
 
-func NewMessageService() *MessageService {
+func NewMessageService(ctx appengine.Context) *MessageService {
 	svc := MessageService{}
 	svc.Cls = &svc
+	svc.context = ctx
 	svc.messagesInChannel = make(map[string][]*Message)
 	return &svc
 }
@@ -70,4 +73,16 @@ func (m *MessageService) DeleteMessage(message *Message) error {
  */
 func (m *MessageService) SaveMessage(message *Message) error {
 	return nil
+}
+
+/**
+ * Removes all messages.
+ */
+func (svc *MessageService) RemoveAllMessages() {
+	q := datastore.NewQuery("Message").KeysOnly()
+	keys, err := q.GetAll(svc.context, nil)
+	if err != nil {
+		log.Println("RemoveAll Error: ", err)
+	}
+	datastore.DeleteMulti(svc.context, keys)
 }

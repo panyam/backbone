@@ -21,6 +21,11 @@ type IIDService interface {
  */
 type IUserService interface {
 	/**
+	 * Removes all entries.
+	 */
+	RemoveAllUsers()
+
+	/**
 	 * Get user info by ID
 	 */
 	GetUserById(id string) (*User, error)
@@ -42,24 +47,14 @@ type IUserService interface {
 	 * 		otherwise object is updated.
 	 */
 	SaveUser(user *User, override bool) error
-
-	/**
-	 * Deletes a user from the sytem
-	 */
-	// DeleteUser(user *User) error
-
-	/**
-	 * Create a user with the given id and username.
-	 * If the ID or Username already exists an error is thrown.
-	 * If the ID is empty, then it is upto the backend to decide whether to
-	 * throw an error or auto assign an ID.
-	 * A valid User object on return WILL have an ID if the backend can
-	 * auto generate IDs
-	 */
-	CreateUser(id string, username string) (*User, error)
 }
 
 type ITeamService interface {
+	/**
+	 * Removes all entries.
+	 */
+	RemoveAllTeams()
+
 	/**
 	 * Create a team.
 	 * If the ID is empty, then it is upto the backend to decide whether to
@@ -102,6 +97,11 @@ type ITeamService interface {
 
 type IChannelService interface {
 	/**
+	 * Removes all entries.
+	 */
+	RemoveAllChannels()
+
+	/**
 	 * Creates a channel.
 	 * If the channel's ID parameter is not set then a new channel is created.
 	 * If the ID parameter IS set:
@@ -140,6 +140,11 @@ type IChannelService interface {
 }
 
 type IMessageService interface {
+	/**
+	 * Removes all entries.
+	 */
+	RemoveAllMessages()
+
 	/**
 	 * Get the messages in a channel for a particular user.
 	 */

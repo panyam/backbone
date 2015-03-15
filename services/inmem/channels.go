@@ -10,15 +10,12 @@ type ChannelService struct {
 	Cls            interface{}
 	channelCounter int64
 	channelsById   map[string]*Channel
-	usersById      map[string]*User
 }
 
 func NewChannelService() *ChannelService {
 	svc := ChannelService{}
 	svc.Cls = &svc
-	svc.channelCounter = 1
-	svc.channelsById = make(map[string]*Channel)
-	svc.usersById = make(map[string]*User)
+	svc.RemoveAllChannels()
 	return &svc
 }
 
@@ -92,4 +89,12 @@ func (c *ChannelService) ListChannels(user *User, team *Team) ([]*Channel, error
 		}
 	}
 	return out, nil
+}
+
+/**
+ * Removes all entries.
+ */
+func (svc *ChannelService) RemoveAllChannels() {
+	svc.channelCounter = 1
+	svc.channelsById = make(map[string]*Channel)
 }

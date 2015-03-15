@@ -17,10 +17,7 @@ type TeamService struct {
 func NewTeamService() *TeamService {
 	svc := TeamService{}
 	svc.Cls = &svc
-	svc.teamCounter = 1
-	svc.teamsById = make(map[string]*Team)
-	svc.teamsByKey = make(map[string]*Team)
-	svc.usersById = make(map[string]*User)
+	svc.RemoveAllTeams()
 	return &svc
 }
 
@@ -113,4 +110,14 @@ func (c *TeamService) LeaveTeam(team *Team, user *User) error {
  */
 func (c *TeamService) InviteToTeam(inviter *User, invitee *User, team *Team) error {
 	return nil
+}
+
+/**
+ * Removes all entries.
+ */
+func (svc *TeamService) RemoveAllTeams() {
+	svc.teamCounter = 1
+	svc.teamsById = make(map[string]*Team)
+	svc.teamsByKey = make(map[string]*Team)
+	svc.usersById = make(map[string]*User)
 }

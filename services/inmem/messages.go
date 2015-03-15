@@ -13,7 +13,7 @@ type MessageService struct {
 func NewMessageService() *MessageService {
 	svc := MessageService{}
 	svc.Cls = &svc
-	svc.messagesInChannel = make(map[string][]*Message)
+	svc.RemoveAllMessages()
 	return &svc
 }
 
@@ -68,4 +68,12 @@ func (m *MessageService) DeleteMessage(message *Message) error {
  */
 func (m *MessageService) SaveMessage(message *Message) error {
 	return nil
+}
+
+/**
+ * Removes all entries.
+ */
+func (svc *MessageService) RemoveAllMessages() {
+	svc.messageCounter = 0
+	svc.messagesInChannel = make(map[string][]*Message)
 }

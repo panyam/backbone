@@ -5,6 +5,7 @@ import (
 	"appengine/datastore"
 	"fmt"
 	. "github.com/panyam/backbone/services/core"
+	"log"
 )
 
 type UserService struct {
@@ -26,6 +27,9 @@ func (s *UserService) GetUserById(id string) (*User, error) {
 	var user User
 	key := ChannelKeyFor(s.context, id)
 	err := datastore.Get(s.context, key, &user)
+	if err != nil {
+		return nil, err
+	}
 	return &user, err
 }
 
@@ -74,6 +78,8 @@ func (s *UserService) SaveUser(user *User, override bool) error {
 			key, err = datastore.Put(c, key, user)
 			if err == nil {
 				user.Id = key.StringID()
+			} else {
+				log.Println(" =========== Daaaaaaaaaamn: ", err)
 			}
 		} else if err == nil {
 			// found existing username/team
@@ -97,4 +103,16 @@ func (s *UserService) SaveUser(user *User, override bool) error {
 		}
 		return err
 	}, nil)
+}
+
+/**
+ * Removes all entries.
+ */
+func (svc *UserService) RemoveAllUsers() {
+	q := datastore.NewQuery("User").KeysOnly()
+	keys, err := q.GetAll(svc.context, nil)
+	if err != nil {
+		log.Println("RemoveAll Error: ", err)
+	}
+	datastore.DeleteMulti(svc.context, keys)
 }

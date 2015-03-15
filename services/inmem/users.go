@@ -14,8 +14,7 @@ type UserService struct {
 func NewUserService() *UserService {
 	svc := UserService{}
 	svc.Cls = &svc
-	svc.usersById = make(map[string]*User)
-	svc.usersByName = make(map[string]*User)
+	svc.RemoveAllUsers()
 	return &svc
 }
 
@@ -29,7 +28,7 @@ func (s *UserService) GetUserById(id string) (*User, error) {
 /**
 * Get a user by username.
  */
-func (s *UserService) GetUser(username string) (*User, error) {
+func (s *UserService) GetUser(username string, team *Team) (*User, error) {
 	return s.usersByName[username], nil
 }
 
@@ -49,6 +48,28 @@ func (s *UserService) CreateUser(id string, username string) (*User, error) {
 	return newuser, nil
 }
 
-func (s *UserService) SaveUser(user *User) error {
+/**
+ * Saves a user.
+ * 	If the ID param is empty:
+ * 		If username/team does not already exist a new one is created.
+ * 		otherwise, it is updated and returned if override=true otherwise
+ * 		false is returned.
+ * 	Otherwise:
+ * 		If username/team does not exist then it is written as is (Create or Update)
+ * 		otherwise if IDs of curr and existing are different errow is thrown,
+ * 		otherwise object is updated.
+ */
+func (s *UserService) SaveUser(user *User, override bool) error {
+	if user.Id == "" {
+	} else {
+	}
 	return nil
+}
+
+/**
+ * Removes all entries.
+ */
+func (svc *UserService) RemoveAllUsers() {
+	svc.usersById = make(map[string]*User)
+	svc.usersByName = make(map[string]*User)
 }
