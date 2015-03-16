@@ -10,32 +10,29 @@ import (
 )
 
 func (s *TestSuite) TestCreateMessageService(c *C) {
-	svg := CreateServiceGroup()
-	svc := svg.MessageService
+	svc := s.serviceGroup.MessageService
 	c.Assert(svc, Not(Equals), nil)
 }
 
 func (s *TestSuite) TestGetMessages(c *C) {
-	svg := CreateServiceGroup()
-	chsvc := svg.ChannelService
+	chsvc := s.serviceGroup.ChannelService
 	team := NewTeam("superteam", "superorg", "Super Team")
 	channel := NewChannel(team, "", "test", "group")
 	chsvc.SaveChannel(channel, true)
 
-	msgsvc := svg.MessageService
+	msgsvc := s.serviceGroup.MessageService
 	msgs, _ := msgsvc.GetMessages(channel, nil, 0, -1)
 	c.Assert(len(msgs), Equals, 0)
 }
 
 func (s *TestSuite) TestCreateMessage(c *C) {
-	svg := CreateServiceGroup()
-	chsvc := svg.ChannelService
-	team, _ := svg.TeamService.CreateTeam("1", "org", "team")
+	chsvc := s.serviceGroup.ChannelService
+	team, _ := s.serviceGroup.TeamService.CreateTeam("1", "org", "team")
 	channel := NewChannel(team, "", "test", "group")
 	err := chsvc.SaveChannel(channel, true)
 
-	usersvc := svg.UserService
-	msgsvc := svg.MessageService
+	usersvc := s.serviceGroup.UserService
+	msgsvc := s.serviceGroup.MessageService
 
 	sender := User{Username: "user1", Team: team}
 	err := usersvc.SaveUser(&sender, false)
@@ -48,14 +45,13 @@ func (s *TestSuite) TestCreateMessage(c *C) {
 }
 
 func (s *TestSuite) TestDeleteMessage(c *C) {
-	svg := CreateServiceGroup()
-	chsvc := svg.ChannelService
+	chsvc := s.serviceGroup.ChannelService
 	team := NewTeam("superteam", "superorg", "Super Team")
 	channel := NewChannel(team, "", "test", "group")
 	err := chsvc.SaveChannel(channel, true)
 
-	usersvc := svg.UserService
-	msgsvc := svg.MessageService
+	usersvc := s.serviceGroup.UserService
+	msgsvc := s.serviceGroup.MessageService
 	sender, _ := usersvc.CreateUser("1", "user1")
 	message := NewMessage(channel, sender)
 	err = msgsvc.CreateMessage(message)

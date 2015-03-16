@@ -1,5 +1,6 @@
 package services
 
+/*
 import (
 	. "github.com/panyam/backbone/services/core"
 	. "gopkg.in/check.v1"
@@ -20,8 +21,6 @@ func (s *TestSuite) TestSaveUserEmptyId_ShouldCreateId(c *C) {
 	fetched_user, _ = svc.GetUser("user1", team)
 	c.Assert(fetched_user, Equals, user)
 }
-
-/*
 
 func (s *TestSuite) TestCreateUserService(c *C) {
 	svc := s.serviceGroup.UserService

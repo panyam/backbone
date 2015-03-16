@@ -8,7 +8,7 @@ type Team struct {
 	/**
 	 * Unique system wide ID.
 	 */
-	Id string
+	Id int64
 
 	/**
 	 * Name of this team.
@@ -30,7 +30,7 @@ type User struct {
 	/**
 	 * GUID.
 	 */
-	Id string
+	Id int64
 
 	/**
 	 * The username that is unique within the team for this user.
@@ -54,12 +54,12 @@ type User struct {
 	Status int
 }
 
-func NewUser(id string, username string) *User {
+func NewUser(id int64, username string) *User {
 	user := User{Id: id, Username: username}
 	return &user
 }
 
-func NewTeam(id string, org string, name string) *Team {
+func NewTeam(id int64, org string, name string) *Team {
 	team := Team{Id: id, Organization: org, Name: name}
 	return &team
 }

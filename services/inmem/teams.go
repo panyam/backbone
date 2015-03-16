@@ -2,16 +2,15 @@ package inmem
 
 import (
 	"errors"
-	"fmt"
 	. "github.com/panyam/backbone/services/core"
 )
 
 type TeamService struct {
 	Cls         interface{}
 	teamCounter int64
-	teamsById   map[string]*Team
+	teamsById   map[int64]*Team
 	teamsByKey  map[string]*Team
-	usersById   map[string]*User
+	usersById   map[int64]*User
 }
 
 func NewTeamService() *TeamService {
@@ -24,13 +23,13 @@ func NewTeamService() *TeamService {
 /**
  * Lets a user create a team.
  */
-func (c *TeamService) CreateTeam(id string, org string, name string) (*Team, error) {
+func (c *TeamService) CreateTeam(id int64, org string, name string) (*Team, error) {
 	key := org + ":" + name
 	if _, ok := c.teamsByKey[key]; ok {
 		return nil, errors.New("Team already exists with org and name")
 	}
-	if id == "" {
-		id = fmt.Sprintf("%d", c.teamCounter)
+	if id == 0 {
+		id = c.teamCounter
 	} else if _, ok := c.teamsById[id]; ok {
 		return nil, errors.New("Team already exists by ID")
 	}
@@ -117,7 +116,7 @@ func (c *TeamService) InviteToTeam(inviter *User, invitee *User, team *Team) err
  */
 func (svc *TeamService) RemoveAllTeams() {
 	svc.teamCounter = 1
-	svc.teamsById = make(map[string]*Team)
+	svc.teamsById = make(map[int64]*Team)
 	svc.teamsByKey = make(map[string]*Team)
-	svc.usersById = make(map[string]*User)
+	svc.usersById = make(map[int64]*User)
 }

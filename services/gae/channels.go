@@ -23,10 +23,10 @@ func NewChannelService(ctx appengine.Context) *ChannelService {
 
 func (c *ChannelService) SaveChannel(channel *Channel, override bool) error {
 	key := ChannelKeyFor(c.context, channel.Id)
-	if channel.Id == "" {
+	if channel.Id == 0 {
 		key, err := datastore.Put(c.context, key, channel)
 		if err == nil {
-			channel.Id = key.StringID()
+			channel.Id = key.IntID()
 		}
 		return err
 	}
@@ -34,7 +34,7 @@ func (c *ChannelService) SaveChannel(channel *Channel, override bool) error {
 	if override {
 		key, err := datastore.Put(c.context, key, channel)
 		if err == nil {
-			channel.Id = key.StringID()
+			channel.Id = key.IntID()
 		}
 		return err
 	}
@@ -50,7 +50,7 @@ func (c *ChannelService) SaveChannel(channel *Channel, override bool) error {
 			err = errors.New("Channel already exist")
 		} else {
 			key, err = datastore.Put(c, key, channel)
-			channel.Id = key.StringID()
+			channel.Id = key.IntID()
 		}
 		return err
 	}, nil)
@@ -60,7 +60,7 @@ func (c *ChannelService) SaveChannel(channel *Channel, override bool) error {
 /**
  * Retrieve a channel by ID
  */
-func (c *ChannelService) GetChannelById(id string) (*Channel, error) {
+func (c *ChannelService) GetChannelById(id int64) (*Channel, error) {
 	var channel Channel
 	key := ChannelKeyFor(c.context, id)
 	err := datastore.Get(c.context, key, &channel)

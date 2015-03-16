@@ -11,7 +11,7 @@ type Channel struct {
 	/**
 	 * Globally unique Channel ID.
 	 */
-	Id string
+	Id int64
 
 	/**
 	 * Team this channel belongs to.   Mandatory.
@@ -63,7 +63,7 @@ type Channel struct {
 	MetaData map[string]interface{}
 }
 
-func NewChannel(team *Team, id string, name string, group string) *Channel {
+func NewChannel(team *Team, id int64, name string, group string) *Channel {
 	return &Channel{Team: team, Id: id, Name: name, Group: group}
 }
 

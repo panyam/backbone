@@ -23,7 +23,7 @@ func NewUserService(ctx appengine.Context) *UserService {
 /**
  * Get user info by ID
  */
-func (s *UserService) GetUserById(id string) (*User, error) {
+func (s *UserService) GetUserById(id int64) (*User, error) {
 	var user User
 	key := ChannelKeyFor(s.context, id)
 	err := datastore.Get(s.context, key, &user)
@@ -71,29 +71,29 @@ func (s *UserService) SaveUser(user *User, override bool) error {
 		if err == datastore.Done {
 			// username/team does NOT exist
 			err = nil
-			if user.Id == "" {
+			if user.Id == 0 {
 				// create a new one
 				key = datastore.NewIncompleteKey(c, "User", nil)
 			}
 			key, err = datastore.Put(c, key, user)
 			if err == nil {
-				user.Id = key.StringID()
+				user.Id = key.IntID()
 			} else {
 				log.Println(" =========== Daaaaaaaaaamn: ", err)
 			}
 		} else if err == nil {
 			// found existing username/team
-			if user.Id == "" {
+			if user.Id == 0 {
 				if override {
 					key, err = datastore.Put(c, key, user)
 					if err == nil {
-						user.Id = key.StringID()
+						user.Id = key.IntID()
 					}
 				} else {
 					err = fmt.Errorf("Username/team already exists")
 				}
 			} else {
-				if user.Id == key.StringID() {
+				if user.Id == key.IntID() {
 					// then update
 					key, err = datastore.Put(c, key, user)
 				} else {

@@ -1,6 +1,5 @@
 package services
 
-/*
 import (
 	. "github.com/panyam/backbone/services/core"
 	. "gopkg.in/check.v1"
@@ -9,16 +8,9 @@ import (
 	// "time"
 )
 
-func (s *TestSuite) TestCreateTeamService(c *C) {
-	svg := CreateServiceGroup()
-	svc := svg.TeamService
-	c.Assert(svc, Not(Equals), nil)
-}
-
 func (s *TestSuite) TestCreateTeam(c *C) {
-	svg := CreateServiceGroup()
-	svc := svg.TeamService
-	team, err := svc.CreateTeam("", "group", "test")
+	svc := s.serviceGroup.TeamService
+	team, err := svc.CreateTeam(0, "group", "test")
 	c.Assert(err, Equals, nil)
 	c.Assert(team, Not(Equals), (*Team)(nil))
 	c.Assert(team.Name, Equals, "test")
@@ -28,18 +20,9 @@ func (s *TestSuite) TestCreateTeam(c *C) {
 	c.Assert(team.Name, Equals, "test")
 }
 
+/*
 func (s *TestSuite) TestCreateTeamExistsByName(c *C) {
-	svg := CreateServiceGroup()
-	svc := svg.TeamService
-	team, err := svc.CreateTeam("", "group", "test")
-	team, err = svc.CreateTeam("", "group", "test")
-	c.Assert(err, Not(Equals), nil)
-	c.Assert(team, Equals, (*Team)(nil))
-}
-
-func (s *TestSuite) TestCreateTeamExistsById(c *C) {
-	svg := CreateServiceGroup()
-	svc := svg.TeamService
+	svc := s.serviceGroup.TeamService
 	team, err := svc.CreateTeam("1", "group", "test")
 	team, err = svc.CreateTeam("1", "group2", "test2")
 	c.Assert(err, Not(Equals), nil)
@@ -47,9 +30,8 @@ func (s *TestSuite) TestCreateTeamExistsById(c *C) {
 }
 
 func (s *TestSuite) TestDeleteTeam(c *C) {
-	svg := CreateServiceGroup()
-	svc := svg.TeamService
-	team, err := svc.CreateTeam("", "group", "test")
+	svc := s.serviceGroup.TeamService
+	team, err := svc.CreateTeam(0, "group", "test")
 	c.Assert(err, Equals, nil)
 	c.Assert(team, Not(Equals), (*Team)(nil))
 	svc.DeleteTeam(team)
@@ -59,17 +41,15 @@ func (s *TestSuite) TestDeleteTeam(c *C) {
 }
 
 func (s *TestSuite) TestJoinTeam(c *C) {
-	svg := CreateServiceGroup()
-	svc := svg.TeamService
-	team, _ := svc.CreateTeam("", "group", "test")
+	svc := s.serviceGroup.TeamService
+	team, _ := svc.CreateTeam(0, "group", "test")
 	user := NewUser("1", "user1")
 	svc.JoinTeam(team, user)
 	c.Assert(svc.TeamContains(team, user), Equals, true)
 }
 
 func (s *TestSuite) TestLeaveTeam(c *C) {
-	svg := CreateServiceGroup()
-	svc := svg.TeamService
+	svc := s.serviceGroup.TeamService
 	team, _ := svc.CreateTeam("", "group", "test")
 	user := NewUser("1", "user1")
 	svc.JoinTeam(team, user)

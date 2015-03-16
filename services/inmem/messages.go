@@ -7,7 +7,7 @@ import (
 type MessageService struct {
 	Cls               interface{}
 	messageCounter    int64
-	messagesInChannel map[string][]*Message
+	messagesInChannel map[int64][]*Message
 }
 
 func NewMessageService() *MessageService {
@@ -75,5 +75,5 @@ func (m *MessageService) SaveMessage(message *Message) error {
  */
 func (svc *MessageService) RemoveAllMessages() {
 	svc.messageCounter = 0
-	svc.messagesInChannel = make(map[string][]*Message)
+	svc.messagesInChannel = make(map[int64][]*Message)
 }

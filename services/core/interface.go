@@ -11,7 +11,7 @@ type IIDService interface {
 	/**
 	 * Releases an ID back to the domain.
 	 */
-	ReleaseID(domain string, id string)
+	ReleaseID(domain string, id int64)
 }
 
 /**
@@ -28,7 +28,7 @@ type IUserService interface {
 	/**
 	 * Get user info by ID
 	 */
-	GetUserById(id string) (*User, error)
+	GetUserById(id int64) (*User, error)
 
 	/**
 	 * Get a user by username in a particular team.
@@ -62,7 +62,7 @@ type ITeamService interface {
 	 * A valid Team object on return WILL have an ID if the backend can
 	 * auto generate IDs
 	 */
-	CreateTeam(id string, org string, name string) (*Team, error)
+	CreateTeam(id int64, org string, name string) (*Team, error)
 
 	/**
 	 * Retrieve teams in a org
@@ -116,7 +116,7 @@ type IChannelService interface {
 	/**
 	 * Get channel by Id
 	 */
-	GetChannelById(id string) (*Channel, error)
+	GetChannelById(id int64) (*Channel, error)
 
 	/**
 	 * Delete a channel.

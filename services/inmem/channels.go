@@ -2,14 +2,13 @@ package inmem
 
 import (
 	"errors"
-	"fmt"
 	. "github.com/panyam/backbone/services/core"
 )
 
 type ChannelService struct {
 	Cls            interface{}
 	channelCounter int64
-	channelsById   map[string]*Channel
+	channelsById   map[int64]*Channel
 }
 
 func NewChannelService() *ChannelService {
@@ -23,8 +22,8 @@ func NewChannelService() *ChannelService {
  * Lets a user create a channel.
  */
 func (c *ChannelService) SaveChannel(channel *Channel, override bool) error {
-	if channel.Id == "" {
-		channel.Id = fmt.Sprintf("%d", c.channelCounter)
+	if channel.Id == 0 {
+		channel.Id = c.channelCounter
 		c.channelCounter++
 	} else if _, ok := c.channelsById[channel.Id]; ok && !override {
 		return errors.New("Channel already exists by ID")
@@ -36,7 +35,7 @@ func (c *ChannelService) SaveChannel(channel *Channel, override bool) error {
 /**
  * Retrieve a channel by Name.
  */
-func (c *ChannelService) GetChannelById(id string) (*Channel, error) {
+func (c *ChannelService) GetChannelById(id int64) (*Channel, error) {
 	if channel, ok := c.channelsById[id]; ok {
 		return channel, nil
 	}
@@ -96,5 +95,5 @@ func (c *ChannelService) ListChannels(user *User, team *Team) ([]*Channel, error
  */
 func (svc *ChannelService) RemoveAllChannels() {
 	svc.channelCounter = 1
-	svc.channelsById = make(map[string]*Channel)
+	svc.channelsById = make(map[int64]*Channel)
 }

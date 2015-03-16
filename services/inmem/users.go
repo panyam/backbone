@@ -7,7 +7,7 @@ import (
 
 type UserService struct {
 	Cls         interface{}
-	usersById   map[string]*User
+	usersById   map[int64]*User
 	usersByName map[string]*User
 }
 
@@ -21,7 +21,7 @@ func NewUserService() *UserService {
 /**
  * Get user info by ID
  */
-func (s *UserService) GetUserById(id string) (*User, error) {
+func (s *UserService) GetUserById(id int64) (*User, error) {
 	return s.usersById[id], nil
 }
 
@@ -35,7 +35,7 @@ func (s *UserService) GetUser(username string, team *Team) (*User, error) {
 /**
 * Create a user with the given id and username.
  */
-func (s *UserService) CreateUser(id string, username string) (*User, error) {
+func (s *UserService) CreateUser(id int64, username string) (*User, error) {
 	if _, ok := s.usersById[id]; ok {
 		return nil, errors.New("User id already exists")
 	}
@@ -60,7 +60,7 @@ func (s *UserService) CreateUser(id string, username string) (*User, error) {
  * 		otherwise object is updated.
  */
 func (s *UserService) SaveUser(user *User, override bool) error {
-	if user.Id == "" {
+	if user.Id == 0 {
 	} else {
 	}
 	return nil
@@ -70,6 +70,6 @@ func (s *UserService) SaveUser(user *User, override bool) error {
  * Removes all entries.
  */
 func (svc *UserService) RemoveAllUsers() {
-	svc.usersById = make(map[string]*User)
+	svc.usersById = make(map[int64]*User)
 	svc.usersByName = make(map[string]*User)
 }

@@ -8,7 +8,7 @@ type Message struct {
 	/**
 	 * Message ID - GUID
 	 */
-	Id string
+	Id int64
 
 	/**
 	 * Channel to which this message belongs.
@@ -59,6 +59,7 @@ type MessageReceipt struct {
 
 type MessageFragment struct {
 	MimeType string
+	index    uint32
 	Body     []byte
 	Size     int64
 }

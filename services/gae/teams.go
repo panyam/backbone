@@ -4,7 +4,6 @@ import (
 	"appengine"
 	"appengine/datastore"
 	"errors"
-	"fmt"
 	. "github.com/panyam/backbone/services/core"
 	"log"
 )
@@ -13,9 +12,9 @@ type TeamService struct {
 	Cls         interface{}
 	context     appengine.Context
 	teamCounter int64
-	teamsById   map[string]*Team
+	teamsById   map[int64]*Team
 	teamsByKey  map[string]*Team
-	usersById   map[string]*User
+	usersById   map[int64]*User
 }
 
 func NewTeamService(ctx appengine.Context) *TeamService {
@@ -23,22 +22,22 @@ func NewTeamService(ctx appengine.Context) *TeamService {
 	svc.Cls = &svc
 	svc.context = ctx
 	svc.teamCounter = 1
-	svc.teamsById = make(map[string]*Team)
+	svc.teamsById = make(map[int64]*Team)
 	svc.teamsByKey = make(map[string]*Team)
-	svc.usersById = make(map[string]*User)
+	svc.usersById = make(map[int64]*User)
 	return &svc
 }
 
 /**
  * Lets a user create a team.
  */
-func (c *TeamService) CreateTeam(id string, org string, name string) (*Team, error) {
+func (c *TeamService) CreateTeam(id int64, org string, name string) (*Team, error) {
 	key := org + ":" + name
 	if _, ok := c.teamsByKey[key]; ok {
 		return nil, errors.New("Team already exists with org and name")
 	}
-	if id == "" {
-		id = fmt.Sprintf("%d", c.teamCounter)
+	if id == 0 {
+		id = c.teamCounter
 	} else if _, ok := c.teamsById[id]; ok {
 		return nil, errors.New("Team already exists by ID")
 	}

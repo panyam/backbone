@@ -11,14 +11,14 @@ type MessageService struct {
 	Cls               interface{}
 	context           appengine.Context
 	messageCounter    int64
-	messagesInChannel map[string][]*Message
+	messagesInChannel map[int64][]*Message
 }
 
 func NewMessageService(ctx appengine.Context) *MessageService {
 	svc := MessageService{}
 	svc.Cls = &svc
 	svc.context = ctx
-	svc.messagesInChannel = make(map[string][]*Message)
+	svc.messagesInChannel = make(map[int64][]*Message)
 	return &svc
 }
 

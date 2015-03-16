@@ -2,13 +2,16 @@ package services
 
 import (
 	"appengine/aetest"
+	"database/sql"
+	_ "github.com/lib/pq"
 	"github.com/panyam/backbone/services/core"
 	"github.com/panyam/backbone/services/gae"
 	"github.com/panyam/backbone/services/inmem"
+	"github.com/panyam/backbone/services/sqlds"
 	"log"
 )
 
-var factoryType string = "gae"
+var factoryType string = "sql"
 
 func CreateServiceGroup() core.ServiceGroup {
 	sg := core.ServiceGroup{}
@@ -26,6 +29,16 @@ func CreateServiceGroup() core.ServiceGroup {
 		sg.UserService = gae.NewUserService(ctx)
 		sg.TeamService = gae.NewTeamService(ctx)
 		sg.MessageService = gae.NewMessageService(ctx)
+	} else if factoryType == "sql" {
+		db, err := sql.Open("postgres", "user=test dbname=test sslmode=disable")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		sg.ChannelService = sqlds.NewChannelService(db)
+		sg.UserService = sqlds.NewUserService(db)
+		sg.TeamService = sqlds.NewTeamService(db)
+		sg.MessageService = sqlds.NewMessageService(db)
 	}
 	return sg
 }
