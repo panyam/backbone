@@ -4,13 +4,14 @@ import (
 	. "github.com/panyam/backbone/services/core"
 	. "gopkg.in/check.v1"
 	// "code.google.com/p/gomock/gomock"
-	// "log"
+	"log"
 	// "time"
 )
 
 func (s *TestSuite) TestCreateTeam(c *C) {
 	svc := s.serviceGroup.TeamService
 	team, err := svc.CreateTeam(0, "group", "test")
+	log.Println("Error: ", err)
 	c.Assert(err, Equals, nil)
 	c.Assert(team, Not(Equals), (*Team)(nil))
 	c.Assert(team.Name, Equals, "test")
