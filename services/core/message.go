@@ -5,10 +5,7 @@ import (
 )
 
 type Message struct {
-	/**
-	 * Message ID - GUID
-	 */
-	Id int64
+	Object
 
 	/**
 	 * Channel to which this message belongs.

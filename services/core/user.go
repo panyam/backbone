@@ -4,11 +4,27 @@ import (
 	"time"
 )
 
-type Team struct {
+type Object struct {
 	/**
 	 * Unique system wide ID.
 	 */
 	Id int64
+
+	/**
+	 * When the object was created.
+	 */
+	Created time.Time
+
+	/**
+	 * Status of the user account.
+	 * 0 = valid and active
+	 * everything else = invalid
+	 */
+	Status int
+}
+
+type Team struct {
+	Object
 
 	/**
 	 * Name of this team.
@@ -27,10 +43,7 @@ type Team struct {
  * email etc.
  */
 type User struct {
-	/**
-	 * GUID.
-	 */
-	Id int64
+	Object
 
 	/**
 	 * The username that is unique within the team for this user.
@@ -42,24 +55,16 @@ type User struct {
 	 * The combination of Team/Username *has* to be unique.
 	 */
 	Team *Team
-
-	/**
-	 * When the user was created.
-	 */
-	Created time.Time
-
-	/**
-	 * Status of the user account.
-	 */
-	Status int
 }
 
 func NewUser(id int64, username string) *User {
-	user := User{Id: id, Username: username}
+	user := User{Username: username}
+	user.Object = Object{Id: id}
 	return &user
 }
 
 func NewTeam(id int64, org string, name string) *Team {
-	team := Team{Id: id, Organization: org, Name: name}
+	team := Team{Organization: org, Name: name}
+	team.Object = Object{Id: id}
 	return &team
 }

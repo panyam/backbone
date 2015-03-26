@@ -91,6 +91,6 @@ func (c *ChannelService) FromChannel(gc *GAEChannel, channel *Channel) {
 	for _, user := range channel.Participants {
 		gc.ParticipantKeys = append(gc.ParticipantKeys, UserKeyFor(c.context, user.Id))
 	}
-	gc.Status = channel.Status
+	// gc.Status = channel.Status
 	gc.ParentMessageKey = MessageKeyFor(c.context, channel.ParentMessage.Id)
 }

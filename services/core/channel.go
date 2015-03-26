@@ -8,10 +8,7 @@ import (
  * Channels/Threads/Groups/Conversations etc
  */
 type Channel struct {
-	/**
-	 * Globally unique Channel ID.
-	 */
-	Id int64
+	Object
 
 	/**
 	 * Team this channel belongs to.   Mandatory.
@@ -37,11 +34,6 @@ type Channel struct {
 	Creator *User
 
 	/**
-	 * Channel creation time.
-	 */
-	Created time.Time
-
-	/**
 	 * When the last message was posted on this channel.
 	 */
 	LastMessageAt time.Time
@@ -51,11 +43,6 @@ type Channel struct {
 	 */
 	Participants []*User
 
-	/**
-	 * Status of this channel.
-	 */
-	Status string
-
 	// A channel can be created by forking out of a message (like a seperate thread)
 	ParentMessage *Message
 
@@ -64,7 +51,9 @@ type Channel struct {
 }
 
 func NewChannel(team *Team, id int64, name string, group string) *Channel {
-	return &Channel{Team: team, Id: id, Name: name, Group: group}
+	channel := &Channel{Team: team, Name: name, Group: group}
+	channel.Object = Object{Id: id}
+	return channel
 }
 
 /**

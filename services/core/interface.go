@@ -70,6 +70,11 @@ type ITeamService interface {
 	GetTeamsInOrg(org string, offset int, count int) ([]*Team, error)
 
 	/**
+	 * Retrieve a team by Id
+	 */
+	GetTeamById(id int64) (*Team, error)
+
+	/**
 	 * Retrieve a team by Name.
 	 */
 	GetTeamByName(org string, name string) (*Team, error)
@@ -80,14 +85,14 @@ type ITeamService interface {
 	DeleteTeam(team *Team) error
 
 	/**
-	 * Lets a user to join a team (if allowed)
+	 * Lets a user with the given username join a team (if allowed)
 	 */
-	JoinTeam(team *Team, user *User) error
+	JoinTeam(team *Team, username string) (*User, error)
 
 	/**
 	 * Tells if a user belongs to a team.
 	 */
-	TeamContains(team *Team, user *User) bool
+	TeamContains(team *Team, username string) bool
 
 	/**
 	 * Lets a user leave a team or be kicked out.

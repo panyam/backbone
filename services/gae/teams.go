@@ -56,6 +56,13 @@ func (c *TeamService) GetTeamsInOrg(org string, offset int, count int) ([]*Team,
 }
 
 /**
+ * Retrieve a team by ID.
+ */
+func (c *TeamService) GetTeamById(id int64) (*Team, error) {
+	return nil, nil
+}
+
+/**
  * Retrieve a team by Name.
  */
 func (c *TeamService) GetTeamByName(org string, name string) (*Team, error) {
@@ -84,17 +91,15 @@ func (c *TeamService) DeleteTeam(team *Team) error {
 /**
  * Lets a user to join a team (if allowed)
  */
-func (c *TeamService) JoinTeam(team *Team, user *User) error {
-	c.usersById[user.Id] = user
-	return nil
+func (c *TeamService) JoinTeam(team *Team, username string) (*User, error) {
+	return nil, nil
 }
 
 /**
  * Tells if a user belongs to a team.
  */
-func (c *TeamService) TeamContains(team *Team, user *User) bool {
-	_, ok := c.usersById[user.Id]
-	return ok
+func (c *TeamService) TeamContains(team *Team, username string) bool {
+	return false
 }
 
 /**
