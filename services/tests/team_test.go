@@ -3,6 +3,7 @@ package services
 import (
 	. "github.com/panyam/backbone/services/core"
 	. "gopkg.in/check.v1"
+	"log"
 	// "code.google.com/p/gomock/gomock"
 	// "time"
 )
@@ -32,10 +33,15 @@ func (s *TestSuite) TestDeleteTeam(c *C) {
 	team, err := svc.CreateTeam(0, "group", "test")
 	c.Assert(err, Equals, nil)
 	c.Assert(team, Not(Equals), (*Team)(nil))
+	c.Assert(team.Id, Not(Equals), 0)
+
+	log.Println("TeamID: ", team.Id)
 	err = svc.DeleteTeam(team)
+	c.Assert(err, Equals, nil)
+
 	team, err = svc.GetTeamByName("group", "test")
-	c.Assert(err, Not(Equals), nil)
 	c.Assert(team, Equals, (*Team)(nil))
+	c.Assert(err, Not(Equals), nil)
 }
 
 /*

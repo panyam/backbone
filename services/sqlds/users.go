@@ -28,7 +28,7 @@ func (svc *UserService) InitDB() {
 		[]string{
 			"Id bigint PRIMARY KEY",
 			"Username varchar(32) NOT NULL",
-			"TeamId bigint NOT NULL REFERENCES teams (Id)",
+			"TeamId bigint NOT NULL REFERENCES teams (Id) ON DELETE CASCADE",
 			"Created TIMESTAMP WITHOUT TIME ZONE DEFAULT statement_timestamp()",
 			"Status INT DEFAULT (0)",
 		},

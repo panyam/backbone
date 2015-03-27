@@ -2,7 +2,6 @@ package sqlds
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	. "github.com/panyam/backbone/services/core"
 )
@@ -14,6 +13,7 @@ type ChannelService struct {
 }
 
 const CHANNELS_TABLE = "channels"
+const CHANNEL_USERS_TABLE = "channel_users"
 
 func NewChannelService(db *sql.DB, sg *ServiceGroup) *ChannelService {
 	svc := ChannelService{}
@@ -28,13 +28,23 @@ func (svc *ChannelService) InitDB() {
 	CreateTable(svc.DB, CHANNELS_TABLE,
 		[]string{
 			"Id bigint PRIMARY KEY",
-			"TeamId bigint NOT NULL REFERENCES teams (Id)",
-			"UserId bigint NOT NULL REFERENCES users (Id)",
+			"TeamId bigint NOT NULL REFERENCES teams (Id) ON DELETE CASCADE",
+			"UserId bigint DEFAULT(0) REFERENCES users (Id) ON DELETE SET DEFAULT",
 			"Created TIMESTAMP WITHOUT TIME ZONE DEFAULT statement_timestamp()",
 			"Name varchar(128) DEFAULT ('')",
 			"GroupName varchar(128) DEFAULT ('')",
 			"Status INT DEFAULT (0)",
 		})
+
+	CreateTable(svc.DB, CHANNEL_USERS_TABLE,
+		[]string{
+			"UserId bigint NOT NULL REFERENCES users (Id) ON DELETE CASCADE",
+			"ChannelId bigint NOT NULL REFERENCES channels (Id) ON DELETE CASCADE",
+			"JoinedAt TIMESTAMP WITHOUT TIME ZONE DEFAULT statement_timestamp()",
+			"LeftAt TIMESTAMP WITHOUT TIME ZONE DEFAULT NULL",
+			"Status INT DEFAULT (0)",
+		},
+		", CONSTRAINT unique_channel_membership UNIQUE (UserId, ChannelId)")
 }
 
 /**
@@ -50,7 +60,7 @@ func (svc *ChannelService) SaveChannel(channel *Channel, override bool) error {
 		}
 		return err
 	} else {
-		query := fmt.Sprintf(`UPDATE %s SET GroupName = '%s', TeamId = %d, UserId= %d, Name = '%s', Status = %d where GroupName = '%s', Id = %d`, CHANNELS_TABLE, channel.GroupName, channel.Team.Id, channel.Creator.Id, channel.Name, channel.Status, channel.Id)
+		query := fmt.Sprintf(`UPDATE %s SET GroupName = '%s', TeamId = %d, UserId = %d, Name = '%s', Status = %d where  Id = %d`, CHANNELS_TABLE, channel.GroupName, channel.Team.Id, channel.Creator.Id, channel.Name, channel.Status, channel.Id)
 		_, err := svc.DB.Exec(query)
 		return err
 	}
@@ -73,28 +83,56 @@ func (svc *ChannelService) GetChannelById(id int64) (*Channel, error) {
 	channel.Id = id
 	channel.Team, err = svc.SG.TeamService.GetTeamById(teamId)
 	channel.Creator, err = svc.SG.UserService.GetUserById(userId)
+
+	// Also get all members
+	channel.Members = svc.GetChannelMembers(&channel)
 	return &channel, err
+}
+
+func (svc *ChannelService) GetChannelMembers(channel *Channel) *[]ChannelMember {
+	query := fmt.Sprintf("SELECT UserId, JoinedAt, LeftAt, Status FROM %s where ChannelId = %d", CHANNEL_USERS_TABLE, channel.Id)
+	rows, err := svc.DB.Query(query)
+	if err == nil {
+		defer rows.Close()
+	}
+
+	members := make([]ChannelMember, 0, 0)
+	for rows.Next() {
+		var member ChannelMember
+		var userId int64
+		rows.Scan(&userId, &member.JoinedAt, &member.LeftAt, &member.Status)
+		member.User, _ = svc.SG.UserService.GetUserById(userId)
+		members = append(members, member)
+	}
+	return &members
 }
 
 /**
  * Delete a channel.
  */
-func (c *ChannelService) DeleteChannel(channel *Channel) error {
-	return errors.New("No such channel")
+func (svc *ChannelService) DeleteChannel(channel *Channel) error {
+	query := fmt.Sprintf("DELETE FROM %s WHERE Id = %d", CHANNELS_TABLE, channel.Id)
+	_, err := svc.DB.Exec(query)
+	return err
 }
 
 /**
  * Lets a user to join a channel (if allowed)
  */
-func (c *ChannelService) JoinChannel(channel *Channel, user *User) error {
-	return nil
+func (svc *ChannelService) JoinChannel(channel *Channel, user *User) error {
+	query := fmt.Sprintf(`INSERT INTO %s ( UserId, ChannelId ) VALUES (%d, %d)`,
+		CHANNEL_USERS_TABLE, user.Id, channel.Id)
+	_, err := svc.DB.Exec(query)
+	return err
 }
 
 /**
  * Lets a user leave a channel or be kicked out.
  */
-func (c *ChannelService) LeaveChannel(channel *Channel, user *User) error {
-	return nil
+func (svc *ChannelService) LeaveChannel(channel *Channel, user *User) error {
+	query := fmt.Sprintf(`UPDATE %s set UserId = %d, ChannelId = %d LeftAt = timestamp_now()`, CHANNEL_USERS_TABLE, user.Id, channel.Id)
+	_, err := svc.DB.Exec(query)
+	return err
 }
 
 /**

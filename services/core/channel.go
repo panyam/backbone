@@ -38,16 +38,24 @@ type Channel struct {
 	 */
 	LastMessageAt time.Time
 
-	/**
-	 * List of participants in this group.
-	 */
-	Participants []*User
-
 	// A channel can be created by forking out of a message (like a seperate thread)
 	ParentMessage *Message
 
+	// Members in this channel
+	Members *[]ChannelMember
+
 	// Metadata associated with the channel
 	MetaData map[string]interface{}
+}
+
+type ChannelMember struct {
+	User *User
+
+	JoinedAt time.Time
+
+	LeftAt time.Time
+
+	Status int
 }
 
 func NewChannel(team *Team, creator *User, id int64, name string, group string) *Channel {
@@ -60,9 +68,11 @@ func NewChannel(team *Team, creator *User, id int64, name string, group string) 
  * Tells if a user belongs to a channel.
  */
 func (channel *Channel) ContainsUser(user *User) bool {
-	for _, value := range channel.Participants {
-		if value.Id == user.Id {
-			return true
+	if channel.Members != nil {
+		for _, value := range *channel.Members {
+			if value.User.Id == user.Id {
+				return true
+			}
 		}
 	}
 	return false

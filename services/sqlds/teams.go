@@ -14,6 +14,7 @@ type TeamService struct {
 }
 
 const TEAMS_TABLE = "teams"
+const TEAM_USERS_TABLE = "team_users"
 
 func NewTeamService(db *sql.DB, sg *ServiceGroup) *TeamService {
 	svc := TeamService{}
@@ -31,6 +32,15 @@ func (svc *TeamService) InitDB() {
 			"Organization varchar(32) NOT NULL",
 			"Name varchar(32) NOT NULL",
 		})
+
+	CreateTable(svc.DB, TEAM_USERS_TABLE,
+		[]string{
+			"UserId bigint NOT NULL REFERENCES users (Id) ON DELETE CASCADE",
+			"TeamId bigint NOT NULL REFERENCES teams (Id) ON DELETE CASCADE",
+			"Created TIMESTAMP WITHOUT TIME ZONE DEFAULT statement_timestamp()",
+			"Status INT DEFAULT (0)",
+		},
+		", CONSTRAINT unique_team_membership UNIQUE (UserId, TeamId)")
 }
 
 /**
@@ -106,7 +116,8 @@ func (svc *TeamService) GetTeamByName(org string, name string) (*Team, error) {
  * Delete a team.
  */
 func (svc *TeamService) DeleteTeam(team *Team) error {
-	query := fmt.Sprintf("DELETE FROM %s WHERE Id = %d", TEAMS_TABLE, team.Id)
+	query := fmt.Sprintf("DELETE FROM %s WHERE Id = %d ", TEAMS_TABLE, team.Id)
+	fmt.Println("Query: ", query)
 	_, err := svc.DB.Exec(query)
 	return err
 }
