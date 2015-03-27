@@ -83,13 +83,10 @@ func (svc *ChannelService) GetChannelById(id int64) (*Channel, error) {
 	channel.Id = id
 	channel.Team, err = svc.SG.TeamService.GetTeamById(teamId)
 	channel.Creator, err = svc.SG.UserService.GetUserById(userId)
-
-	// Also get all members
-	channel.Members = svc.GetChannelMembers(&channel)
 	return &channel, err
 }
 
-func (svc *ChannelService) GetChannelMembers(channel *Channel) *[]ChannelMember {
+func (svc *ChannelService) GetChannelMembers(channel *Channel) []ChannelMember {
 	query := fmt.Sprintf("SELECT UserId, JoinedAt, LeftAt, Status FROM %s where ChannelId = %d", CHANNEL_USERS_TABLE, channel.Id)
 	rows, err := svc.DB.Query(query)
 	if err == nil {
@@ -104,7 +101,7 @@ func (svc *ChannelService) GetChannelMembers(channel *Channel) *[]ChannelMember 
 		member.User, _ = svc.SG.UserService.GetUserById(userId)
 		members = append(members, member)
 	}
-	return &members
+	return members
 }
 
 /**
@@ -114,6 +111,19 @@ func (svc *ChannelService) DeleteChannel(channel *Channel) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE Id = %d", CHANNELS_TABLE, channel.Id)
 	_, err := svc.DB.Exec(query)
 	return err
+}
+
+/**
+ * Tells if a user belongs to a channel.
+ */
+func (svc *ChannelService) ContainsUser(channel *Channel, user *User) bool {
+	members := svc.GetChannelMembers(channel)
+	for _, value := range members {
+		if value.User.Id == user.Id {
+			return true
+		}
+	}
+	return false
 }
 
 /**

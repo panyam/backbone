@@ -41,9 +41,6 @@ type Channel struct {
 	// A channel can be created by forking out of a message (like a seperate thread)
 	ParentMessage *Message
 
-	// Members in this channel
-	Members *[]ChannelMember
-
 	// Metadata associated with the channel
 	MetaData map[string]interface{}
 }
@@ -62,18 +59,4 @@ func NewChannel(team *Team, creator *User, id int64, name string, group string) 
 	channel := &Channel{Team: team, Name: name, GroupName: group, Creator: creator}
 	channel.Object = Object{Id: id}
 	return channel
-}
-
-/**
- * Tells if a user belongs to a channel.
- */
-func (channel *Channel) ContainsUser(user *User) bool {
-	if channel.Members != nil {
-		for _, value := range *channel.Members {
-			if value.User.Id == user.Id {
-				return true
-			}
-		}
-	}
-	return false
 }

@@ -124,6 +124,16 @@ type IChannelService interface {
 	GetChannelById(id int64) (*Channel, error)
 
 	/**
+	 * Gets the channel members.
+	 */
+	GetChannelMembers(channel *Channel) []ChannelMember
+
+	/**
+	 * Tells if a channe contains a user.
+	 */
+	ContainsUser(channel *Channel, user *User) bool
+
+	/**
 	 * Delete a channel.
 	 */
 	DeleteChannel(channel *Channel) error

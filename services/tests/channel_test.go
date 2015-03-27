@@ -71,21 +71,21 @@ func (s *TestSuite) TestJoinChannel(c *C) {
 	channel := NewChannel(team, user, 0, "test", "group")
 	_ = s.serviceGroup.ChannelService.SaveChannel(channel, true)
 
-	s.serviceGroup.ChannelService.JoinChannel(channel, user2)
-	c.Assert(channel.ContainsUser(user), Equals, true)
-	c.Assert(channel.ContainsUser(user2), Equals, true)
-}
-
-/*
-func (s *TestSuite) TestLeaveChannel(c *C) {
-	team := NewTeam("superteam", "superorg", "Super Team")
-	channel := NewChannel(team, "", "test", "group")
-	s.serviceGroup.ChannelService.SaveChannel(channel, true)
-
-	user := NewUser("1", "user1")
 	s.serviceGroup.ChannelService.JoinChannel(channel, user)
-	c.Assert(channel.ContainsUser(user), Equals, true)
-	s.serviceGroup.ChannelService.LeaveChannel(channel, user)
-	c.Assert(channel.ContainsUser(user), Equals, false)
+	s.serviceGroup.ChannelService.JoinChannel(channel, user2)
+	c.Assert(s.serviceGroup.ChannelService.ContainsUser(channel, user), Equals, true)
+	c.Assert(s.serviceGroup.ChannelService.ContainsUser(channel, user2), Equals, true)
 }
-*/
+
+func (s *TestSuite) TestLeaveChannel(c *C) {
+	svc := s.serviceGroup.UserService
+	team, _ := s.serviceGroup.TeamService.CreateTeam(1, "org", "team")
+	user := NewUser(0, "user1", team)
+	_ = svc.SaveUser(user, false)
+	channel := NewChannel(team, user, 0, "test", "group")
+	_ = s.serviceGroup.ChannelService.SaveChannel(channel, true)
+
+	c.Assert(s.serviceGroup.ChannelService.ContainsUser(channel, user), Equals, false)
+	s.serviceGroup.ChannelService.JoinChannel(channel, user)
+	c.Assert(s.serviceGroup.ChannelService.ContainsUser(channel, user), Equals, true)
+}
