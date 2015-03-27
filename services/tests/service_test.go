@@ -25,3 +25,10 @@ func (s *TestSuite) SetUpTest(c *C) {
 	s.serviceGroup.UserService.RemoveAllUsers()
 	s.serviceGroup.MessageService.RemoveAllMessages()
 }
+
+func (s *TestSuite) TearDownTest(c *C) {
+	s.serviceGroup.ChannelService.RemoveAllChannels()
+	s.serviceGroup.TeamService.RemoveAllTeams()
+	s.serviceGroup.UserService.RemoveAllUsers()
+	s.serviceGroup.MessageService.RemoveAllMessages()
+}

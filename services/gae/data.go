@@ -31,7 +31,7 @@ type GAEChannel struct {
 	 * the user can define uniqueness constraints on when a group should not be
 	 * duplicated.
 	 */
-	Group string
+	GroupName string
 
 	/**
 	 * Creator of the group.
@@ -67,7 +67,7 @@ func (c *ChannelService) ToChannel(gc *GAEChannel, channel *Channel) {
 		channel.Id = gc.Id.StringID()
 		channel.Creator = gc.CreatorKey = UserKeyFor(c.context, channel.Creator.Id)
 		gc.Name = channel.Name
-		gc.Group = channel.Group
+		gc.GroupName = channel.GroupName
 		gc.Created = channel.Created
 		gc.LastMessageAt = channel.LastMessageAt
 		gc.ParticipantKeys = nil
@@ -84,7 +84,7 @@ func (c *ChannelService) FromChannel(gc *GAEChannel, channel *Channel) {
 	gc.TeamKey = TeamKeyFor(c.context, channel.Team.Id)
 	gc.CreatorKey = UserKeyFor(c.context, channel.Creator.Id)
 	gc.Name = channel.Name
-	gc.Group = channel.Group
+	gc.GroupName = channel.GroupName
 	gc.Created = channel.Created
 	gc.LastMessageAt = channel.LastMessageAt
 	gc.ParticipantKeys = nil

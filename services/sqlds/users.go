@@ -8,14 +8,15 @@ import (
 
 type UserService struct {
 	Cls interface{}
-	SG  ServiceGroup
+	SG  *ServiceGroup
 	DB  *sql.DB
 }
 
 const USERS_TABLE = "users"
 
-func NewUserService(db *sql.DB) *UserService {
+func NewUserService(db *sql.DB, sg *ServiceGroup) *UserService {
 	svc := UserService{}
+	svc.SG = sg
 	svc.Cls = &svc
 	svc.DB = db
 	svc.InitDB()
@@ -25,12 +26,13 @@ func NewUserService(db *sql.DB) *UserService {
 func (svc *UserService) InitDB() {
 	CreateTable(svc.DB, USERS_TABLE,
 		[]string{
-			"Id int64 PRIMARY KEY",
+			"Id bigint PRIMARY KEY",
 			"Username varchar(32) NOT NULL",
-			"TeamId varchar(16) NOT NULL REFERENCES teams (Id)",
+			"TeamId bigint NOT NULL REFERENCES teams (Id)",
 			"Created TIMESTAMP WITHOUT TIME ZONE DEFAULT statement_timestamp()",
 			"Status INT DEFAULT (0)",
-		}, "UNIQUE (Username, TeamId)")
+		},
+		", CONSTRAINT unique_username_team UNIQUE (Username, TeamId)")
 }
 
 /**
@@ -44,39 +46,18 @@ func (svc *UserService) RemoveAllUsers() {
  * Get user info by ID
  */
 func (svc *UserService) GetUserById(id int64) (*User, error) {
-	query := fmt.Sprintf("SELECT Id, Username, TeamId, Status, Created from %s where Id = %d", USERS_TABLE, id)
-	rows, err := svc.DB.Query(query)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	rows.Next()
+	query := fmt.Sprintf("SELECT Username, TeamId, Status, Created from %s where Id = %d", USERS_TABLE, id)
+	row := svc.DB.QueryRow(query)
 
 	var user User
-	user.Id = id
-	err = rows.Scan(&id)
-	if err != nil {
-		return nil, err
-	}
-	err = rows.Scan(&user.Username)
-	if err != nil {
-		return nil, err
-	}
 	var teamId int64
-	err = rows.Scan(teamId)
+	err := row.Scan(&user.Username, &teamId, &user.Status, &user.Created)
+	user.Id = id
 	if err != nil {
 		return nil, err
 	}
+	user.Id = id
 	user.Team, err = svc.SG.TeamService.GetTeamById(teamId)
-
-	err = rows.Scan(&user.Status)
-	if err != nil {
-		return nil, err
-	}
-	err = rows.Scan(&user.Created)
-	if err != nil {
-		return nil, err
-	}
 	return &user, err
 }
 
@@ -84,7 +65,14 @@ func (svc *UserService) GetUserById(id int64) (*User, error) {
  * Get a user by username in a particular team.
  */
 func (svc *UserService) GetUser(username string, team *Team) (*User, error) {
-	return nil, nil
+	query := fmt.Sprintf("SELECT Id, Status, Created from %s where Username = '%s' and TeamId = %d", USERS_TABLE, username, team.Id)
+	row := svc.DB.QueryRow(query)
+
+	var user User
+	err := row.Scan(&user.Id, &user.Status, &user.Created)
+	user.Username = username
+	user.Team = team
+	return &user, err
 }
 
 /**
@@ -100,11 +88,15 @@ func (svc *UserService) GetUser(username string, team *Team) (*User, error) {
  */
 func (svc *UserService) SaveUser(user *User, override bool) error {
 	if user.Id == 0 {
-		query := fmt.Sprintf(`INSERT INTO %s ( TeamId, Username, Status) VALUES (%d, '%s')`, USERS_TABLE, user.Team.Id, user.Username, user.Status)
+		id := UUIDGen()
+		query := fmt.Sprintf(`INSERT INTO %s ( Id, TeamId, Username, Status) VALUES (%d, %d, '%s', %d)`, USERS_TABLE, id, user.Team.Id, user.Username, user.Status)
 		_, err := svc.DB.Exec(query)
+		if err == nil {
+			user.Id = id
+		}
 		return err
 	} else {
-		query := fmt.Sprintf(`UPDATE %s SET ( TeamId = %d, Username = '%s', Status = %d)`, USERS_TABLE, user.Team.Id, user.Username, user.Status)
+		query := fmt.Sprintf(`UPDATE %s SET TeamId = %d, Username = '%s', Status = %d where Id = %d`, USERS_TABLE, user.Team.Id, user.Username, user.Status, user.Id)
 		_, err := svc.DB.Exec(query)
 		return err
 	}

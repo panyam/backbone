@@ -4,14 +4,12 @@ import (
 	. "github.com/panyam/backbone/services/core"
 	. "gopkg.in/check.v1"
 	// "code.google.com/p/gomock/gomock"
-	"log"
 	// "time"
 )
 
 func (s *TestSuite) TestCreateTeam(c *C) {
 	svc := s.serviceGroup.TeamService
 	team, err := svc.CreateTeam(0, "group", "test")
-	log.Println("Error: ", err)
 	c.Assert(err, Equals, nil)
 	c.Assert(team, Not(Equals), (*Team)(nil))
 	c.Assert(team.Name, Equals, "test")
@@ -35,9 +33,7 @@ func (s *TestSuite) TestDeleteTeam(c *C) {
 	c.Assert(err, Equals, nil)
 	c.Assert(team, Not(Equals), (*Team)(nil))
 	err = svc.DeleteTeam(team)
-	log.Println("Delete Team Error: ", err)
 	team, err = svc.GetTeamByName("group", "test")
-	log.Println("Get Team Error: ", err)
 	c.Assert(err, Not(Equals), nil)
 	c.Assert(team, Equals, (*Team)(nil))
 }

@@ -35,7 +35,7 @@ func CreateTable(db *sql.DB, tableName string, columns []string, tableConstraint
 }
 
 func ClearTable(db *sql.DB, tableName string) error {
-	_, error := db.Exec(fmt.Sprintf("DELETE FROM %s", tableName))
+	_, error := db.Exec(fmt.Sprintf("DELETE FROM %s CASCADE", tableName))
 	if error != nil {
 		log.Printf("Error clearing table %s: %s\n", tableName, error)
 	}

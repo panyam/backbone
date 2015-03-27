@@ -35,10 +35,10 @@ func CreateServiceGroup() core.ServiceGroup {
 			log.Fatal(err)
 		}
 
-		sg.ChannelService = sqlds.NewChannelService(db)
-		sg.UserService = sqlds.NewUserService(db)
-		sg.TeamService = sqlds.NewTeamService(db)
-		sg.MessageService = sqlds.NewMessageService(db)
+		sg.ChannelService = sqlds.NewChannelService(db, &sg)
+		sg.UserService = sqlds.NewUserService(db, &sg)
+		sg.TeamService = sqlds.NewTeamService(db, &sg)
+		sg.MessageService = sqlds.NewMessageService(db, &sg)
 	}
 	return sg
 }

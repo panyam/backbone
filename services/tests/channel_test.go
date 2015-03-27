@@ -1,6 +1,5 @@
 package services
 
-/*
 import (
 	. "github.com/panyam/backbone/services/core"
 	. "gopkg.in/check.v1"
@@ -10,9 +9,12 @@ import (
 )
 
 func (s *TestSuite) TestSaveChannelNew(c *C) {
-	team := NewTeam("superteam", "superorg", "Super Team")
-	channel := NewChannel(team, "", "test", "group")
-	err := s.serviceGroup.ChannelService.SaveChannel(channel, true)
+	svc := s.serviceGroup.UserService
+	team, err := s.serviceGroup.TeamService.CreateTeam(1, "org", "team")
+	user := NewUser(0, "user1", team)
+	_ = svc.SaveUser(user, false)
+	channel := NewChannel(team, user, 0, "test", "group")
+	err = s.serviceGroup.ChannelService.SaveChannel(channel, true)
 	c.Assert(err, Equals, nil)
 	c.Assert(channel, Not(Equals), (*Channel)(nil))
 	c.Assert(channel.Id, Not(Equals), "")
@@ -23,6 +25,7 @@ func (s *TestSuite) TestSaveChannelNew(c *C) {
 	c.Assert(channel.Name, Equals, "test")
 }
 
+/*
 func (s *TestSuite) TestSaveChannelExistsById(c *C) {
 	team := NewTeam("superteam", "superorg", "Super Team")
 	channel := NewChannel(team, "", "test", "group")

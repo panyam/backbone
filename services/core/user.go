@@ -57,8 +57,8 @@ type User struct {
 	Team *Team
 }
 
-func NewUser(id int64, username string) *User {
-	user := User{Username: username}
+func NewUser(id int64, username string, team *Team) *User {
+	user := User{Username: username, Team: team}
 	user.Object = Object{Id: id}
 	return &user
 }

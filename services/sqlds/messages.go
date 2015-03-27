@@ -8,11 +8,13 @@ import (
 type MessageService struct {
 	Cls interface{}
 	DB  *sql.DB
+	SG  *ServiceGroup
 }
 
-func NewMessageService(db *sql.DB) *MessageService {
+func NewMessageService(db *sql.DB, sg *ServiceGroup) *MessageService {
 	svc := MessageService{}
 	svc.Cls = &svc
+	svc.SG = sg
 	svc.DB = db
 	svc.RemoveAllMessages()
 	return &svc

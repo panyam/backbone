@@ -16,6 +16,11 @@ type Channel struct {
 	Team *Team
 
 	/**
+	 * Creator of the group.
+	 */
+	Creator *User
+
+	/**
 	 * Name of this channel.
 	 */
 	Name string
@@ -26,12 +31,7 @@ type Channel struct {
 	 * the user can define uniqueness constraints on when a group should not be
 	 * duplicated.
 	 */
-	Group string
-
-	/**
-	 * Creator of the group.
-	 */
-	Creator *User
+	GroupName string
 
 	/**
 	 * When the last message was posted on this channel.
@@ -50,8 +50,8 @@ type Channel struct {
 	MetaData map[string]interface{}
 }
 
-func NewChannel(team *Team, id int64, name string, group string) *Channel {
-	channel := &Channel{Team: team, Name: name, Group: group}
+func NewChannel(team *Team, creator *User, id int64, name string, group string) *Channel {
+	channel := &Channel{Team: team, Name: name, GroupName: group, Creator: creator}
 	channel.Object = Object{Id: id}
 	return channel
 }

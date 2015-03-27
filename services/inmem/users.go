@@ -42,7 +42,7 @@ func (s *UserService) CreateUser(id int64, username string) (*User, error) {
 	if _, ok := s.usersByName[username]; ok {
 		return nil, errors.New("User name already exists")
 	}
-	newuser := NewUser(id, username)
+	newuser := NewUser(id, username, nil)
 	s.usersById[id] = newuser
 	s.usersByName[username] = newuser
 	return newuser, nil

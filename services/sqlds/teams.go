@@ -5,19 +5,20 @@ import (
 	// "errors"
 	"fmt"
 	. "github.com/panyam/backbone/services/core"
-	"log"
 )
 
 type TeamService struct {
 	Cls interface{}
 	DB  *sql.DB
+	SG  *ServiceGroup
 }
 
 const TEAMS_TABLE = "teams"
 
-func NewTeamService(db *sql.DB) *TeamService {
+func NewTeamService(db *sql.DB, sg *ServiceGroup) *TeamService {
 	svc := TeamService{}
 	svc.Cls = &svc
+	svc.SG = sg
 	svc.DB = db
 	svc.InitDB()
 	return &svc
@@ -53,7 +54,6 @@ func (svc *TeamService) CreateTeam(id int64, org string, name string) (*Team, er
 	team := Team{Organization: org, Name: name}
 	team.Object = Object{Id: id}
 	query := fmt.Sprintf(`INSERT INTO %s ( Id, Organization, Name ) VALUES (%d, '%s', '%s')`, TEAMS_TABLE, id, org, name)
-	log.Println("Query: ", query)
 	_, err := svc.DB.Exec(query)
 	if err != nil {
 		return nil, err
@@ -73,24 +73,12 @@ func (svc *TeamService) GetTeamsInOrg(org string, offset int, count int) ([]*Tea
  */
 func (svc *TeamService) GetTeamById(id int64) (*Team, error) {
 	query := fmt.Sprintf("SELECT Organization, Name from %s where Id = %d", TEAMS_TABLE, id)
-	rows, err := svc.DB.Query(query)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	rows.Next()
+	row := svc.DB.QueryRow(query)
 
 	var team Team
 	team.Id = id
-	err = rows.Scan(&team.Organization)
-	if err != nil {
-		return nil, err
-	}
-	err = rows.Scan(&team.Name)
-	if err != nil {
-		return nil, err
-	}
-	return &team, nil
+	err := row.Scan(&team.Organization, &team.Name)
+	return &team, err
 }
 
 /**
