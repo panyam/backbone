@@ -13,7 +13,8 @@ type ChannelService struct {
 }
 
 const CHANNELS_TABLE = "channels"
-const CHANNEL_USERS_TABLE = "channel_users"
+const CHANNEL_MEMBERS_TABLE = "channel_members"
+const CHANNEL_METADATA_TABLE = "channel_metadata"
 
 func NewChannelService(db *sql.DB, sg *ServiceGroup) *ChannelService {
 	svc := ChannelService{}
@@ -31,12 +32,13 @@ func (svc *ChannelService) InitDB() {
 			"TeamId bigint NOT NULL REFERENCES teams (Id) ON DELETE CASCADE",
 			"UserId bigint DEFAULT(0) REFERENCES users (Id) ON DELETE SET DEFAULT",
 			"Created TIMESTAMP WITHOUT TIME ZONE DEFAULT statement_timestamp()",
-			"Name varchar(128) DEFAULT ('')",
-			"GroupName varchar(128) DEFAULT ('')",
+			"Name TEXT DEFAULT ('')",
+			"GroupName TEXT DEFAULT ('')",
+			"LastMessageAt TIMESTAMP WITHOUT TIME ZONE",
 			"Status INT DEFAULT (0)",
 		})
 
-	CreateTable(svc.DB, CHANNEL_USERS_TABLE,
+	CreateTable(svc.DB, CHANNEL_MEMBERS_TABLE,
 		[]string{
 			"UserId bigint NOT NULL REFERENCES users (Id) ON DELETE CASCADE",
 			"ChannelId bigint NOT NULL REFERENCES channels (Id) ON DELETE CASCADE",
@@ -45,6 +47,8 @@ func (svc *ChannelService) InitDB() {
 			"Status INT DEFAULT (0)",
 		},
 		", CONSTRAINT unique_channel_membership UNIQUE (UserId, ChannelId)")
+
+	CreateMetadataTable(svc.DB, CHANNEL_METADATA_TABLE, CHANNELS_TABLE, "Channel")
 }
 
 /**
@@ -87,7 +91,7 @@ func (svc *ChannelService) GetChannelById(id int64) (*Channel, error) {
 }
 
 func (svc *ChannelService) GetChannelMembers(channel *Channel) []ChannelMember {
-	query := fmt.Sprintf("SELECT UserId, JoinedAt, LeftAt, Status FROM %s where ChannelId = %d", CHANNEL_USERS_TABLE, channel.Id)
+	query := fmt.Sprintf("SELECT UserId, JoinedAt, LeftAt, Status FROM %s where ChannelId = %d", CHANNEL_MEMBERS_TABLE, channel.Id)
 	rows, err := svc.DB.Query(query)
 	if err == nil {
 		defer rows.Close()
@@ -131,7 +135,7 @@ func (svc *ChannelService) ContainsUser(channel *Channel, user *User) bool {
  */
 func (svc *ChannelService) JoinChannel(channel *Channel, user *User) error {
 	query := fmt.Sprintf(`INSERT INTO %s ( UserId, ChannelId ) VALUES (%d, %d)`,
-		CHANNEL_USERS_TABLE, user.Id, channel.Id)
+		CHANNEL_MEMBERS_TABLE, user.Id, channel.Id)
 	_, err := svc.DB.Exec(query)
 	return err
 }
@@ -140,7 +144,7 @@ func (svc *ChannelService) JoinChannel(channel *Channel, user *User) error {
  * Lets a user leave a channel or be kicked out.
  */
 func (svc *ChannelService) LeaveChannel(channel *Channel, user *User) error {
-	query := fmt.Sprintf(`UPDATE %s set UserId = %d, ChannelId = %d LeftAt = timestamp_now()`, CHANNEL_USERS_TABLE, user.Id, channel.Id)
+	query := fmt.Sprintf(`UPDATE %s set UserId = %d, ChannelId = %d LeftAt = timestamp_now()`, CHANNEL_MEMBERS_TABLE, user.Id, channel.Id)
 	_, err := svc.DB.Exec(query)
 	return err
 }

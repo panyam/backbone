@@ -18,9 +18,10 @@ type Message struct {
 	Sender *User
 
 	/**
-	 * When the message was sent.
+	 * When the message was created.  For now there is no distinction
+	 * between a created time stamp and a sent time stamp.
 	 */
-	SentAt time.Time
+	Created time.Time
 
 	/**
 	 * Type of message - eg, "invite", "status", "command", "event" etc
@@ -28,20 +29,6 @@ type Message struct {
 	 * messages could be sent by bots or other APIs
 	 */
 	MsgType string
-
-	/**
-	 * Whether message is to be persisted or not.  When a message is not
-	 * persisted it is only sent to the users that are reachable.
-	 */
-	Persist bool
-
-	/**
-	 * All the message fragments.
-	 */
-	Fragments []*MessageFragment
-
-	// Metadata associated with the message
-	MetaData map[string]interface{}
 }
 
 /**
@@ -65,6 +52,7 @@ func NewMessage(channel *Channel, sender *User) *Message {
 	msg := Message{
 		Channel: channel,
 		Sender:  sender,
-		SentAt:  time.Now()}
+		Created: time.Now()}
+	msg.Object = Object{Id: 0}
 	return &msg
 }

@@ -37,12 +37,6 @@ type Channel struct {
 	 * When the last message was posted on this channel.
 	 */
 	LastMessageAt time.Time
-
-	// A channel can be created by forking out of a message (like a seperate thread)
-	ParentMessage *Message
-
-	// Metadata associated with the channel
-	MetaData map[string]interface{}
 }
 
 type ChannelMember struct {

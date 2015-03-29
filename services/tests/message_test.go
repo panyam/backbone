@@ -1,6 +1,5 @@
 package services
 
-/*
 import (
 	. "github.com/panyam/backbone/services/core"
 	. "gopkg.in/check.v1"
@@ -14,36 +13,38 @@ func (s *TestSuite) TestCreateMessageService(c *C) {
 	c.Assert(svc, Not(Equals), nil)
 }
 
-func (s *TestSuite) TestGetMessages(c *C) {
-	chsvc := s.serviceGroup.ChannelService
-	team := NewTeam("superteam", "superorg", "Super Team")
-	channel := NewChannel(team, "", "test", "group")
-	chsvc.SaveChannel(channel, true)
+func (s *TestSuite) MakeTestChannel() *Channel {
+	// create team
+	team, _ := s.serviceGroup.TeamService.CreateTeam(1, "org", "team")
 
-	msgsvc := s.serviceGroup.MessageService
-	msgs, _ := msgsvc.GetMessages(channel, nil, 0, -1)
+	user := NewUser(0, "user1", team)
+	_ = s.serviceGroup.UserService.SaveUser(user, false)
+
+	// create channel
+	channel := NewChannel(team, user, 0, "test", "group")
+	s.serviceGroup.ChannelService.SaveChannel(channel, true)
+
+	return channel
+}
+
+func (s *TestSuite) TestGetMessages(c *C) {
+	channel := s.MakeTestChannel()
+
+	msgs, _ := s.serviceGroup.MessageService.GetMessages(channel, nil, 0, -1)
 	c.Assert(len(msgs), Equals, 0)
 }
 
 func (s *TestSuite) TestCreateMessage(c *C) {
-	chsvc := s.serviceGroup.ChannelService
-	team, _ := s.serviceGroup.TeamService.CreateTeam("1", "org", "team")
-	channel := NewChannel(team, "", "test", "group")
-	err := chsvc.SaveChannel(channel, true)
+	channel := s.MakeTestChannel()
 
-	usersvc := s.serviceGroup.UserService
-	msgsvc := s.serviceGroup.MessageService
-
-	sender := User{Username: "user1", Team: team}
-	err := usersvc.SaveUser(&sender, false)
-
-	message := NewMessage(channel, sender)
-	err = msgsvc.CreateMessage(message)
+	message := NewMessage(channel, channel.Creator)
+	err := s.serviceGroup.MessageService.CreateMessage(message)
 	c.Assert(err, Equals, nil)
-	msgs, _ := msgsvc.GetMessages(channel, nil, 0, -1)
+	msgs, _ := s.serviceGroup.MessageService.GetMessages(channel, nil, 0, -1)
 	c.Assert(len(msgs), Equals, 1)
 }
 
+/*
 func (s *TestSuite) TestDeleteMessage(c *C) {
 	chsvc := s.serviceGroup.ChannelService
 	team := NewTeam("superteam", "superorg", "Super Team")

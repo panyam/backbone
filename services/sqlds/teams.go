@@ -14,7 +14,7 @@ type TeamService struct {
 }
 
 const TEAMS_TABLE = "teams"
-const TEAM_USERS_TABLE = "team_users"
+const TEAM_MEMBERS_TABLE = "team_members"
 
 func NewTeamService(db *sql.DB, sg *ServiceGroup) *TeamService {
 	svc := TeamService{}
@@ -29,11 +29,11 @@ func (svc *TeamService) InitDB() {
 	CreateTable(svc.DB, TEAMS_TABLE,
 		[]string{
 			"Id bigint PRIMARY KEY",
-			"Organization varchar(32) NOT NULL",
-			"Name varchar(32) NOT NULL",
+			"Organization TEXT NOT NULL",
+			"Name TEXT NOT NULL",
 		})
 
-	CreateTable(svc.DB, TEAM_USERS_TABLE,
+	CreateTable(svc.DB, TEAM_MEMBERS_TABLE,
 		[]string{
 			"UserId bigint NOT NULL REFERENCES users (Id) ON DELETE CASCADE",
 			"TeamId bigint NOT NULL REFERENCES teams (Id) ON DELETE CASCADE",
