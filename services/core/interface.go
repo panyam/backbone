@@ -177,6 +177,21 @@ type IMessageService interface {
 	CreateMessage(message *Message) error
 
 	/**
+	 * Gets a message by ID
+	 */
+	GetMessageById(id int64) (*Message, error)
+
+	/**
+	 * Gets the fragments of a message.
+	 */
+	GetMessageFragments(message *Message) []*MessageFragment
+
+	/**
+	 * Get receipts of a particular message.
+	 */
+	GetMessageReceipts(message *Message) []*MessageReceipt
+
+	/**
 	 * Remove a particular message.
 	 */
 	DeleteMessage(message *Message) error

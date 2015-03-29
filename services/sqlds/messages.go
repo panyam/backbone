@@ -56,27 +56,48 @@ func (svc *MessageService) InitDB() {
 }
 
 /**
+ * Send messages to particular recipients in this channel.
+ * If Channel, message or user is nil an error is returned.
+ */
+func (svc *MessageService) CreateMessage(message *Message) error {
+	return nil
+}
+
+/**
  * Get the messages in a channel for a particular user.
  * If channel does not exist then an empty list is returned.
  * If user is nil then all messages in a channel is returned.
  * Pagination is possible with offset and count.
  */
-func (m *MessageService) GetMessages(channel *Channel, user *User, offset int, count int) ([]*Message, error) {
+func (svc *MessageService) GetMessages(channel *Channel, user *User, offset int, count int) ([]*Message, error) {
 	return nil, nil
 }
 
 /**
- * Send messages to particular recipients in this channel.
- * If Channel, message or user is nil an error is returned.
+ * Gets a message by ID
  */
-func (m *MessageService) CreateMessage(message *Message) error {
+func (svc *MessageService) GetMessageById(id int64) (*Message, error) {
+	return nil, nil
+}
+
+/**
+ * Gets the fragments of a message.
+ */
+func (svc *MessageService) GetMessageFragments(message *Message) []*MessageFragment {
+	return nil
+}
+
+/**
+ * Get receipts of a particular message.
+ */
+func (svc *MessageService) GetMessageReceipts(message *Message) []*MessageReceipt {
 	return nil
 }
 
 /**
  * Remove a particular message.
  */
-func (m *MessageService) DeleteMessage(message *Message) error {
+func (svc *MessageService) DeleteMessage(message *Message) error {
 	return nil
 }
 
@@ -85,7 +106,7 @@ func (m *MessageService) DeleteMessage(message *Message) error {
  * If the message ID is missing (or empty) then a new message is created.
  * If message ID is present then the existing message is updated.
  */
-func (m *MessageService) SaveMessage(message *Message) error {
+func (svc *MessageService) SaveMessage(message *Message) error {
 	return nil
 }
 
