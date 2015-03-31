@@ -25,7 +25,7 @@ type IAuthService interface {
 	/**
 	 * Logs in a user given by username and his/her credentials.
 	 */
-	LoginUser(username string, credentials map[string]interface{}) (*UserLogin, error)
+	SaveUserLogin(login *UserLogin) error
 
 	/**
 	 * Removes all entries.

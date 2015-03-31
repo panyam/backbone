@@ -2,16 +2,18 @@ package connectors
 
 import (
 	goclient "github.com/panyam/relay/clients/goclient"
-	service_core "github.com/panyam/relay/connectors/core"
-	connector_core "github.com/panyam/relay/services/msg/core"
+	connector_core "github.com/panyam/relay/connectors/core"
+	auth_core "github.com/panyam/relay/services/auth/core"
+	msg_core "github.com/panyam/relay/services/msg/core"
 	. "gopkg.in/check.v1"
 	"testing"
 )
 
 type TestSuite struct {
-	server       service_core.Server
+	server       connector_core.Server
 	client       *goclient.ApiClient
-	serviceGroup *connector_core.ServiceGroup
+	authService  auth_core.IAuthService
+	serviceGroup *msg_core.ServiceGroup
 }
 
 var _ = Suite(&TestSuite{})
@@ -20,7 +22,7 @@ var _ = Suite(&TestSuite{})
 func Test(t *testing.T) { TestingT(t) }
 
 func (s *TestSuite) SetUpSuite(c *C) {
-	s.serviceGroup = CreateTestServiceGroup()
+	s.serviceGroup, s.authService = CreateTestServices()
 	s.server = CreateTestServer()
 	s.client = goclient.NewApiClient("http://localhost:3000/api")
 	s.client.Authenticator = &goclient.DebugAuthenticator{"testuser"}

@@ -65,7 +65,6 @@ func (svc *AuthService) SaveRegistration(registration *authcore.Registration) er
 	}
 
 	// otherwise create a registration object
-	return nil
 	if registration.Id == 0 {
 		id := UUIDGen()
 		err := InsertRow(svc.DB, REGISTRATIONS_TABLE,
@@ -126,4 +125,35 @@ func (svc *AuthService) RemoveAllRegistrations() {
  */
 func (svc *AuthService) RemoveAllLogins() {
 	ClearTable(svc.DB, LOGINS_TABLE)
+}
+
+/**
+ * Saves a user login object.
+ */
+func (svc *AuthService) SaveUserLogin(login *authcore.UserLogin) error {
+	var userId int64 = 0
+	if login.User != nil {
+		userId = login.User.Id
+	}
+	if login.Id == 0 {
+		id := UUIDGen()
+		err := InsertRow(svc.DB, LOGINS_TABLE,
+			"Id", "%ld", id,
+			"Source", "%s", login.Source,
+			"SourceId", "%s", login.SourceId,
+			"UserId", "%ld", userId,
+			"Credentials", "%s", login.Credentials,
+			"Status", "%d", login.Status)
+		if err == nil {
+			login.Id = id
+		}
+		return err
+	} else {
+		return UpdateRows(svc.DB, LOGINS_TABLE, fmt.Sprintf("Id = %d", login.Id),
+			"Source", "%s", login.Source,
+			"SourceId", "%s", login.SourceId,
+			"UserId", "%ld", userId,
+			"Credentials", "%s", login.Credentials,
+			"Status", "%d", login.Status)
+	}
 }
