@@ -3,11 +3,11 @@ package services
 import (
 	"database/sql"
 	_ "github.com/lib/pq"
-	"github.com/panyam/backbone/services/core"
+	"github.com/panyam/relay/services/core"
 	// "appengine/aetest"
-	// "github.com/panyam/backbone/services/gae"
-	// "github.com/panyam/backbone/services/inmem"
-	"github.com/panyam/backbone/services/sqlds"
+	// "github.com/panyam/relay/services/gae"
+	// "github.com/panyam/relay/services/inmem"
+	"github.com/panyam/relay/services/sqlds"
 	"log"
 )
 

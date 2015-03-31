@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/panyam/backbone/connectors/gorilla/common"
+	"github.com/panyam/relay/connectors/gorilla/common"
 	"net/http"
 )
 

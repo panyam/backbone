@@ -1,9 +1,9 @@
 package main
 
 import (
-	// "github.com/panyam/backbone/connectors/gocraft"
-	"github.com/panyam/backbone/connectors"
-	"github.com/panyam/backbone/connectors/gorilla"
+	// "github.com/panyam/relay/connectors/gocraft"
+	"github.com/panyam/relay/connectors"
+	"github.com/panyam/relay/connectors/gorilla"
 )
 
 func CreateServer() connectors.Server {

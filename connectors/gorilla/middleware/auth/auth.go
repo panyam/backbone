@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/panyam/backbone/models"
+	"github.com/panyam/relay/models"
 	"log"
 	"net/http"
 )

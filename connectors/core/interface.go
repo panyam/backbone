@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/panyam/backbone/services/core"
+	"github.com/panyam/relay/services/core"
 )
 
 type Server interface {

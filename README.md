@@ -1,2 +1,2 @@
-# backbone
+# relay
 Messaging toolkit

@@ -5,7 +5,7 @@ import (
 	"appengine/datastore"
 	"errors"
 	"fmt"
-	. "github.com/panyam/backbone/services/core"
+	. "github.com/panyam/relay/services/core"
 	"log"
 )
 

@@ -1,9 +1,9 @@
 package connectors
 
 import (
-	service_core "github.com/panyam/backbone/connectors/core"
-	// client "github.com/panyam/backbone/services/client/goclient"
-	connector_core "github.com/panyam/backbone/services/core"
+	service_core "github.com/panyam/relay/connectors/core"
+	// client "github.com/panyam/relay/services/client/goclient"
+	connector_core "github.com/panyam/relay/services/core"
 	. "gopkg.in/check.v1"
 	"testing"
 )

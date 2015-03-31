@@ -1,7 +1,7 @@
 package services
 
 import (
-	"github.com/panyam/backbone/services/core"
+	"github.com/panyam/relay/services/core"
 	. "gopkg.in/check.v1"
 	"testing"
 )

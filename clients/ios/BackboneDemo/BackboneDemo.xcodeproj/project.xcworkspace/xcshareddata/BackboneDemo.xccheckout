@@ -11,7 +11,7 @@
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>24ADFC9C4BBC329CDA9B36CA43F0A4A036691B0E</key>
-		<string>https://github.com/panyam/backbone</string>
+		<string>https://github.com/panyam/relay</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>clients/ios/BackboneDemo/BackboneDemo.xcodeproj</string>
@@ -21,7 +21,7 @@
 		<string>../../../../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>https://github.com/panyam/backbone</string>
+	<string>https://github.com/panyam/relay</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
@@ -34,7 +34,7 @@
 			<key>IDESourceControlWCCIdentifierKey</key>
 			<string>24ADFC9C4BBC329CDA9B36CA43F0A4A036691B0E</string>
 			<key>IDESourceControlWCCName</key>
-			<string>backbone</string>
+			<string>relay</string>
 		</dict>
 	</array>
 </dict>

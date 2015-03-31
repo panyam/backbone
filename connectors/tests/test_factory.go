@@ -3,10 +3,10 @@ package connectors
 import (
 	"database/sql"
 	_ "github.com/lib/pq"
-	connector_core "github.com/panyam/backbone/connectors/core"
-	"github.com/panyam/backbone/connectors/gorilla"
-	service_core "github.com/panyam/backbone/services/core"
-	"github.com/panyam/backbone/services/sqlds"
+	connector_core "github.com/panyam/relay/connectors/core"
+	"github.com/panyam/relay/connectors/gorilla"
+	service_core "github.com/panyam/relay/services/core"
+	"github.com/panyam/relay/services/sqlds"
 	"log"
 )
 

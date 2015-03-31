@@ -3,7 +3,7 @@ package sqlds
 import (
 	"database/sql"
 	"fmt"
-	. "github.com/panyam/backbone/services/core"
+	. "github.com/panyam/relay/services/core"
 )
 
 type MessageService struct {

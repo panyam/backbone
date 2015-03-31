@@ -2,7 +2,7 @@ package inmem
 
 import (
 	"errors"
-	. "github.com/panyam/backbone/services/core"
+	. "github.com/panyam/relay/services/core"
 )
 
 type ChannelService struct {

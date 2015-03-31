@@ -1,7 +1,7 @@
 package inmem
 
 import (
-	. "github.com/panyam/backbone/services/core"
+	. "github.com/panyam/relay/services/core"
 )
 
 type MessageService struct {

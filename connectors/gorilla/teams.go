@@ -1,8 +1,8 @@
 package gorilla
 
 import (
-	// "github.com/panyam/backbone/services"
-	. "github.com/panyam/backbone/connectors/gorilla/common"
+	// "github.com/panyam/relay/services"
+	. "github.com/panyam/relay/connectors/gorilla/common"
 	"log"
 	"net/http"
 )

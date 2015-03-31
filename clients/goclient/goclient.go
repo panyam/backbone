@@ -2,7 +2,7 @@ package goclient
 
 import (
 	"fmt"
-	"github.com/panyam/backbone/services/core"
+	"github.com/panyam/relay/services/core"
 	"io"
 	"log"
 	"net/http"

@@ -3,8 +3,8 @@ package gorilla
 import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
-	"github.com/panyam/backbone/connectors/gorilla/middleware"
-	"github.com/panyam/backbone/services/core"
+	"github.com/panyam/relay/connectors/gorilla/middleware"
+	"github.com/panyam/relay/services/core"
 	"log"
 	"net/http"
 )
@@ -42,7 +42,7 @@ func (s *Server) Run() {
 	mwWithLogin := s.DefaultMiddleware(true)
 	mwWithoutLogin := s.DefaultMiddleware(false)
 
-	// /Users/sri/projects/go/src/github.com/panyam/backbone/clients
+	// /Users/sri/projects/go/src/github.com/panyam/relay/clients
 	http.Handle("/", r)
 	r.HandleFunc("/", mwWithLogin.Apply(s.RootPageHandler()))
 	r.HandleFunc("/login/", mwWithoutLogin.Apply(s.LoginPageHandler()))
