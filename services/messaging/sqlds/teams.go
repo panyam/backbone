@@ -4,7 +4,8 @@ import (
 	"database/sql"
 	// "errors"
 	"fmt"
-	. "github.com/panyam/relay/services/core"
+	. "github.com/panyam/relay/services/messaging/core"
+	. "github.com/panyam/relay/utils"
 )
 
 type TeamService struct {

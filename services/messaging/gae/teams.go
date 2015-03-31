@@ -1,22 +1,30 @@
-package inmem
+package gae
 
 import (
+	"appengine"
+	"appengine/datastore"
 	"errors"
-	. "github.com/panyam/relay/services/core"
+	. "github.com/panyam/relay/services/messaging/core"
+	"log"
 )
 
 type TeamService struct {
 	Cls         interface{}
+	context     appengine.Context
 	teamCounter int64
 	teamsById   map[int64]*Team
 	teamsByKey  map[string]*Team
 	usersById   map[int64]*User
 }
 
-func NewTeamService() *TeamService {
+func NewTeamService(ctx appengine.Context) *TeamService {
 	svc := TeamService{}
 	svc.Cls = &svc
-	svc.RemoveAllTeams()
+	svc.context = ctx
+	svc.teamCounter = 1
+	svc.teamsById = make(map[int64]*Team)
+	svc.teamsByKey = make(map[string]*Team)
+	svc.usersById = make(map[int64]*User)
 	return &svc
 }
 
@@ -120,8 +128,10 @@ func (c *TeamService) InviteToTeam(inviter *User, invitee *User, team *Team) err
  * Removes all entries.
  */
 func (svc *TeamService) RemoveAllTeams() {
-	svc.teamCounter = 1
-	svc.teamsById = make(map[int64]*Team)
-	svc.teamsByKey = make(map[string]*Team)
-	svc.usersById = make(map[int64]*User)
+	q := datastore.NewQuery("Team").KeysOnly()
+	keys, err := q.GetAll(svc.context, nil)
+	if err != nil {
+		log.Println("RemoveAll Error: ", err)
+	}
+	datastore.DeleteMulti(svc.context, keys)
 }

@@ -1,7 +1,7 @@
 package services
 
 import (
-	. "github.com/panyam/relay/services/core"
+	. "github.com/panyam/relay/services/messaging/core"
 	. "gopkg.in/check.v1"
 	// "code.google.com/p/gomock/gomock"
 	// "log"

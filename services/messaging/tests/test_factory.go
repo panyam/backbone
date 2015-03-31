@@ -3,11 +3,11 @@ package services
 import (
 	"database/sql"
 	_ "github.com/lib/pq"
-	"github.com/panyam/relay/services/core"
+	"github.com/panyam/relay/services/messaging/core"
 	// "appengine/aetest"
-	// "github.com/panyam/relay/services/gae"
-	// "github.com/panyam/relay/services/inmem"
-	"github.com/panyam/relay/services/sqlds"
+	// "github.com/panyam/relay/services/messaging/gae"
+	// "github.com/panyam/relay/services/messaging/inmem"
+	"github.com/panyam/relay/services/messaging/sqlds"
 	"log"
 )
 

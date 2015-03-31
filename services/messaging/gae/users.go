@@ -4,7 +4,7 @@ import (
 	"appengine"
 	"appengine/datastore"
 	"fmt"
-	. "github.com/panyam/relay/services/core"
+	. "github.com/panyam/relay/services/messaging/core"
 	"log"
 )
 

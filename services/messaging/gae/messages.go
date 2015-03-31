@@ -1,19 +1,24 @@
-package inmem
+package gae
 
 import (
-	. "github.com/panyam/relay/services/core"
+	"appengine"
+	"appengine/datastore"
+	. "github.com/panyam/relay/services/messaging/core"
+	"log"
 )
 
 type MessageService struct {
 	Cls               interface{}
+	context           appengine.Context
 	messageCounter    int64
 	messagesInChannel map[int64][]*Message
 }
 
-func NewMessageService() *MessageService {
+func NewMessageService(ctx appengine.Context) *MessageService {
 	svc := MessageService{}
 	svc.Cls = &svc
-	svc.RemoveAllMessages()
+	svc.context = ctx
+	svc.messagesInChannel = make(map[int64][]*Message)
 	return &svc
 }
 
@@ -71,9 +76,13 @@ func (m *MessageService) SaveMessage(message *Message) error {
 }
 
 /**
- * Removes all entries.
+ * Removes all messages.
  */
 func (svc *MessageService) RemoveAllMessages() {
-	svc.messageCounter = 0
-	svc.messagesInChannel = make(map[int64][]*Message)
+	q := datastore.NewQuery("Message").KeysOnly()
+	keys, err := q.GetAll(svc.context, nil)
+	if err != nil {
+		log.Println("RemoveAll Error: ", err)
+	}
+	datastore.DeleteMulti(svc.context, keys)
 }

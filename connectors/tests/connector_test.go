@@ -1,15 +1,16 @@
 package connectors
 
 import (
+	goclient "github.com/panyam/relay/clients/goclient"
 	service_core "github.com/panyam/relay/connectors/core"
-	// client "github.com/panyam/relay/services/client/goclient"
-	connector_core "github.com/panyam/relay/services/core"
+	connector_core "github.com/panyam/relay/services/messaging/core"
 	. "gopkg.in/check.v1"
 	"testing"
 )
 
 type TestSuite struct {
 	server       service_core.Server
+	client       *goclient.ApiClient
 	serviceGroup *connector_core.ServiceGroup
 }
 
@@ -21,6 +22,8 @@ func Test(t *testing.T) { TestingT(t) }
 func (s *TestSuite) SetUpSuite(c *C) {
 	s.serviceGroup = CreateTestServiceGroup()
 	s.server = CreateTestServer()
+	s.client = goclient.NewApiClient("http://localhost:3000/api")
+	s.client.Authenticator = &goclient.DebugAuthenticator{"testuser"}
 	s.server.SetServiceGroup(s.serviceGroup)
 	go s.server.Run()
 }
@@ -34,7 +37,4 @@ func (s *TestSuite) SetUpTest(c *C) {
 
 func (s *TestSuite) TearDownSuite(c *C) {
 	s.server.Stop()
-}
-
-func (s *TestSuite) TestUserRegistration(c *C) {
 }

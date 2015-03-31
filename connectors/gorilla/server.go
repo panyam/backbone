@@ -4,7 +4,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/panyam/relay/connectors/gorilla/middleware"
-	"github.com/panyam/relay/services/core"
+	"github.com/panyam/relay/services/messaging/core"
 	"log"
 	"net/http"
 )

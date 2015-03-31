@@ -3,7 +3,8 @@ package sqlds
 import (
 	"database/sql"
 	"fmt"
-	. "github.com/panyam/relay/services/core"
+	. "github.com/panyam/relay/services/messaging/core"
+	. "github.com/panyam/relay/utils"
 )
 
 type Metadata struct {

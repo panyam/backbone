@@ -1,4 +1,4 @@
-package sqlds
+package utils
 
 import (
 	"bytes"

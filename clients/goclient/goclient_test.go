@@ -1,7 +1,7 @@
 package goclient
 
 import (
-	"github.com/panyam/relay/services/core"
+	"github.com/panyam/relay/services/messaging/core"
 	. "gopkg.in/check.v1"
 	"testing"
 	// "code.google.com/p/gomock/gomock"

@@ -2,7 +2,7 @@ package inmem
 
 import (
 	"errors"
-	. "github.com/panyam/relay/services/core"
+	. "github.com/panyam/relay/services/messaging/core"
 )
 
 type UserService struct {
