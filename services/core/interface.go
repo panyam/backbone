@@ -174,7 +174,7 @@ type IMessageService interface {
 	 * A valid Message object on return WILL have a non empty ID if the backend can
 	 * auto generate IDs
 	 */
-	CreateMessage(message *Message) error
+	SaveMessage(message *Message) error
 
 	/**
 	 * Gets a message by ID
@@ -195,11 +195,4 @@ type IMessageService interface {
 	 * Remove a particular message.
 	 */
 	DeleteMessage(message *Message) error
-
-	/**
-	 * Saves a message.
-	 * If the message ID is missing (or empty) then a new message is created.
-	 * If message ID is present then the existing message is updated.
-	 */
-	// SaveMessage(message *Message) error
 }

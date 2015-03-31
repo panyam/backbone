@@ -2,6 +2,7 @@ package sqlds
 
 import (
 	"database/sql"
+	"fmt"
 	. "github.com/panyam/backbone/services/core"
 )
 
@@ -59,18 +60,91 @@ func (svc *MessageService) InitDB() {
  * Send messages to particular recipients in this channel.
  * If Channel, message or user is nil an error is returned.
  */
-func (svc *MessageService) CreateMessage(message *Message) error {
-	return nil
+func (svc *MessageService) SaveMessage(message *Message) error {
+	if message.Id == 0 {
+		id := UUIDGen()
+		err := InsertRow(svc.DB, MESSAGES_TABLE,
+			"Id", "%ld", id,
+			"ChannelId", "%ld", message.Channel.Id,
+			"SenderId", "%ld", message.Sender.Id,
+			"Status", "%d", message.Status,
+			"MsgType", "%s", message.MsgType,
+			"MsgData", "%s", message.MsgData)
+		if err == nil {
+			message.Id = id
+		}
+		return err
+	} else {
+		return UpdateRows(svc.DB, MESSAGES_TABLE, "Id = %d",
+			"ChannelId", "%d", message.Channel.Id,
+			"SenderId", "%d", message.Sender.Id,
+			"Status", "%d", message.Status,
+			"MsgType", "%s", message.MsgType,
+			"MsgData", "%s", message.MsgData)
+	}
 }
 
 /**
- * Get the messages in a channel for a particular user.
+ * Get the messages in a channel for a particular user (optional)
  * If channel does not exist then an empty list is returned.
  * If user is nil then all messages in a channel is returned.
  * Pagination is possible with offset and count.
+ * Messages are also ordered by the created time stamp.
  */
-func (svc *MessageService) GetMessages(channel *Channel, user *User, offset int, count int) ([]*Message, error) {
-	return nil, nil
+func (svc *MessageService) GetMessages(channel *Channel, sender *User, offset int, count int) ([]*Message, error) {
+	reverse := false
+	descending := false
+	if count <= 0 {
+		count = 50
+	}
+	if offset < 0 {
+		offset = (-offset) - 1
+		descending = true
+		reverse = true
+	}
+	whereClause := fmt.Sprintf("WHERE ChannelId = %d", channel.Id)
+	if sender != nil {
+		whereClause += fmt.Sprintf(" AND SenderId = %d")
+	}
+	orderClause := "ORDER BY Created"
+	if descending {
+		orderClause += " DESC"
+	}
+
+	query := fmt.Sprintf("SELECT Id, Created, Status, MsgType, MsgData, SenderId from %s %s %s LIMIT %d OFFSET %d", MESSAGES_TABLE, whereClause, orderClause, count, offset)
+	rows, err := svc.DB.Query(query)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+	out := make([]*Message, 0, count)
+	for rows.Next() {
+		var senderId int64 = 0
+		msg := &Message{}
+		err := rows.Scan(&msg.Id, &msg.Created, &msg.Status, &msg.MsgType, &msg.MsgData, &senderId)
+		if err != nil {
+			return nil, err
+		}
+		if sender == nil {
+			msg.Sender, err = svc.SG.UserService.GetUserById(senderId)
+		} else {
+			msg.Sender = sender
+		}
+		out = append(out, msg)
+	}
+	if reverse {
+		start := 0
+		end := len(out) - 1
+		for start < end {
+			tmp := out[start]
+			out[start] = out[end]
+			out[end] = tmp
+			start++
+			end--
+		}
+	}
+	return out, nil
 }
 
 /**
@@ -98,16 +172,9 @@ func (svc *MessageService) GetMessageReceipts(message *Message) []*MessageReceip
  * Remove a particular message.
  */
 func (svc *MessageService) DeleteMessage(message *Message) error {
-	return nil
-}
-
-/**
- * Saves a message.
- * If the message ID is missing (or empty) then a new message is created.
- * If message ID is present then the existing message is updated.
- */
-func (svc *MessageService) SaveMessage(message *Message) error {
-	return nil
+	query := fmt.Sprintf("DELETE FROM %s WHERE Id = %d", MESSAGES_TABLE, message.Id)
+	_, err := svc.DB.Exec(query)
+	return err
 }
 
 /**

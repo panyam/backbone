@@ -18,17 +18,17 @@ type Message struct {
 	Sender *User
 
 	/**
-	 * When the message was created.  For now there is no distinction
-	 * between a created time stamp and a sent time stamp.
-	 */
-	Created time.Time
-
-	/**
 	 * Type of message - eg, "invite", "status", "command", "event" etc
 	 * This is normally only required when we do integrations so these
 	 * messages could be sent by bots or other APIs
 	 */
 	MsgType string
+
+	/**
+	 * For storing simple messages.  The alternative is to use message fragments
+	 * and store them as a list of fragments.
+	 */
+	MsgData string
 }
 
 /**
@@ -51,8 +51,7 @@ type MessageFragment struct {
 func NewMessage(channel *Channel, sender *User) *Message {
 	msg := Message{
 		Channel: channel,
-		Sender:  sender,
-		Created: time.Now()}
+		Sender:  sender}
 	msg.Object = Object{Id: 0}
 	return &msg
 }
