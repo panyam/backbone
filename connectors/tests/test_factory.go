@@ -5,8 +5,8 @@ import (
 	_ "github.com/lib/pq"
 	connector_core "github.com/panyam/relay/connectors/core"
 	"github.com/panyam/relay/connectors/gorilla"
-	service_core "github.com/panyam/relay/services/messaging/core"
-	"github.com/panyam/relay/services/messaging/sqlds"
+	service_core "github.com/panyam/relay/services/msg/core"
+	"github.com/panyam/relay/services/msg/sqlds"
 	"log"
 )
 

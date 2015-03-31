@@ -3,7 +3,7 @@ package connectors
 import (
 	goclient "github.com/panyam/relay/clients/goclient"
 	service_core "github.com/panyam/relay/connectors/core"
-	connector_core "github.com/panyam/relay/services/messaging/core"
+	connector_core "github.com/panyam/relay/services/msg/core"
 	. "gopkg.in/check.v1"
 	"testing"
 )

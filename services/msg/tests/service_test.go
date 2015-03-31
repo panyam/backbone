@@ -1,7 +1,7 @@
 package services
 
 import (
-	"github.com/panyam/relay/services/messaging/core"
+	"github.com/panyam/relay/services/msg/core"
 	. "gopkg.in/check.v1"
 	"testing"
 )

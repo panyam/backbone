@@ -2,7 +2,7 @@ package gae
 
 import (
 	"appengine/datastore"
-	. "github.com/panyam/relay/services/messaging/core"
+	. "github.com/panyam/relay/services/msg/core"
 	"time"
 )
 

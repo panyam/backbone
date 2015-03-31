@@ -3,7 +3,7 @@ package sqlds
 import (
 	"database/sql"
 	"fmt"
-	. "github.com/panyam/relay/services/messaging/core"
+	. "github.com/panyam/relay/services/msg/core"
 	. "github.com/panyam/relay/utils"
 )
 

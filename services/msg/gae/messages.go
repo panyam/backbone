@@ -3,7 +3,7 @@ package gae
 import (
 	"appengine"
 	"appengine/datastore"
-	. "github.com/panyam/relay/services/messaging/core"
+	. "github.com/panyam/relay/services/msg/core"
 	"log"
 )
 

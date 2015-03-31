@@ -3,7 +3,7 @@ package sqlds
 import (
 	"database/sql"
 	"fmt"
-	. "github.com/panyam/relay/services/messaging/core"
+	. "github.com/panyam/relay/services/msg/core"
 	. "github.com/panyam/relay/utils"
 )
 
@@ -113,9 +113,7 @@ func (svc *ChannelService) GetChannelMembers(channel *Channel) []ChannelMember {
  * Delete a channel.
  */
 func (svc *ChannelService) DeleteChannel(channel *Channel) error {
-	query := fmt.Sprintf("DELETE FROM %s WHERE Id = %d", CHANNELS_TABLE, channel.Id)
-	_, err := svc.DB.Exec(query)
-	return err
+	return DeleteById(svc.DB, CHANNELS_TABLE, channel.Id)
 }
 
 /**

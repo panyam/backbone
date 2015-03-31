@@ -71,8 +71,8 @@ func InsertRow(db *sql.DB, tableName string, args ...interface{}) error {
 }
 
 func UpdateRows(db *sql.DB, tableName string, whereClause string, args ...interface{}) error {
-	query := fmt.Sprintf("UPDATE %s SET", tableName)
-	columnsString := "("
+	query := fmt.Sprintf("UPDATE %s SET ", tableName)
+	columnsString := ""
 
 	numArgs := len(args)
 	if numArgs%3 != 0 {
@@ -100,6 +100,12 @@ func UpdateRows(db *sql.DB, tableName string, whereClause string, args ...interf
 	if whereClause != "" {
 		query += " WHERE " + whereClause
 	}
+	_, err := db.Exec(query)
+	return err
+}
+
+func DeleteById(db *sql.DB, tableName string, id int64) error {
+	query := fmt.Sprintf("DELETE FROM %s WHERE Id = %d", tableName, id)
 	_, err := db.Exec(query)
 	return err
 }

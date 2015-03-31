@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	// "errors"
 	"fmt"
-	. "github.com/panyam/relay/services/messaging/core"
+	. "github.com/panyam/relay/services/msg/core"
 	. "github.com/panyam/relay/utils"
 )
 
@@ -117,10 +117,7 @@ func (svc *TeamService) GetTeamByName(org string, name string) (*Team, error) {
  * Delete a team.
  */
 func (svc *TeamService) DeleteTeam(team *Team) error {
-	query := fmt.Sprintf("DELETE FROM %s WHERE Id = %d ", TEAMS_TABLE, team.Id)
-	fmt.Println("Query: ", query)
-	_, err := svc.DB.Exec(query)
-	return err
+	return DeleteById(svc.DB, TEAMS_TABLE, team.Id)
 }
 
 /**

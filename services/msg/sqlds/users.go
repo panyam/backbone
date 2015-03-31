@@ -3,7 +3,7 @@ package sqlds
 import (
 	"database/sql"
 	"fmt"
-	. "github.com/panyam/relay/services/messaging/core"
+	. "github.com/panyam/relay/services/msg/core"
 	. "github.com/panyam/relay/utils"
 )
 
@@ -90,15 +90,19 @@ func (svc *UserService) GetUser(username string, team *Team) (*User, error) {
 func (svc *UserService) SaveUser(user *User, override bool) error {
 	if user.Id == 0 {
 		id := UUIDGen()
-		query := fmt.Sprintf(`INSERT INTO %s ( Id, TeamId, Username, Status) VALUES (%d, %d, '%s', %d)`, USERS_TABLE, id, user.Team.Id, user.Username, user.Status)
-		_, err := svc.DB.Exec(query)
+		err := InsertRow(svc.DB, USERS_TABLE,
+			"Id", "%ld", id,
+			"TeamId", "%ld", user.Team.Id,
+			"Username", "%s", user.Username,
+			"Status", "%d", user.Status)
 		if err == nil {
 			user.Id = id
 		}
 		return err
 	} else {
-		query := fmt.Sprintf(`UPDATE %s SET TeamId = %d, Username = '%s', Status = %d where Id = %d`, USERS_TABLE, user.Team.Id, user.Username, user.Status, user.Id)
-		_, err := svc.DB.Exec(query)
-		return err
+		return UpdateRows(svc.DB, USERS_TABLE, fmt.Sprintf("Id = %d", user.Id),
+			"TeamId", "%ld", user.Team.Id,
+			"Username", "%s", user.Username,
+			"Status", "%d", user.Status)
 	}
 }

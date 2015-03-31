@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/panyam/relay/services/messaging/core"
+	"github.com/panyam/relay/services/msg/core"
 )
 
 type Server interface {

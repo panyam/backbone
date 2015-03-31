@@ -3,7 +3,7 @@ package sqlds
 import (
 	"database/sql"
 	"fmt"
-	. "github.com/panyam/relay/services/messaging/core"
+	. "github.com/panyam/relay/services/msg/core"
 	. "github.com/panyam/relay/utils"
 )
 
@@ -76,7 +76,7 @@ func (svc *MessageService) SaveMessage(message *Message) error {
 		}
 		return err
 	} else {
-		return UpdateRows(svc.DB, MESSAGES_TABLE, "Id = %d",
+		return UpdateRows(svc.DB, MESSAGES_TABLE, fmt.Sprintf("Id = %d", message.Id),
 			"ChannelId", "%d", message.Channel.Id,
 			"SenderId", "%d", message.Sender.Id,
 			"Status", "%d", message.Status,
@@ -173,13 +173,12 @@ func (svc *MessageService) GetMessageReceipts(message *Message) []*MessageReceip
  * Remove a particular message.
  */
 func (svc *MessageService) DeleteMessage(message *Message) error {
-	query := fmt.Sprintf("DELETE FROM %s WHERE Id = %d", MESSAGES_TABLE, message.Id)
-	_, err := svc.DB.Exec(query)
-	return err
+	return DeleteById(svc.DB, MESSAGES_TABLE, message.Id)
 }
 
 /**
  * Removes all entries.
  */
 func (svc *MessageService) RemoveAllMessages() {
+	ClearTable(svc.DB, MESSAGES_TABLE)
 }
