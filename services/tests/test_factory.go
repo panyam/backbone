@@ -30,7 +30,8 @@ func CreateServiceGroup() core.ServiceGroup {
 			sg.UserService = gae.NewUserService(ctx)
 			sg.TeamService = gae.NewTeamService(ctx)
 			sg.MessageService = gae.NewMessageService(ctx)
-		} else */if factoryType == "sql" {
+		} else */
+	if factoryType == "sql" {
 		db, err := sql.Open("postgres", "user=test dbname=test sslmode=disable")
 		if err != nil {
 			log.Fatal(err)

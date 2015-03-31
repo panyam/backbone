@@ -2,7 +2,7 @@ package goclient
 
 import (
 	"fmt"
-	"github.com/panyam/backbone/models"
+	"github.com/panyam/backbone/services/core"
 	"io"
 	"log"
 	"net/http"
@@ -71,18 +71,18 @@ func (client *ApiClient) ConfirmRegistration(registrationId string, verification
 	return err
 }
 
-func (client *ApiClient) GetTeams(username string) ([]*models.Team, error) {
+func (client *ApiClient) GetTeams(username string) ([]*core.Team, error) {
 	url := fmt.Sprintf("/users/%s/teams/", username)
 	req, err := client.MakeAuthRequest("GET", url, nil, nil)
-	teams := new([]*models.Team)
+	teams := new([]*core.Team)
 	_, err = SendRequest(req, teams)
 	return *teams, err
 }
 
-func (client *ApiClient) CreateTeam(name string, organization string) (*models.Team, error) {
+func (client *ApiClient) CreateTeam(name string, organization string) (*core.Team, error) {
 	params := map[string]string{"name": name, "org": organization}
 	req, err := client.MakeAuthRequest("POST", "/teams/", params, nil)
-	team := new(models.Team)
+	team := new(core.Team)
 	_, err = SendRequest(req, team)
 	return team, err
 }

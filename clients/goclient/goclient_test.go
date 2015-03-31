@@ -1,7 +1,7 @@
 package goclient
 
 import (
-	// . "github.com/panyam/backbone/models"
+	"github.com/panyam/backbone/services/core"
 	. "gopkg.in/check.v1"
 	"testing"
 	// "code.google.com/p/gomock/gomock"
@@ -9,6 +9,7 @@ import (
 
 type TestSuite struct {
 	client *ApiClient
+	sg     *core.ServiceGroup
 }
 
 var _ = Suite(&TestSuite{})

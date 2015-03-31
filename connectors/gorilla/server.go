@@ -4,18 +4,14 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/panyam/backbone/connectors/gorilla/middleware"
-	"github.com/panyam/backbone/models"
-	"github.com/panyam/backbone/services"
+	"github.com/panyam/backbone/services/core"
 	"log"
 	"net/http"
 )
 
 type Server struct {
-	teamService    services.ITeamService
-	userService    services.IUserService
-	channelService services.IChannelService
-	messageService services.IMessageService
-	store          *sessions.CookieStore
+	serviceGroup *core.ServiceGroup
+	store        *sessions.CookieStore
 }
 
 func NewServer() *Server {
@@ -26,20 +22,8 @@ func (s *Server) SetCookieStore(cs *sessions.CookieStore) {
 	s.store = sessions.NewCookieStore([]byte("something-very-secret"))
 }
 
-func (s *Server) SetTeamService(svc services.ITeamService) {
-	s.teamService = svc
-}
-
-func (s *Server) SetUserService(svc services.IUserService) {
-	s.userService = svc
-}
-
-func (s *Server) SetChannelService(svc services.IChannelService) {
-	s.channelService = svc
-}
-
-func (s *Server) SetMessageService(svc services.IMessageService) {
-	s.messageService = svc
+func (s *Server) SetServiceGroup(sg *core.ServiceGroup) {
+	s.serviceGroup = sg
 }
 
 func (s *Server) DefaultMiddleware(requiresUser bool) *middleware.MiddlewareChain {
@@ -112,7 +96,7 @@ func (s *Server) createApiRouter(parent *mux.Router) *mux.Router {
 	return apiRouter
 }
 
-func (s *Server) GetUser(request *http.Request) *models.User {
+func (s *Server) GetUser(request *http.Request) *core.User {
 	request.ParseForm()
 	log.Println("Form: ", request.Form)
 	log.Println("Cookies: ", request.Cookies)
