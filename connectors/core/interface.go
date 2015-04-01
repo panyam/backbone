@@ -1,11 +1,13 @@
 package core
 
 import (
-	"github.com/panyam/relay/services/msg/core"
+	authcore "github.com/panyam/relay/services/auth/core"
+	msgcore "github.com/panyam/relay/services/msg/core"
 )
 
 type Server interface {
 	Run()
 	Stop()
-	SetServiceGroup(sg *core.ServiceGroup)
+	SetServiceGroup(sg *msgcore.ServiceGroup)
+	SetAuthService(authSvc authcore.IAuthService)
 }

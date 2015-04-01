@@ -4,17 +4,22 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/panyam/relay/connectors/gorilla/middleware"
-	"github.com/panyam/relay/services/msg/core"
+	authcore "github.com/panyam/relay/services/auth/core"
+	msgcore "github.com/panyam/relay/services/msg/core"
 	"log"
+	"math/rand"
 	"net/http"
+	"time"
 )
 
 type Server struct {
-	serviceGroup *core.ServiceGroup
+	serviceGroup *msgcore.ServiceGroup
+	authService  authcore.IAuthService
 	store        *sessions.CookieStore
 }
 
 func NewServer() *Server {
+	rand.Seed(time.Now().UTC().UnixNano())
 	return &Server{}
 }
 
@@ -22,8 +27,12 @@ func (s *Server) SetCookieStore(cs *sessions.CookieStore) {
 	s.store = sessions.NewCookieStore([]byte("something-very-secret"))
 }
 
-func (s *Server) SetServiceGroup(sg *core.ServiceGroup) {
+func (s *Server) SetServiceGroup(sg *msgcore.ServiceGroup) {
 	s.serviceGroup = sg
+}
+
+func (s *Server) SetAuthService(authSvc authcore.IAuthService) {
+	s.authService = authSvc
 }
 
 func (s *Server) DefaultMiddleware(requiresUser bool) *middleware.MiddlewareChain {
@@ -96,7 +105,7 @@ func (s *Server) createApiRouter(parent *mux.Router) *mux.Router {
 	return apiRouter
 }
 
-func (s *Server) GetUser(request *http.Request) *core.User {
+func (s *Server) GetUser(request *http.Request) *msgcore.User {
 	request.ParseForm()
 	log.Println("Form: ", request.Form)
 	log.Println("Cookies: ", request.Cookies)

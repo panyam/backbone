@@ -27,6 +27,7 @@ func (s *TestSuite) SetUpSuite(c *C) {
 	s.client = goclient.NewApiClient("http://localhost:3000/api")
 	s.client.Authenticator = &goclient.DebugAuthenticator{"testuser"}
 	s.server.SetServiceGroup(s.serviceGroup)
+	s.server.SetAuthService(s.authService)
 	go s.server.Run()
 }
 

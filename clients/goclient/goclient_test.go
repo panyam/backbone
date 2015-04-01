@@ -29,5 +29,4 @@ func (s *TestSuite) TearDownTest(c *C) {
 }
 
 func (s *TestSuite) TestUserRegistration(c *C) {
-	s.client.RegisterUser("testuser", "phone", "1231231234", "password")
 }

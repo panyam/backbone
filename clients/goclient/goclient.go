@@ -2,7 +2,8 @@ package goclient
 
 import (
 	"fmt"
-	"github.com/panyam/relay/services/msg/core"
+	authcore "github.com/panyam/relay/services/auth/core"
+	msgcore "github.com/panyam/relay/services/msg/core"
 	"io"
 	"log"
 	"net/http"
@@ -33,9 +34,9 @@ func (client *ApiClient) url(path string) string {
 	}
 }
 
-func (client *ApiClient) RegisterUser(username string, address_type string,
-	address string, password string) (string, error) {
+func (client *ApiClient) RegisterUser(teamId int64, username string, address_type string, address string, password string) (*authcore.Registration, error) {
 	params := map[string]string{
+		"teamId":       fmt.Sprintf("%d", teamId),
 		"username":     username,
 		"address_type": address_type,
 		"address":      address,
@@ -47,7 +48,7 @@ func (client *ApiClient) RegisterUser(username string, address_type string,
 	req, err := MakeRequest("POST", client.url("/users/register/"), params, nil)
 	resp, err := SendRequest(req, nil)
 	log.Println("Register Response: ", resp)
-	return "", err
+	return nil, err
 }
 
 func (client *ApiClient) MakeAuthRequest(method, endpoint string,
@@ -71,18 +72,18 @@ func (client *ApiClient) ConfirmRegistration(registrationId string, verification
 	return err
 }
 
-func (client *ApiClient) GetTeams(username string) ([]*core.Team, error) {
+func (client *ApiClient) GetTeams(username string) ([]*msgcore.Team, error) {
 	url := fmt.Sprintf("/users/%s/teams/", username)
 	req, err := client.MakeAuthRequest("GET", url, nil, nil)
-	teams := new([]*core.Team)
+	teams := new([]*msgcore.Team)
 	_, err = SendRequest(req, teams)
 	return *teams, err
 }
 
-func (client *ApiClient) CreateTeam(name string, organization string) (*core.Team, error) {
+func (client *ApiClient) CreateTeam(name string, organization string) (*msgcore.Team, error) {
 	params := map[string]string{"name": name, "org": organization}
 	req, err := client.MakeAuthRequest("POST", "/teams/", params, nil)
-	team := new(core.Team)
+	team := new(msgcore.Team)
 	_, err = SendRequest(req, team)
 	return team, err
 }

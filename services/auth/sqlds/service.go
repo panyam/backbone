@@ -51,7 +51,7 @@ func (svc *AuthService) InitDB() {
 			"Status INT DEFAULT(0)",
 			"Created TIMESTAMP WITHOUT TIME ZONE DEFAULT statement_timestamp()",
 		},
-		", CONSTRAINT unique_registrations UNIQUE (Source, SourceId)")
+		", CONSTRAINT unique_user_logins UNIQUE (Source, SourceId)")
 }
 
 /**
