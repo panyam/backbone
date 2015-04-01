@@ -7,8 +7,8 @@ import (
 
 type Registration struct {
 	Id               int64
-	Username         string
 	Team             *Team
+	Username         string
 	Created          time.Time
 	AddressType      string
 	Address          string

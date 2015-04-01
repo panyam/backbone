@@ -2,18 +2,19 @@ package connectors
 
 import (
 	goclient "github.com/panyam/relay/clients/goclient"
-	connector_core "github.com/panyam/relay/connectors/core"
-	auth_core "github.com/panyam/relay/services/auth/core"
-	msg_core "github.com/panyam/relay/services/msg/core"
+	connectorcore "github.com/panyam/relay/connectors/core"
+	authcore "github.com/panyam/relay/services/auth/core"
+	msgcore "github.com/panyam/relay/services/msg/core"
 	. "gopkg.in/check.v1"
 	"testing"
 )
 
 type TestSuite struct {
-	server       connector_core.Server
+	server       connectorcore.Server
 	client       *goclient.ApiClient
-	authService  auth_core.IAuthService
-	serviceGroup *msg_core.ServiceGroup
+	testTeam     *msgcore.Team
+	authService  authcore.IAuthService
+	serviceGroup *msgcore.ServiceGroup
 }
 
 var _ = Suite(&TestSuite{})
@@ -36,6 +37,8 @@ func (s *TestSuite) SetUpTest(c *C) {
 	s.serviceGroup.TeamService.RemoveAllTeams()
 	s.serviceGroup.UserService.RemoveAllUsers()
 	s.serviceGroup.MessageService.RemoveAllMessages()
+
+	s.testTeam, _ = s.serviceGroup.TeamService.CreateTeam(1, "org", "team")
 }
 
 func (s *TestSuite) TearDownSuite(c *C) {

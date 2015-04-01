@@ -71,6 +71,9 @@ func (svc *UserService) GetUser(username string, team *Team) (*User, error) {
 
 	var user User
 	err := row.Scan(&user.Id, &user.Status, &user.Created)
+	if err != nil {
+		return nil, err
+	}
 	user.Username = username
 	user.Team = team
 	return &user, err

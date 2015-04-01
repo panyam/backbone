@@ -38,6 +38,7 @@ func (svc *AuthService) InitDB() {
 			"Created TIMESTAMP WITHOUT TIME ZONE DEFAULT statement_timestamp()",
 			"AddressType TEXT DEFAULT('phone')",
 			"Address TEXT NOT NULL",
+			"Status INT DEFAULT(0)",
 			"VerificationData TEXT DEFAULT('')",
 		},
 		", CONSTRAINT unique_registrations UNIQUE (TeamId, Username)")
@@ -74,6 +75,7 @@ func (svc *AuthService) SaveRegistration(registration *authcore.Registration) er
 			"Address", "%s", registration.Address,
 			"AddressType", "%s", registration.AddressType,
 			"Status", "%d", registration.Status)
+		fmt.Println("======= ok hwere we are, user: ", user, err)
 		if err == nil {
 			registration.Id = id
 		}

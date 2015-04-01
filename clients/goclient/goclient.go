@@ -1,6 +1,7 @@
 package goclient
 
 import (
+	"encoding/json"
 	"fmt"
 	authcore "github.com/panyam/relay/services/auth/core"
 	msgcore "github.com/panyam/relay/services/msg/core"
@@ -46,9 +47,19 @@ func (client *ApiClient) RegisterUser(teamId int64, username string, address_typ
 	}
 
 	req, err := MakeRequest("POST", client.url("/users/register/"), params, nil)
-	resp, err := SendRequest(req, nil)
-	log.Println("Register Response: ", resp)
-	return nil, err
+	var data map[string]interface{}
+	_, err = SendRequest(req, &data)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Println("data: ", data)
+	registration := authcore.Registration{}
+	registration.Username = data["Username"].(string)
+	registration.Address = data["Address"].(string)
+	registration.AddressType = data["AddressType"].(string)
+	registration.Id, _ = data["Id"].(json.Number).Int64()
+	return &registration, err
 }
 
 func (client *ApiClient) MakeAuthRequest(method, endpoint string,
@@ -69,6 +80,8 @@ func (client *ApiClient) ConfirmRegistration(registrationId string, verification
 	req, err := MakeRequest("POST", url, params, nil)
 	resp, err := SendRequest(req, nil)
 	log.Println("Confirm Reg Resp: ", resp)
+	defer resp.Body.Close()
+	// body, err := ioutil.ReadAll(resp.Body)
 	return err
 }
 

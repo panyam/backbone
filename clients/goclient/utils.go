@@ -40,7 +40,9 @@ func SendRequest(req *http.Request, output interface{}) (*http.Response, error) 
 		}
 	}
 	if output != nil {
-		return resp, json.NewDecoder(resp.Body).Decode(output)
+		decoder := json.NewDecoder(resp.Body)
+		decoder.UseNumber()
+		return resp, decoder.Decode(output)
 	}
 	return resp, err
 }

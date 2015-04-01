@@ -32,6 +32,13 @@ func (s *Server) AccountRegisterHandler() RequestHandlerFunc {
 		}
 		s.authService.SaveRegistration(&registration)
 		log.Println("Register account, Registration: ", registration)
+		utils.SendJsonResponse(rw, map[string]interface{}{
+			"Id":          registration.Id,
+			"Username":    registration.Username,
+			"AddressType": registration.AddressType,
+			"Address":     registration.Address,
+			"Team":        teamId,
+		})
 	}
 }
 
