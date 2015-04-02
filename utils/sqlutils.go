@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/satori/go.uuid"
 	"log"
+	"reflect"
 	"strings"
 )
 
@@ -35,32 +36,37 @@ func CreateTable(db *sql.DB, tableName string, columns []string, tableConstraint
 	return error
 }
 
+func formatSqlValue(value interface{}) string {
+	v := reflect.ValueOf(value)
+	// t := v.Type()
+	kind := v.Kind()
+	if kind == reflect.Int || kind == reflect.Int8 || kind == reflect.Int16 || kind == reflect.Int32 || kind == reflect.Int64 {
+		return fmt.Sprintf("%d", value)
+	} else if kind == reflect.Uint || kind == reflect.Uint8 || kind == reflect.Uint16 || kind == reflect.Uint32 || kind == reflect.Uint64 {
+		return fmt.Sprintf("%d", value)
+	} else if kind == reflect.String {
+		return fmt.Sprintf("'%s'", value)
+	}
+	return "'<unknown_type>'"
+}
+
 func InsertRow(db *sql.DB, tableName string, args ...interface{}) error {
 	query := fmt.Sprintf("INSERT INTO %s", tableName)
 	columnsString := "("
 	valuesString := "("
 	numArgs := len(args)
-	if numArgs%3 != 0 {
-		return errors.New("Number of arguments must be a multiple of 3")
+	if numArgs%2 != 0 {
+		return errors.New("Number of arguments must be a multiple of 2")
 	}
 
-	for i := 0; i < numArgs; i += 3 {
+	for i := 0; i < numArgs; i += 2 {
 		colName := args[i].(string)
-		colFormat := args[i+1].(string)
 		if i > 0 {
-			columnsString = columnsString + ", "
-			valuesString = valuesString + ", "
+			columnsString += ", "
+			valuesString += ", "
 		}
-		columnsString = columnsString + " " + colName
-		if colFormat == "%d" {
-			valuesString = valuesString + fmt.Sprintf(" %d", args[i+2].(int))
-		} else if colFormat == "%ld" {
-			valuesString = valuesString + fmt.Sprintf(" %d", args[i+2].(int64))
-		} else if colFormat == "%s" {
-			valuesString = valuesString + fmt.Sprintf(" '%s'", args[i+2].(string))
-		} else {
-			return errors.New(fmt.Sprintf("Invalid col format: %s at index %d", colFormat, i+1))
-		}
+		columnsString += colName
+		valuesString += formatSqlValue(args[i+1])
 	}
 
 	columnsString = columnsString + ")"
@@ -75,25 +81,16 @@ func UpdateRows(db *sql.DB, tableName string, whereClause string, args ...interf
 	columnsString := ""
 
 	numArgs := len(args)
-	if numArgs%3 != 0 {
-		return errors.New("Number of arguments must be a multiple of 3")
+	if numArgs%2 != 0 {
+		return errors.New("Number of arguments must be a multiple of 2")
 	}
 
-	for i := 0; i < numArgs; i += 3 {
+	for i := 0; i < numArgs; i += 2 {
 		colName := args[i].(string)
-		colFormat := args[i+1].(string)
 		if i > 0 {
 			columnsString = columnsString + ", "
 		}
-		if colFormat == "%d" {
-			columnsString += fmt.Sprintf("%s = %d", colName, args[i+2].(int))
-		} else if colFormat == "%ld" {
-			columnsString += fmt.Sprintf("%s = %d", colName, args[i+2].(int64))
-		} else if colFormat == "%s" {
-			columnsString += fmt.Sprintf("%s = '%s'", colName, args[i+2].(string))
-		} else {
-			return errors.New(fmt.Sprintf("Invalid col format: %s at index %d", colFormat, i+1))
-		}
+		columnsString += fmt.Sprintf("%s = %s", colName, formatSqlValue(args[i+1]))
 	}
 
 	query = query + columnsString

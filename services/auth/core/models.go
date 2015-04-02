@@ -10,6 +10,7 @@ type Registration struct {
 	Team             *Team
 	Username         string
 	Created          time.Time
+	ExpiresAt        time.Time
 	AddressType      string
 	Address          string
 	VerificationData string

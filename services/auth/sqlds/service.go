@@ -36,6 +36,7 @@ func (svc *AuthService) InitDB() {
 			"TeamId bigint NOT NULL REFERENCES teams (Id) ON DELETE CASCADE",
 			"Username TEXT NOT NULL",
 			"Created TIMESTAMP WITHOUT TIME ZONE DEFAULT statement_timestamp()",
+			"ExpiresAt TIMESTAMP WITHOUT TIME ZONE",
 			"AddressType TEXT DEFAULT('phone')",
 			"Address TEXT NOT NULL",
 			"Status INT DEFAULT(0)",
@@ -69,24 +70,23 @@ func (svc *AuthService) SaveRegistration(registration *authcore.Registration) er
 	if registration.Id == 0 {
 		id := UUIDGen()
 		err := InsertRow(svc.DB, REGISTRATIONS_TABLE,
-			"Id", "%ld", id,
-			"TeamId", "%ld", registration.Team.Id,
-			"Username", "%s", registration.Username,
-			"Address", "%s", registration.Address,
-			"AddressType", "%s", registration.AddressType,
-			"Status", "%d", registration.Status)
-		fmt.Println("======= ok hwere we are, user: ", user, err)
+			"Id", id,
+			"TeamId", registration.Team.Id,
+			"Username", registration.Username,
+			"Address", registration.Address,
+			"AddressType", registration.AddressType,
+			"Status", registration.Status)
 		if err == nil {
 			registration.Id = id
 		}
 		return err
 	} else {
 		return UpdateRows(svc.DB, REGISTRATIONS_TABLE, fmt.Sprintf("Id = %d", registration.Id),
-			"TeamId", "%ld", registration.Team.Id,
-			"Username", "%s", registration.Username,
-			"Address", "%s", registration.Address,
-			"AddressType", "%s", registration.AddressType,
-			"Status", "%d", registration.Status)
+			"TeamId", registration.Team.Id,
+			"Username", registration.Username,
+			"Address", registration.Address,
+			"AddressType", registration.AddressType,
+			"Status", registration.Status)
 	}
 }
 
@@ -140,22 +140,22 @@ func (svc *AuthService) SaveUserLogin(login *authcore.UserLogin) error {
 	if login.Id == 0 {
 		id := UUIDGen()
 		err := InsertRow(svc.DB, LOGINS_TABLE,
-			"Id", "%ld", id,
-			"Source", "%s", login.Source,
-			"SourceId", "%s", login.SourceId,
-			"UserId", "%ld", userId,
-			"Credentials", "%s", login.Credentials,
-			"Status", "%d", login.Status)
+			"Id", id,
+			"Source", login.Source,
+			"SourceId", login.SourceId,
+			"UserId", userId,
+			"Credentials", login.Credentials,
+			"Status", login.Status)
 		if err == nil {
 			login.Id = id
 		}
 		return err
 	} else {
 		return UpdateRows(svc.DB, LOGINS_TABLE, fmt.Sprintf("Id = %d", login.Id),
-			"Source", "%s", login.Source,
-			"SourceId", "%s", login.SourceId,
-			"UserId", "%ld", userId,
-			"Credentials", "%s", login.Credentials,
-			"Status", "%d", login.Status)
+			"Source", login.Source,
+			"SourceId", login.SourceId,
+			"UserId", userId,
+			"Credentials", login.Credentials,
+			"Status", login.Status)
 	}
 }

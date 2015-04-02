@@ -65,23 +65,23 @@ func (svc *MessageService) SaveMessage(message *Message) error {
 	if message.Id == 0 {
 		id := UUIDGen()
 		err := InsertRow(svc.DB, MESSAGES_TABLE,
-			"Id", "%ld", id,
-			"ChannelId", "%ld", message.Channel.Id,
-			"SenderId", "%ld", message.Sender.Id,
-			"Status", "%d", message.Status,
-			"MsgType", "%s", message.MsgType,
-			"MsgData", "%s", message.MsgData)
+			"Id", id,
+			"ChannelId", message.Channel.Id,
+			"SenderId", message.Sender.Id,
+			"Status", message.Status,
+			"MsgType", message.MsgType,
+			"MsgData", message.MsgData)
 		if err == nil {
 			message.Id = id
 		}
 		return err
 	} else {
 		return UpdateRows(svc.DB, MESSAGES_TABLE, fmt.Sprintf("Id = %d", message.Id),
-			"ChannelId", "%d", message.Channel.Id,
-			"SenderId", "%d", message.Sender.Id,
-			"Status", "%d", message.Status,
-			"MsgType", "%s", message.MsgType,
-			"MsgData", "%s", message.MsgData)
+			"ChannelId", message.Channel.Id,
+			"SenderId", message.Sender.Id,
+			"Status", message.Status,
+			"MsgType", message.MsgType,
+			"MsgData", message.MsgData)
 	}
 }
 

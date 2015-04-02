@@ -94,18 +94,18 @@ func (svc *UserService) SaveUser(user *User, override bool) error {
 	if user.Id == 0 {
 		id := UUIDGen()
 		err := InsertRow(svc.DB, USERS_TABLE,
-			"Id", "%ld", id,
-			"TeamId", "%ld", user.Team.Id,
-			"Username", "%s", user.Username,
-			"Status", "%d", user.Status)
+			"Id", id,
+			"TeamId", user.Team.Id,
+			"Username", user.Username,
+			"Status", user.Status)
 		if err == nil {
 			user.Id = id
 		}
 		return err
 	} else {
 		return UpdateRows(svc.DB, USERS_TABLE, fmt.Sprintf("Id = %d", user.Id),
-			"TeamId", "%ld", user.Team.Id,
-			"Username", "%s", user.Username,
-			"Status", "%d", user.Status)
+			"TeamId", user.Team.Id,
+			"Username", user.Username,
+			"Status", user.Status)
 	}
 }
