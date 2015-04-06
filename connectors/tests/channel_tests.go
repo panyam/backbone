@@ -2,7 +2,7 @@ package connectors
 
 import (
 	// authcore "github.com/panyam/relay/services/auth/core"
-	msgcore "github.com/panyam/relay/services/msg/core"
+	// msgcore "github.com/panyam/relay/services/msg/core"
 	. "gopkg.in/check.v1"
 )
 
@@ -14,10 +14,10 @@ import (
  */
 func (s *TestSuite) TestCreateChannels(c *C) {
 	// No login returns Not allowed
-	channel := msgcore.NewChannel(s.testTeam, s.testUser, 1, "Test")
-	_, err := s.client.CreateChannel(s.testTeam, "testchannel", true, nil)
-	c.Assert(err, Not(Equals), nil)
-	c.Assert(channel, Equals, nil)
+	channel, err := s.client.CreateChannel(s.testTeam, "testchannel", true, nil)
+	c.Assert(err, Not(IsNil))
+	c.Assert(err.Error(), Equals, "401 Unauthorized")
+	c.Assert(channel, IsNil)
 }
 
 /**

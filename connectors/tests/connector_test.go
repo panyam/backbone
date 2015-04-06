@@ -42,7 +42,7 @@ func (s *TestSuite) SetUpTest(c *C) {
 	s.testTeam, _ = s.serviceGroup.TeamService.CreateTeam(1, "org", "testteam")
 	s.testUser = msgcore.NewUser(0, "testuser", s.testTeam)
 	err := s.serviceGroup.UserService.SaveUser(s.testUser, false)
-	c.Assert(err, Equals, nil)
+	c.Assert(err, IsNil)
 
 	s.client.DisableAuthentication()
 }

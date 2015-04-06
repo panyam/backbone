@@ -57,16 +57,22 @@ func (svc *ChannelService) InitDB() {
 func (svc *ChannelService) SaveChannel(channel *Channel, override bool) error {
 	if channel.Id == 0 {
 		id := UUIDGen()
-		query := fmt.Sprintf(`INSERT INTO %s ( Id, TeamId, UserId, Name, Status) VALUES (%d, %d, %d, '%s', '%s', %d)`, CHANNELS_TABLE, id, channel.Team.Id, channel.Creator.Id, channel.Name, channel.Status)
-		_, err := svc.DB.Exec(query)
+		err := InsertRow(svc.DB, CHANNELS_TABLE,
+			"Id", id,
+			"TeamId", channel.Team.Id,
+			"UserId", channel.Creator.Id,
+			"Name", channel.Name,
+			"Status", channel.Status)
 		if err == nil {
 			channel.Id = id
 		}
 		return err
 	} else {
-		query := fmt.Sprintf(`UPDATE %s SET TeamId = %d, UserId = %d, Name = '%s', Status = %d where  Id = %d`, CHANNELS_TABLE, channel.Team.Id, channel.Creator.Id, channel.Name, channel.Status, channel.Id)
-		_, err := svc.DB.Exec(query)
-		return err
+		return UpdateRows(svc.DB, CHANNELS_TABLE, fmt.Sprintf("Id = %d", channel.Id),
+			"TeamId", channel.Team.Id,
+			"UserId", channel.Creator.Id,
+			"Name", channel.Name,
+			"Status", channel.Status)
 	}
 }
 

@@ -11,7 +11,7 @@ import (
 
 func (s *TestSuite) TestCreateMessageService(c *C) {
 	svc := s.serviceGroup.MessageService
-	c.Assert(svc, Not(Equals), nil)
+	c.Assert(svc, Not(IsNil))
 }
 
 func (s *TestSuite) MakeTestChannel() *Channel {
@@ -22,7 +22,7 @@ func (s *TestSuite) MakeTestChannel() *Channel {
 	_ = s.serviceGroup.UserService.SaveUser(user, false)
 
 	// create channel
-	channel := NewChannel(team, user, 0, "test", "group")
+	channel := NewChannel(team, user, 0, "test")
 	s.serviceGroup.ChannelService.SaveChannel(channel, true)
 
 	return channel
@@ -40,7 +40,7 @@ func (s *TestSuite) TestSaveMessage(c *C) {
 
 	message := NewMessage(channel, channel.Creator)
 	err := s.serviceGroup.MessageService.SaveMessage(message)
-	c.Assert(err, Equals, nil)
+	c.Assert(err, IsNil)
 	msgs, err := s.serviceGroup.MessageService.GetMessages(channel, nil, 0, -1)
 	log.Println("err: ", err)
 	c.Assert(len(msgs), Equals, 1)
@@ -56,19 +56,19 @@ func (s *TestSuite) TestPaginationAtFront(c *C) {
 		message := NewMessage(channel, channel.Creator)
 		message.MsgData = fmt.Sprintf("Message %d", i)
 		err := s.serviceGroup.MessageService.SaveMessage(message)
-		c.Assert(err, Equals, nil)
+		c.Assert(err, IsNil)
 	}
 
 	top20, err := s.serviceGroup.MessageService.GetMessages(channel, nil, 0, 20)
-	c.Assert(err, Equals, nil)
+	c.Assert(err, IsNil)
 	c.Assert(len(top20), Equals, 20)
 
 	mid20, err := s.serviceGroup.MessageService.GetMessages(channel, nil, 30, 20)
-	c.Assert(err, Equals, nil)
+	c.Assert(err, IsNil)
 	c.Assert(len(mid20), Equals, 20)
 
 	bottom20, err := s.serviceGroup.MessageService.GetMessages(channel, nil, -1, 20)
-	c.Assert(err, Equals, nil)
+	c.Assert(err, IsNil)
 	c.Assert(len(bottom20), Equals, 20)
 
 	// check messages are correct
@@ -90,13 +90,13 @@ func (s *TestSuite) TestDeleteMessage(c *C) {
 
 	message := NewMessage(channel, channel.Creator)
 	err := s.serviceGroup.MessageService.SaveMessage(message)
-	c.Assert(err, Equals, nil)
+	c.Assert(err, IsNil)
 
 	msgs, err := s.serviceGroup.MessageService.GetMessages(channel, nil, 0, -1)
 	c.Assert(len(msgs), Equals, 1)
 
 	err = s.serviceGroup.MessageService.DeleteMessage(message)
-	c.Assert(err, Equals, nil)
+	c.Assert(err, IsNil)
 	msgs, err = s.serviceGroup.MessageService.GetMessages(channel, nil, 0, -1)
 	c.Assert(len(msgs), Equals, 0)
 }

@@ -33,16 +33,12 @@ func MakeRequest(method, endpoint string, queryParams map[string]string, body io
 func SendRequest(req *http.Request, output interface{}) (*http.Response, error) {
 	c := http.Client{}
 	resp, err := c.Do(req)
-	if resp != nil {
-		log.Println("response is: ", resp.Status, err)
-		if resp.Body != nil && output == nil {
-			defer resp.Body.Close()
-		}
+	if resp == nil || resp.Body == nil || output == nil || resp.ContentLength == 0 {
+		return resp, err
 	}
-	if output != nil {
-		decoder := json.NewDecoder(resp.Body)
-		decoder.UseNumber()
-		return resp, decoder.Decode(output)
-	}
-	return resp, err
+
+	defer resp.Body.Close()
+	decoder := json.NewDecoder(resp.Body)
+	decoder.UseNumber()
+	return resp, decoder.Decode(output)
 }

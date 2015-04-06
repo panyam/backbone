@@ -134,7 +134,10 @@ func (client *ApiClient) CreateTeam(name string, organization string) (*msgcore.
 	params := map[string]string{"name": name, "org": organization}
 	req, err := client.MakeAuthRequest("POST", "/teams/", params, nil)
 	team := new(msgcore.Team)
-	_, err = SendRequest(req, team)
+	resp, err := SendRequest(req, team)
+	if resp.StatusCode != 200 {
+		return nil, errors.New(resp.Status)
+	}
 	return team, err
 }
 
@@ -169,9 +172,11 @@ func (client *ApiClient) CreateChannel(team *msgcore.Team, name string, public b
 	url := fmt.Sprintf("/teams/%s/channels/", utils.ID2String(team.Id))
 	req, err := client.MakeAuthRequest("POST", url, params, nil)
 	var data map[string]interface{}
-	_, err = SendRequest(req, data)
-	if err == nil {
-		return msgcore.ChannelFromDict(data)
+	resp, err := SendRequest(req, data)
+	if err != nil {
+		return nil, err
+	} else if resp.StatusCode != 200 {
+		return nil, errors.New(resp.Status)
 	}
-	return nil, err
+	return msgcore.ChannelFromDict(data)
 }
