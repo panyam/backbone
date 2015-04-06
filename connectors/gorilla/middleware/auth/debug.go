@@ -1,9 +1,9 @@
 package middleware
 
 import (
-	"github.com/panyam/relay/models"
-	"github.com/panyam/relay/services"
-	"log"
+	"github.com/panyam/relay/connectors/gorilla/common"
+	msgcore "github.com/panyam/relay/services/msg/core"
+	"github.com/panyam/relay/utils"
 	"net/http"
 )
 
@@ -11,7 +11,7 @@ type UserService interface {
 	/**
 	 * Get user info by ID
 	 */
-	GetUserById(id string) (*User, error)
+	GetUserById(id int64) (*msgcore.User, error)
 }
 
 /**
@@ -20,17 +20,24 @@ type UserService interface {
  * based on this.
  */
 type DebugValidator struct {
-	userid      string
+	userid      int64
 	userService UserService
 }
 
-func NewDebugValidator(u string, userService UserService) *DebugValidator {
+func NewDebugValidator(u int64, userService UserService) *DebugValidator {
 	return &DebugValidator{userid: u}
 }
 
-func (validator *DebugValidator) ValidateRequest(request *http.Request, context *RequestContext) *models.User {
-	if request.Form["__user"] == validator.Userid {
-		return userService.GetUserById(validator.Userid)
+func (validator *DebugValidator) ValidateRequest(request *http.Request, context common.IRequestContext) *msgcore.User {
+	users := request.Form["__dbguser"]
+	if len(users) > 0 {
+		userid := utils.String2ID(users[0])
+		if userid == validator.userid {
+			user, err := validator.userService.GetUserById(validator.userid)
+			if user != nil && err == nil {
+				return user
+			}
+		}
 	}
 	return nil
 }

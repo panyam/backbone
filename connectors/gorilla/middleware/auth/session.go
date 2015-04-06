@@ -1,8 +1,8 @@
 package middleware
 
 import (
+	"github.com/panyam/relay/connectors/gorilla/common"
 	// "github.com/gorilla/sessions"
-	"log"
 	"net/http"
 )
 
@@ -17,10 +17,12 @@ func PasswordValidator() {
 type SessionValidator struct {
 }
 
-func (fm *SessionValidator) ProcessRequest(rw http.ResponseWriter, request *http.Request, context *RequestContext) MiddlewareResult {
+func (fm *SessionValidator) ProcessRequest(rw http.ResponseWriter, request *http.Request, context common.IRequestContext) error {
+	return nil
 }
 
-func (fm *SessionValidator) ProcessResponse(rw http.ResponseWriter, request *http.Request, context *RequestContext) MiddlewareResult {
+func (fm *SessionValidator) ProcessResponse(rw http.ResponseWriter, request *http.Request, context common.IRequestContext) error {
+	return nil
 }
 
 /**
@@ -29,8 +31,10 @@ func (fm *SessionValidator) ProcessResponse(rw http.ResponseWriter, request *htt
 type SignedRequestValidator struct {
 }
 
-func (fm *SignedRequestValidator) ProcessRequest(rw http.ResponseWriter, request *http.Request, context *RequestContext) MiddlewareResult {
+func (fm *SignedRequestValidator) ProcessRequest(rw http.ResponseWriter, request *http.Request, context common.IRequestContext) error {
+	return nil
 }
 
-func (fm *SignedRequestValidator) ProcessResponse(rw http.ResponseWriter, request *http.Request, context *RequestContext) MiddlewareResult {
+func (fm *SignedRequestValidator) ProcessResponse(rw http.ResponseWriter, request *http.Request, context common.IRequestContext) error {
+	return nil
 }

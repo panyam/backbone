@@ -34,7 +34,6 @@ func (svc *ChannelService) InitDB() {
 			"UserId bigint DEFAULT(0) REFERENCES users (Id) ON DELETE SET DEFAULT",
 			"Created TIMESTAMP WITHOUT TIME ZONE DEFAULT statement_timestamp()",
 			"Name TEXT DEFAULT ('')",
-			"GroupName TEXT DEFAULT ('')",
 			"LastMessageAt TIMESTAMP WITHOUT TIME ZONE",
 			"Status INT DEFAULT (0)",
 		})
@@ -58,14 +57,14 @@ func (svc *ChannelService) InitDB() {
 func (svc *ChannelService) SaveChannel(channel *Channel, override bool) error {
 	if channel.Id == 0 {
 		id := UUIDGen()
-		query := fmt.Sprintf(`INSERT INTO %s ( Id, TeamId, UserId, Name, GroupName, Status) VALUES (%d, %d, %d, '%s', '%s', %d)`, CHANNELS_TABLE, id, channel.Team.Id, channel.Creator.Id, channel.Name, channel.GroupName, channel.Status)
+		query := fmt.Sprintf(`INSERT INTO %s ( Id, TeamId, UserId, Name, Status) VALUES (%d, %d, %d, '%s', '%s', %d)`, CHANNELS_TABLE, id, channel.Team.Id, channel.Creator.Id, channel.Name, channel.Status)
 		_, err := svc.DB.Exec(query)
 		if err == nil {
 			channel.Id = id
 		}
 		return err
 	} else {
-		query := fmt.Sprintf(`UPDATE %s SET GroupName = '%s', TeamId = %d, UserId = %d, Name = '%s', Status = %d where  Id = %d`, CHANNELS_TABLE, channel.GroupName, channel.Team.Id, channel.Creator.Id, channel.Name, channel.Status, channel.Id)
+		query := fmt.Sprintf(`UPDATE %s SET TeamId = %d, UserId = %d, Name = '%s', Status = %d where  Id = %d`, CHANNELS_TABLE, channel.Team.Id, channel.Creator.Id, channel.Name, channel.Status, channel.Id)
 		_, err := svc.DB.Exec(query)
 		return err
 	}
@@ -75,13 +74,13 @@ func (svc *ChannelService) SaveChannel(channel *Channel, override bool) error {
  * Retrieve a channel by Name.
  */
 func (svc *ChannelService) GetChannelById(id int64) (*Channel, error) {
-	query := fmt.Sprintf("SELECT TeamId, UserId, Status, Created, Name, GroupName from %s where Id = %d", CHANNELS_TABLE, id)
+	query := fmt.Sprintf("SELECT TeamId, UserId, Status, Created, Name from %s where Id = %d", CHANNELS_TABLE, id)
 	row := svc.DB.QueryRow(query)
 
 	var channel Channel
 	var teamId int64
 	var userId int64
-	err := row.Scan(&teamId, &userId, &channel.Status, &channel.Created, &channel.Name, &channel.GroupName)
+	err := row.Scan(&teamId, &userId, &channel.Status, &channel.Created, &channel.Name)
 	if err != nil {
 		return nil, err
 	}

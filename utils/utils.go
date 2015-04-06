@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"fmt"
 	"math/rand"
+	"strconv"
 )
 
 func RandSeq(chars string, n int) string {
@@ -24,4 +26,16 @@ func RandAlnum(n int) string {
 
 func RandAlpha(n int) string {
 	return RandSeq("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", n)
+}
+
+func ID2String(id int64) string {
+	return fmt.Sprintf("%d", id)
+}
+
+func String2ID(strid string) int64 {
+	val, err := strconv.ParseInt(strid, 10, 64)
+	if err != nil {
+		return 0
+	}
+	return val
 }

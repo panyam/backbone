@@ -46,14 +46,14 @@ func (svc *AuthService) InitDB() {
 	CreateTable(svc.DB, LOGINS_TABLE,
 		[]string{
 			"Id bigint PRIMARY KEY",
-			"Source TEXT NOT NULL",
-			"SourceId TEXT NOT NULL",
+			"LoginType TEXT NOT NULL",
+			"LoginToken TEXT NOT NULL",
 			"UserId bigint NOT NULL REFERENCES users (Id) ON DELETE CASCADE",
 			"Credentials TEXT DEFAULT('')",
 			"Status INT DEFAULT(0)",
 			"Created TIMESTAMP WITHOUT TIME ZONE DEFAULT statement_timestamp()",
 		},
-		", CONSTRAINT unique_user_logins UNIQUE (Source, SourceId)")
+		", CONSTRAINT unique_user_logins UNIQUE (LoginType, LoginToken)")
 }
 
 /**
@@ -141,8 +141,8 @@ func (svc *AuthService) SaveUserLogin(login *authcore.UserLogin) error {
 		id := UUIDGen()
 		err := InsertRow(svc.DB, LOGINS_TABLE,
 			"Id", id,
-			"Source", login.Source,
-			"SourceId", login.SourceId,
+			"LoginType", login.LoginType,
+			"LoginToken", login.LoginToken,
 			"UserId", userId,
 			"Credentials", login.Credentials,
 			"Status", login.Status)
@@ -152,8 +152,8 @@ func (svc *AuthService) SaveUserLogin(login *authcore.UserLogin) error {
 		return err
 	} else {
 		return UpdateRows(svc.DB, LOGINS_TABLE, fmt.Sprintf("Id = %d", login.Id),
-			"Source", login.Source,
-			"SourceId", login.SourceId,
+			"LoginType", login.LoginType,
+			"LoginToken", login.LoginToken,
 			"UserId", userId,
 			"Credentials", login.Credentials,
 			"Status", login.Status)

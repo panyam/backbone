@@ -15,13 +15,13 @@ import (
  * 				and handlers.
  *
  * Returns:
- * A MiddlewareResult object.
+ * A error if any
  */
-type MiddlewareFunc func(rw http.ResponseWriter, request *http.Request, context *RequestContext) MiddlewareResult
+type MiddlewareFunc func(rw http.ResponseWriter, request *http.Request, context IRequestContext) error
 
 type Middleware interface {
-	ProcessRequest(rw http.ResponseWriter, request *http.Request, context *RequestContext) MiddlewareResult
-	ProcessResponse(rw http.ResponseWriter, request *http.Request, context *RequestContext) MiddlewareResult
+	ProcessRequest(rw http.ResponseWriter, request *http.Request, context IRequestContext) error
+	ProcessResponse(rw http.ResponseWriter, request *http.Request, context IRequestContext) error
 }
 
 type FunctionMiddleware struct {
@@ -29,38 +29,18 @@ type FunctionMiddleware struct {
 	responseMiddleware MiddlewareFunc
 }
 
-func (fm *FunctionMiddleware) ProcessRequest(rw http.ResponseWriter, request *http.Request, context *RequestContext) MiddlewareResult {
+func (fm *FunctionMiddleware) ProcessRequest(rw http.ResponseWriter, request *http.Request, context IRequestContext) error {
 	if fm.requestMiddleware != nil {
 		return fm.requestMiddleware(rw, request, context)
 	}
-	return NewMiddlewareResult(nil, nil)
+	return nil
 }
 
-func (fm *FunctionMiddleware) ProcessResponse(rw http.ResponseWriter, request *http.Request, context *RequestContext) MiddlewareResult {
+func (fm *FunctionMiddleware) ProcessResponse(rw http.ResponseWriter, request *http.Request, context IRequestContext) error {
 	if fm.responseMiddleware != nil {
 		return fm.responseMiddleware(rw, request, context)
 	}
-	return NewMiddlewareResult(nil, nil)
-}
-
-/**
- * Stores result of a middleware function application.
- */
-type MiddlewareResult struct {
-	error error
-	value interface{}
-}
-
-func NewMiddlewareResult(value interface{}, error error) MiddlewareResult {
-	return MiddlewareResult{value: value, error: error}
-}
-
-func (m *MiddlewareResult) Error() error {
-	return m.error
-}
-
-func (m *MiddlewareResult) Value() interface{} {
-	return m.value
+	return nil
 }
 
 type MiddlewareChain struct {
@@ -132,18 +112,18 @@ func (mchain *MiddlewareChain) Apply(handler RequestHandlerFunc) HttpHandlerFunc
 	return func(rw http.ResponseWriter, request *http.Request) {
 		context := NewRequestContext()
 		forward := true
-		var result MiddlewareResult
 		for {
 			middleware := mchain.Current()
+			var err error = nil
 			if forward {
-				result = middleware.ProcessRequest(rw, request, context)
+				err = middleware.ProcessRequest(rw, request, context)
 			} else {
-				result = middleware.ProcessResponse(rw, request, context)
+				err = middleware.ProcessResponse(rw, request, context)
 			}
 
-			if result.Error() != nil {
+			if err != nil {
 				// start going backwards
-				context.AddError(result.Error())
+				context.AddError(err)
 				forward = false
 			}
 			if forward {

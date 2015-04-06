@@ -1,5 +1,12 @@
 package common
 
+type IRequestContext interface {
+	AddError(err error)
+	Set(key string, value interface{})
+	Get(key string) interface{}
+	Errors() []error
+}
+
 /**
  * Request context stores all data related to a request handling sessions.
  */

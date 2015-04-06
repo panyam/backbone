@@ -1,0 +1,74 @@
+package connectors
+
+import (
+	// authcore "github.com/panyam/relay/services/auth/core"
+	msgcore "github.com/panyam/relay/services/msg/core"
+	. "gopkg.in/check.v1"
+)
+
+/**
+ * Channel creation:
+ *
+ * Without login - return 4xx
+ * With login - success
+ */
+func (s *TestSuite) TestCreateChannels(c *C) {
+	// No login returns Not allowed
+	channel := msgcore.NewChannel(s.testTeam, s.testUser, 1, "Test")
+	_, err := s.client.CreateChannel(s.testTeam, "testchannel", true, nil)
+	c.Assert(err, Not(Equals), nil)
+	c.Assert(channel, Equals, nil)
+}
+
+/**
+ * Getting teams.  Cases:
+ *
+ * Without login - return 4xx
+ * With login - return teams user is subscribed to or invited to.
+ */
+func (s *TestSuite) TestGetChannels(c *C) {
+}
+
+/**
+ * Get team details:
+ *
+ * Public team - return it with or without login
+ * Private team:
+ * 	Without login - return 4xx
+ * 	With login if part of team otherwise 4xx
+ */
+func (s *TestSuite) TestGetChannelDetails(c *C) {
+}
+
+/**
+ * Invite to a team
+ *
+ * 	Without login - return 4xx
+ * 	With login if user has "invite" permission and an invitation record is
+ * 	created (nothing happens if user is already invited by this or another user)
+ */
+func (s *TestSuite) TestInviteToChannel(c *C) {
+}
+
+/**
+ * Join a team
+ *
+ * 	Without login - return 4xx
+ * 	With login:
+ * 		if group is public then allow.  Duplicate joins do nothing.
+ * 		if group is private and an invitation record exists then allow.
+ * 		otherwise 4xx
+ */
+func (s *TestSuite) TestJoinChannel(c *C) {
+}
+
+/**
+ * Leave a team
+ *
+ * 	Without login - return 4xx
+ * 	With login:
+ * 		if not part of the group - nothing and 200
+ * 		if part of the group then leave and 200
+ */
+func (s *TestSuite) TestLeaveChannel(c *C) {
+}

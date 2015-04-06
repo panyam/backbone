@@ -5,6 +5,7 @@ import (
 	_ "github.com/lib/pq"
 	connector_core "github.com/panyam/relay/connectors/core"
 	"github.com/panyam/relay/connectors/gorilla"
+	authmw "github.com/panyam/relay/connectors/gorilla/middleware/auth"
 	auth_core "github.com/panyam/relay/services/auth/core"
 	auth_sqlds "github.com/panyam/relay/services/auth/sqlds"
 	msg_core "github.com/panyam/relay/services/msg/core"
@@ -14,11 +15,17 @@ import (
 
 const factoryType = "sql"
 
-func CreateTestServer() connector_core.Server {
-	return gorilla.NewServer()
+func (s *TestSuite) CreateTestServer() connector_core.Server {
+	server := gorilla.NewServer()
+
+	server.DebugUserId = 666
+	validator := authmw.NewDebugValidator(server.DebugUserId, s.serviceGroup.UserService)
+	am := authmw.AuthMiddleware{Validators: []authmw.AuthValidator{validator}}
+	server.SetAuthMiddleware(&am)
+	return server
 }
 
-func CreateTestServices() (*msg_core.ServiceGroup, auth_core.IAuthService) {
+func (s *TestSuite) CreateTestServices() (*msg_core.ServiceGroup, auth_core.IAuthService) {
 	sg := msg_core.ServiceGroup{}
 	var authService auth_core.IAuthService = nil
 	if factoryType == "sql" {

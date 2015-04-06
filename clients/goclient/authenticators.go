@@ -95,7 +95,7 @@ func (auth *DebugAuthenticator) AuthenticateRequest(req *http.Request) (*http.Re
 	if query != "" {
 		query += "&"
 	}
-	query += ("__user" + "=" + auth.Username)
+	query += ("__dbguser" + "=" + auth.Username)
 	var err error
 	req.URL, err = url.Parse(baseUrl + "?" + query)
 	return req, err

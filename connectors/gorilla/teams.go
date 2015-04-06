@@ -27,7 +27,7 @@ func (s *Server) TeamDetailsHandler() RequestHandlerFunc {
 	}
 }
 
-func (s *Server) UpdateTeamHandler() RequestHandlerFunc {
+func (s *Server) SaveTeamHandler() RequestHandlerFunc {
 	return func(rw http.ResponseWriter, request *http.Request, context *RequestContext) {
 		log.Println("UpdateTeam")
 	}

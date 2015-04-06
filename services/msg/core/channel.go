@@ -26,14 +26,6 @@ type Channel struct {
 	Name string
 
 	/**
-	 * Uniqueness groups allows a channel to be unique within a group.  No two
-	 * channels can have the same uniqueness group. The point of this is so that
-	 * the user can define uniqueness constraints on when a group should not be
-	 * duplicated.
-	 */
-	GroupName string
-
-	/**
 	 * When the last message was posted on this channel.
 	 */
 	LastMessageAt time.Time
@@ -49,8 +41,12 @@ type ChannelMember struct {
 	Status int
 }
 
-func NewChannel(team *Team, creator *User, id int64, name string, group string) *Channel {
-	channel := &Channel{Team: team, Name: name, GroupName: group, Creator: creator}
+func NewChannel(team *Team, creator *User, id int64, name string) *Channel {
+	channel := &Channel{Team: team, Name: name, Creator: creator}
 	channel.Object = Object{Id: id}
 	return channel
+}
+
+func ChannelFromDict(data map[string]interface{}) (*Channel, error) {
+	return nil, nil
 }

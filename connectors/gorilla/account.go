@@ -2,6 +2,7 @@ package gorilla
 
 import (
 	// "github.com/panyam/relay/services"
+	"github.com/gorilla/mux"
 	. "github.com/panyam/relay/connectors/gorilla/common"
 	authcore "github.com/panyam/relay/services/auth/core"
 	"github.com/panyam/relay/utils"
@@ -31,13 +32,14 @@ func (s *Server) AccountRegisterHandler() RequestHandlerFunc {
 			VerificationData: verificationData,
 		}
 		s.authService.SaveRegistration(&registration)
-		utils.SendJsonResponse(rw, map[string]interface{}{
-			"Id":          registration.Id,
-			"Username":    registration.Username,
-			"AddressType": registration.AddressType,
-			"Address":     registration.Address,
-			"Team":        teamId,
-		})
+		utils.SendJsonResponse(rw, registration.ToDict())
+	}
+}
+
+func (s *Server) AccountConfirmHandler() RequestHandlerFunc {
+	return func(rw http.ResponseWriter, request *http.Request, context *RequestContext) {
+		registrationId := mux.Vars(request)["Id"]
+		log.Println("Reg Id: ", registrationId)
 	}
 }
 

@@ -1,12 +1,12 @@
 package goclient
 
 import (
-	"encoding/json"
+	"errors"
 	"fmt"
 	authcore "github.com/panyam/relay/services/auth/core"
 	msgcore "github.com/panyam/relay/services/msg/core"
+	"github.com/panyam/relay/utils"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 	// "log"
@@ -35,9 +35,29 @@ func (client *ApiClient) url(path string) string {
 	}
 }
 
-func (client *ApiClient) RegisterUser(teamId int64, username string, address_type string, address string, password string) (*authcore.Registration, error) {
+func (client *ApiClient) EnableAuthentication(auth Authenticator) {
+	client.Authenticator = auth
+}
+
+func (client *ApiClient) DisableAuthentication() {
+	client.Authenticator = nil
+}
+
+func (client *ApiClient) MakeAuthRequest(method, endpoint string,
+	queryParams map[string]string, body io.Reader) (*http.Request, error) {
+	request, err := MakeRequest(method, client.url(endpoint), queryParams, body)
+	if err != nil {
+		return nil, err
+	}
+	if client.Authenticator != nil {
+		client.Authenticator.AuthenticateRequest(request)
+	}
+	return request, nil
+}
+
+func (client *ApiClient) RegisterUser(team *msgcore.Team, username string, address_type string, address string, password string) (*authcore.Registration, error) {
 	params := map[string]string{
-		"teamId":       fmt.Sprintf("%d", teamId),
+		"teamId":       utils.ID2String(team.Id),
 		"username":     username,
 		"address_type": address_type,
 		"address":      address,
@@ -53,50 +73,105 @@ func (client *ApiClient) RegisterUser(teamId int64, username string, address_typ
 		return nil, err
 	}
 
-	log.Println("data: ", data)
-	registration := authcore.Registration{}
-	registration.Username = data["Username"].(string)
-	registration.Address = data["Address"].(string)
-	registration.AddressType = data["AddressType"].(string)
-	registration.Id, _ = data["Id"].(json.Number).Int64()
-	return &registration, err
+	return authcore.RegistrationFromDict(data)
 }
 
-func (client *ApiClient) MakeAuthRequest(method, endpoint string,
-	queryParams map[string]string, body io.Reader) (*http.Request, error) {
-	request, err := MakeRequest(method, client.url(endpoint), queryParams, body)
-	if err != nil {
-		return nil, err
-	}
-	if client.Authenticator != nil {
-		client.Authenticator.AuthenticateRequest(request)
-	}
-	return request, nil
-}
-
-func (client *ApiClient) ConfirmRegistration(registrationId string, verificationCode string) error {
+func (client *ApiClient) ConfirmRegistration(registration *authcore.Registration, verificationCode string) error {
 	params := map[string]string{"verification_code": verificationCode}
-	url := client.url(fmt.Sprintf("/registrations/%s/confirm/", registrationId))
+	url := client.url(fmt.Sprintf("/users/registrations/%s/confirm/", utils.ID2String(registration.Id)))
 	req, err := MakeRequest("POST", url, params, nil)
 	resp, err := SendRequest(req, nil)
-	log.Println("Confirm Reg Resp: ", resp)
-	defer resp.Body.Close()
-	// body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		if resp.StatusCode == 400 {
+			return errors.New("Confirmation failed")
+		} else if resp.StatusCode != 200 {
+			return errors.New(resp.Status)
+		}
+	}
 	return err
 }
 
-func (client *ApiClient) GetTeams(username string) ([]*msgcore.Team, error) {
-	url := fmt.Sprintf("/users/%s/teams/", username)
+// Gets a list of teams a user is subscribed or invited to.
+//
+// **Endpoints:** GET /users/teams/
+//
+// **Auth Required:** YES
+//
+// **Return:**
+//  A list of teams that the current user is subscribed to.  eg:
+//  	```
+//  	[ {"id": 123, "name": "Dream Team", "organization": "Dream Owner"} ]
+//  	```
+func (client *ApiClient) GetTeams() ([]*msgcore.Team, error) {
+	url := "/users/teams/"
 	req, err := client.MakeAuthRequest("GET", url, nil, nil)
-	teams := new([]*msgcore.Team)
-	_, err = SendRequest(req, teams)
-	return *teams, err
+	var data map[string]interface{}
+	_, err = SendRequest(req, data)
+	return nil, err
 }
 
+// Create a team
+//
+// **Endpoints:** POST /teams/
+//
+// **Auth Required:** YES
+//
+// **Parameters:**
+// - organization: Organization the team belongs to (optional)
+// - name: Name of the team (required and must be unique within the organization).
+//
+// **Return:**
+//
+// HTTP Status 200 on success along with team details, eg:
+//
+// ```
+// {"id": "123", "name": "Dream Team", "organization": "Dream Owner"}
+// ```
+//
+// The user needs to have the "teamcreator" permission set otherwise returns
+// 4xx.
 func (client *ApiClient) CreateTeam(name string, organization string) (*msgcore.Team, error) {
 	params := map[string]string{"name": name, "org": organization}
 	req, err := client.MakeAuthRequest("POST", "/teams/", params, nil)
 	team := new(msgcore.Team)
 	_, err = SendRequest(req, team)
 	return team, err
+}
+
+// Create a channel
+//
+// **Endpoints:** POST /teams/<id>/channels/
+//
+// **Auth Required:** YES and user must belong to team or have
+// createteam_<teamid> permission.
+//
+// **Parameters:**
+//
+// - name: Name of the channel (required)
+// - participants: List of usernames participating in the channel.
+// - public: Whether the channel is public or not (public by default)
+//
+// **Return:**
+//
+// HTTP Status 200 on success along with team details, eg:
+//
+// ```
+// {"id": "123", "name": "Dream Team", "organization": "Dream Owner"}
+// ```
+func (client *ApiClient) CreateChannel(team *msgcore.Team, name string, public bool, participants []string) (*msgcore.Channel, error) {
+	params := map[string]string{"name": name,
+		"participants": strings.Join(participants, ","),
+		"public":       "true",
+	}
+	if !public {
+		params["public"] = "false"
+	}
+	url := fmt.Sprintf("/teams/%s/channels/", utils.ID2String(team.Id))
+	req, err := client.MakeAuthRequest("POST", url, params, nil)
+	var data map[string]interface{}
+	_, err = SendRequest(req, data)
+	if err == nil {
+		return msgcore.ChannelFromDict(data)
+	}
+	return nil, err
 }
