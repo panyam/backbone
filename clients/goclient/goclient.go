@@ -7,9 +7,9 @@ import (
 	msgcore "github.com/panyam/relay/services/msg/core"
 	"github.com/panyam/relay/utils"
 	"io"
+	"log"
 	"net/http"
 	"strings"
-	// "log"
 	// "os"
 	// "os/exec"
 	// "sort"
@@ -23,6 +23,7 @@ type ApiClient struct {
 
 func NewApiClient(url string) *ApiClient {
 	client := ApiClient{Url: url}
+	log.Println("New Api Client, URL: ", url)
 	return &client
 }
 
