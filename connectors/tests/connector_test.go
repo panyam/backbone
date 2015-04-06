@@ -6,6 +6,8 @@ import (
 	authcore "github.com/panyam/relay/services/auth/core"
 	msgcore "github.com/panyam/relay/services/msg/core"
 	. "gopkg.in/check.v1"
+
+	"fmt"
 	"testing"
 )
 
@@ -16,9 +18,10 @@ type TestSuite struct {
 	testUser     *msgcore.User
 	authService  authcore.IAuthService
 	serviceGroup *msgcore.ServiceGroup
+	ServerPort   int
 }
 
-var _ = Suite(&TestSuite{})
+var _ = Suite(&TestSuite{ServerPort: 8888})
 
 // Hook up gocheck into the "go test" runner.
 func Test(t *testing.T) { TestingT(t) }
@@ -26,8 +29,7 @@ func Test(t *testing.T) { TestingT(t) }
 func (s *TestSuite) SetUpSuite(c *C) {
 	s.serviceGroup, s.authService = s.CreateTestServices()
 	s.server = s.CreateTestServer()
-	s.client = goclient.NewApiClient("http://localhost:3000/api")
-	s.client.Authenticator = &goclient.DebugAuthenticator{"testuser"}
+	s.client = goclient.NewApiClient(fmt.Sprintf("http://localhost:%d/api", s.ServerPort))
 	s.server.SetServiceGroup(s.serviceGroup)
 	s.server.SetAuthService(s.authService)
 	go s.server.Run()

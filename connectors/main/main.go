@@ -7,7 +7,7 @@ import (
 )
 
 func CreateServer() connectors.Server {
-	gorilla := gorilla.NewServer()
+	gorilla := gorilla.NewServer(3000)
 	gorilla.SetServiceGroup(sg)
 	db, err := sql.Open("postgres", "user=test dbname=test sslmode=disable")
 	if err != nil {

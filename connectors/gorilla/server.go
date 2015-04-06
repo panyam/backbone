@@ -7,6 +7,8 @@ import (
 	authmw "github.com/panyam/relay/connectors/gorilla/middleware/auth"
 	authcore "github.com/panyam/relay/services/auth/core"
 	msgcore "github.com/panyam/relay/services/msg/core"
+
+	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
@@ -19,11 +21,12 @@ type Server struct {
 	store          *sessions.CookieStore
 	authMiddleware *authmw.AuthMiddleware
 	DebugUserId    int64
+	Port           int
 }
 
-func NewServer() *Server {
+func NewServer(port int) *Server {
 	rand.Seed(time.Now().UTC().UnixNano())
-	return &Server{}
+	return &Server{Port: port}
 }
 
 func (s *Server) SetCookieStore(cs *sessions.CookieStore) {
@@ -70,7 +73,7 @@ func (s *Server) Run() {
 
 	apiRouter := s.createApiRouter(r)
 	http.Handle("/api/", apiRouter)
-	log.Fatal(http.ListenAndServe(":3000", nil))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", s.Port), nil))
 }
 
 func (s *Server) Stop() {

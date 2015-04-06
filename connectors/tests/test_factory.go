@@ -3,6 +3,7 @@ package connectors
 import (
 	"database/sql"
 	_ "github.com/lib/pq"
+	goclient "github.com/panyam/relay/clients/goclient"
 	connector_core "github.com/panyam/relay/connectors/core"
 	"github.com/panyam/relay/connectors/gorilla"
 	authmw "github.com/panyam/relay/connectors/gorilla/middleware/auth"
@@ -16,13 +17,17 @@ import (
 const factoryType = "sql"
 
 func (s *TestSuite) CreateTestServer() connector_core.Server {
-	server := gorilla.NewServer()
+	server := gorilla.NewServer(s.ServerPort)
 
 	server.DebugUserId = 666
 	validator := authmw.NewDebugValidator(server.DebugUserId, s.serviceGroup.UserService)
 	am := authmw.AuthMiddleware{Validators: []authmw.AuthValidator{validator}}
 	server.SetAuthMiddleware(&am)
 	return server
+}
+
+func (s *TestSuite) LoginClient() {
+	s.client.EnableAuthentication(&goclient.DebugAuthenticator{Userid: 666})
 }
 
 func (s *TestSuite) CreateTestServices() (*msg_core.ServiceGroup, auth_core.IAuthService) {

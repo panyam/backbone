@@ -1,7 +1,6 @@
 package connectors
 
 import (
-	msgcore "github.com/panyam/relay/services/msg/core"
 	. "gopkg.in/check.v1"
 )
 

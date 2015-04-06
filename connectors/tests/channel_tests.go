@@ -18,6 +18,12 @@ func (s *TestSuite) TestCreateChannels(c *C) {
 	c.Assert(err, Not(IsNil))
 	c.Assert(err.Error(), Equals, "401 Unauthorized")
 	c.Assert(channel, IsNil)
+
+	// Login and repeat above
+	s.LoginClient()
+	channel, err = s.client.CreateChannel(s.testTeam, "testchannel", true, nil)
+	c.Assert(err, IsNil)
+	c.Assert(channel, Not(IsNil))
 }
 
 /**

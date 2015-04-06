@@ -4,6 +4,7 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
+	"github.com/panyam/relay/utils"
 	"io"
 	"log"
 	"net/http"
@@ -85,7 +86,7 @@ func (auth *SignedUrlAuthenticator) AuthenticateRequest(req *http.Request) (*htt
 }
 
 type DebugAuthenticator struct {
-	Username string
+	Userid int64
 }
 
 func (auth *DebugAuthenticator) AuthenticateRequest(req *http.Request) (*http.Request, error) {
@@ -95,7 +96,7 @@ func (auth *DebugAuthenticator) AuthenticateRequest(req *http.Request) (*http.Re
 	if query != "" {
 		query += "&"
 	}
-	query += ("__dbguser" + "=" + auth.Username)
+	query += ("__dbguser" + "=" + utils.ID2String(auth.Userid))
 	var err error
 	req.URL, err = url.Parse(baseUrl + "?" + query)
 	return req, err
