@@ -31,8 +31,16 @@ func MakeRequest(method, endpoint string, queryParams map[string]string, body io
 }
 
 func SendRequest(req *http.Request, output interface{}) (*http.Response, error) {
-	c := http.Client{}
+	c := http.Client{
+		CheckRedirect: func(inreq *http.Request, via []*http.Request) error {
+			log.Println("InReq: ", inreq)
+			return nil
+		}}
 	resp, err := c.Do(req)
+	if err != nil {
+		return resp, err
+	}
+	log.Println("Gaaaaaaaaaaah 2")
 	if resp == nil || resp.Body == nil || output == nil || resp.ContentLength == 0 {
 		return resp, err
 	}

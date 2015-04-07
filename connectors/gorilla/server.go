@@ -51,6 +51,19 @@ func (s *Server) DefaultMiddleware(requiresUser bool) *middleware.MiddlewareChai
 	if requiresUser {
 		out.AddMiddleware(s.authMiddleware)
 	}
+	/*
+		out.AddResponseMiddleware(func(rw http.ResponseWriter, request *http.Request, context common.IRequestContext) error {
+			errs := context.Errors()
+			log.Println("Errors: ", errs)
+			if len(errs) == 0 {
+				output := context.Get("output").(interface{})
+				utils.SendJsonResponse(rw, output)
+			} else {
+				http.Error(rw, errs[0].Error(), context.Get("StatusCode").(int))
+			}
+			return nil
+		})
+	*/
 	return out
 }
 
@@ -99,11 +112,11 @@ func (s *Server) createApiRouter(parent *mux.Router) *mux.Router {
 	teamsRouter.Methods("POST").HandlerFunc(mwWithLogin.Apply(s.CreateTeamHandler()))
 
 	// Channel specific APi for a particular team
-	teamChannelsRouter := apiRouter.PathPrefix("/teams/{id}/channels").Subrouter()
-	teamChannelsRouter.Methods("POST").HandlerFunc(mwWithLogin.Apply(s.CreateChannelHandler()))
+	// teamChannelsRouter := apiRouter.PathPrefix("/teams/{teamid}/channels").Subrouter()
+	// teamChannelsRouter.Methods("POST").HandlerFunc(mwWithLogin.Apply(s.CreateChannelHandler()))
 
 	// Other teams API
-	teamRouter := apiRouter.PathPrefix("/teams/{id}").Subrouter()
+	teamRouter := apiRouter.PathPrefix("/teams/{teamid}").Subrouter()
 	teamRouter.Methods("GET").HandlerFunc(mwWithLogin.Apply(s.TeamDetailsHandler()))
 	teamRouter.Methods("PUT", "POST").HandlerFunc(mwWithLogin.Apply(s.SaveTeamHandler()))
 	teamRouter.Methods("DELETE").HandlerFunc(mwWithLogin.Apply(s.DeleteTeamHandler()))

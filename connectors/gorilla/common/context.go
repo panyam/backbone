@@ -1,5 +1,7 @@
 package common
 
+import "log"
+
 type IRequestContext interface {
 	AddError(err error)
 	Set(key string, value interface{})
@@ -22,6 +24,7 @@ func NewRequestContext() *RequestContext {
 
 func (rc *RequestContext) AddError(err error) {
 	rc.errors = append(rc.errors, err)
+	log.Println("Added error, errs: ", rc.errors)
 }
 
 func (rc *RequestContext) Set(key string, value interface{}) {

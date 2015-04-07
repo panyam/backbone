@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"errors"
+	"fmt"
 	"github.com/panyam/relay/connectors/gorilla/common"
 	msgcore "github.com/panyam/relay/services/msg/core"
 	"log"
@@ -17,6 +18,7 @@ type AuthMiddleware struct {
 }
 
 func (am *AuthMiddleware) ProcessRequest(rw http.ResponseWriter, request *http.Request, context common.IRequestContext) error {
+	log.Println("Validating request: ", request)
 	for _, validator := range am.Validators {
 		user := validator.ValidateRequest(request, context)
 		if user != nil {
@@ -26,9 +28,12 @@ func (am *AuthMiddleware) ProcessRequest(rw http.ResponseWriter, request *http.R
 	}
 
 	// none of the validators matched so throw a 401 unauthorized response
-	log.Println("Auth Failed")
 	rw.WriteHeader(http.StatusUnauthorized)
-	return errors.New("Not allowed")
+	log.Println("No validator matched request, request: ", request)
+	msg := fmt.Sprintf("%d Unauthorized", http.StatusUnauthorized)
+	err := errors.New(msg)
+	// utils.SendJsonError(rw, map[string]interface{}{"error": msg}, http.StatusUnauthorized)
+	return err
 }
 
 func (validator *AuthMiddleware) ProcessResponse(rw http.ResponseWriter, request *http.Request, context common.IRequestContext) error {

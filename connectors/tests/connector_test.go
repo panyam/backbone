@@ -21,7 +21,7 @@ type TestSuite struct {
 	ServerPort   int
 }
 
-var _ = Suite(&TestSuite{ServerPort: 8888})
+var _ = Suite(&TestSuite{ServerPort: 9999})
 
 // Hook up gocheck into the "go test" runner.
 func Test(t *testing.T) { TestingT(t) }
