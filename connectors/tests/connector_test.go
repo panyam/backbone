@@ -19,9 +19,10 @@ type TestSuite struct {
 	authService  authcore.IAuthService
 	serviceGroup *msgcore.ServiceGroup
 	ServerPort   int
+	DebugUserId  int64
 }
 
-var _ = Suite(&TestSuite{ServerPort: 9999})
+var _ = Suite(&TestSuite{ServerPort: 9999, DebugUserId: 666})
 
 // Hook up gocheck into the "go test" runner.
 func Test(t *testing.T) { TestingT(t) }
@@ -44,6 +45,11 @@ func (s *TestSuite) SetUpTest(c *C) {
 	s.testTeam, _ = s.serviceGroup.TeamService.CreateTeam(1, "org", "testteam")
 	s.testUser = msgcore.NewUser(0, "testuser", s.testTeam)
 	err := s.serviceGroup.UserService.SaveUser(s.testUser, false)
+	c.Assert(err, IsNil)
+
+	// Also create the debug user for auth
+	debugUser := msgcore.NewUser(s.DebugUserId, "testuser", s.testTeam)
+	err = s.serviceGroup.UserService.SaveUser(debugUser, false)
 	c.Assert(err, IsNil)
 
 	s.client.DisableAuthentication()

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	_ "github.com/lib/pq"
 	"github.com/panyam/relay/connectors/gorilla"
+	authmw "github.com/panyam/relay/connectors/gorilla/middleware/auth"
 	auth_sqlds "github.com/panyam/relay/services/auth/sqlds"
 	msg_core "github.com/panyam/relay/services/msg/core"
 	msg_sqlds "github.com/panyam/relay/services/msg/sqlds"
@@ -26,6 +27,12 @@ func CreateServer() *gorilla.Server {
 	server := gorilla.NewServer(3000)
 	server.SetServiceGroup(&sg)
 	server.SetAuthService(authService)
+
+	server.DebugUserId = 666
+	validator := authmw.NewDebugValidator(server.DebugUserId, sg.UserService)
+	am := authmw.AuthMiddleware{Validators: []authmw.AuthValidator{validator}}
+	server.SetAuthMiddleware(&am)
+
 	return server
 }
 

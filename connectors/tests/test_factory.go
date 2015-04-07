@@ -19,8 +19,8 @@ const factoryType = "sql"
 func (s *TestSuite) CreateTestServer() connector_core.Server {
 	server := gorilla.NewServer(s.ServerPort)
 
-	server.DebugUserId = 666
-	validator := authmw.NewDebugValidator(server.DebugUserId, s.serviceGroup.UserService)
+	s.DebugUserId = 666
+	validator := authmw.NewDebugValidator(s.DebugUserId, s.serviceGroup.UserService)
 	am := authmw.AuthMiddleware{Validators: []authmw.AuthValidator{validator}}
 	server.SetAuthMiddleware(&am)
 	return server

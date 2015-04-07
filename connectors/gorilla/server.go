@@ -20,7 +20,6 @@ type Server struct {
 	authService    authcore.IAuthService
 	store          *sessions.CookieStore
 	authMiddleware *authmw.AuthMiddleware
-	DebugUserId    int64
 	Port           int
 }
 
@@ -112,8 +111,8 @@ func (s *Server) createApiRouter(parent *mux.Router) *mux.Router {
 	teamsRouter.Methods("POST").HandlerFunc(mwWithLogin.Apply(s.CreateTeamHandler()))
 
 	// Channel specific APi for a particular team
-	// teamChannelsRouter := apiRouter.PathPrefix("/teams/{teamid}/channels").Subrouter()
-	// teamChannelsRouter.Methods("POST").HandlerFunc(mwWithLogin.Apply(s.CreateChannelHandler()))
+	teamChannelsRouter := apiRouter.PathPrefix("/teams/{teamid}/channels").Subrouter()
+	teamChannelsRouter.Methods("GET", "POST").HandlerFunc(mwWithLogin.Apply(s.CreateChannelHandler()))
 
 	// Other teams API
 	teamRouter := apiRouter.PathPrefix("/teams/{teamid}").Subrouter()

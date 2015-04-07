@@ -18,12 +18,14 @@ type AuthMiddleware struct {
 }
 
 func (am *AuthMiddleware) ProcessRequest(rw http.ResponseWriter, request *http.Request, context common.IRequestContext) error {
-	log.Println("Validating request: ", request)
-	for _, validator := range am.Validators {
-		user := validator.ValidateRequest(request, context)
-		if user != nil {
-			context.Set("user", user)
-			return nil
+	log.Println("Validating request: ", request, am)
+	if am.Validators != nil {
+		for _, validator := range am.Validators {
+			user := validator.ValidateRequest(request, context)
+			if user != nil {
+				context.Set("user", user)
+				return nil
+			}
 		}
 	}
 
