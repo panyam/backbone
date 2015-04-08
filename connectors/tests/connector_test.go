@@ -48,7 +48,7 @@ func (s *TestSuite) SetUpTest(c *C) {
 	c.Assert(err, IsNil)
 
 	// Also create the debug user for auth
-	debugUser := msgcore.NewUser(s.DebugUserId, "testuser", s.testTeam)
+	debugUser := msgcore.NewUser(s.DebugUserId, "dbguser", s.testTeam)
 	err = s.serviceGroup.UserService.SaveUser(debugUser, false)
 	c.Assert(err, IsNil)
 

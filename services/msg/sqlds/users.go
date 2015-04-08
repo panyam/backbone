@@ -5,6 +5,7 @@ import (
 	"fmt"
 	. "github.com/panyam/relay/services/msg/core"
 	. "github.com/panyam/relay/utils"
+	"log"
 )
 
 type UserService struct {
@@ -100,12 +101,23 @@ func (svc *UserService) SaveUser(user *User, override bool) error {
 			"Status", user.Status)
 		if err == nil {
 			user.Id = id
+		} else {
+			log.Println("Insert error.  Should retry: ", err)
 		}
 		return err
 	} else {
-		return UpdateRows(svc.DB, USERS_TABLE, fmt.Sprintf("Id = %d", user.Id),
+		err := UpdateRows(svc.DB, USERS_TABLE, fmt.Sprintf("Id = %d", user.Id),
 			"TeamId", user.Team.Id,
 			"Username", user.Username,
 			"Status", user.Status)
+		if err.Error() == "No rows found" {
+			// then Insert
+			err = InsertRow(svc.DB, USERS_TABLE,
+				"Id", user.Id,
+				"TeamId", user.Team.Id,
+				"Username", user.Username,
+				"Status", user.Status)
+		}
+		return err
 	}
 }

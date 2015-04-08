@@ -6,8 +6,8 @@ import (
 	"github.com/panyam/relay/connectors/gorilla"
 	authmw "github.com/panyam/relay/connectors/gorilla/middleware/auth"
 	auth_sqlds "github.com/panyam/relay/services/auth/sqlds"
-	msg_core "github.com/panyam/relay/services/msg/core"
-	msg_sqlds "github.com/panyam/relay/services/msg/sqlds"
+	msgcore "github.com/panyam/relay/services/msg/core"
+	msgsqlds "github.com/panyam/relay/services/msg/sqlds"
 	"log"
 )
 
@@ -16,11 +16,11 @@ func CreateServer() *gorilla.Server {
 	if err != nil {
 		log.Fatal(err)
 	}
-	sg := msg_core.ServiceGroup{}
-	sg.TeamService = msg_sqlds.NewTeamService(db, &sg)
-	sg.UserService = msg_sqlds.NewUserService(db, &sg)
-	sg.ChannelService = msg_sqlds.NewChannelService(db, &sg)
-	sg.MessageService = msg_sqlds.NewMessageService(db, &sg)
+	sg := msgcore.ServiceGroup{}
+	sg.TeamService = msgsqlds.NewTeamService(db, &sg)
+	sg.UserService = msgsqlds.NewUserService(db, &sg)
+	sg.ChannelService = msgsqlds.NewChannelService(db, &sg)
+	sg.MessageService = msgsqlds.NewMessageService(db, &sg)
 
 	authService := auth_sqlds.NewAuthService(db, sg.UserService, sg.TeamService)
 
@@ -28,11 +28,19 @@ func CreateServer() *gorilla.Server {
 	server.SetServiceGroup(&sg)
 	server.SetAuthService(authService)
 
-	server.DebugUserId = 666
-	validator := authmw.NewDebugValidator(server.DebugUserId, sg.UserService)
+	// some dummy data for testing
+	debugUserId := int64(666)
+	validator := authmw.NewDebugValidator(debugUserId, sg.UserService)
 	am := authmw.AuthMiddleware{Validators: []authmw.AuthValidator{validator}}
 	server.SetAuthMiddleware(&am)
 
+	testTeam, err := sg.TeamService.CreateTeam(1, "testorg", "testteam")
+	if err != nil {
+		testTeam, err = sg.TeamService.GetTeamById(1)
+	}
+	log.Println("TestTeam: ", testTeam, err)
+	debugUser := msgcore.NewUser(debugUserId, "debuguser", testTeam)
+	sg.UserService.SaveUser(debugUser, false)
 	return server
 }
 

@@ -97,7 +97,14 @@ func UpdateRows(db *sql.DB, tableName string, whereClause string, args ...interf
 	if whereClause != "" {
 		query += " WHERE " + whereClause
 	}
-	_, err := db.Exec(query)
+	result, err := db.Exec(query)
+	if err != nil {
+		return err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil || rowsAffected == 0 {
+		return errors.New("No rows found")
+	}
 	return err
 }
 
