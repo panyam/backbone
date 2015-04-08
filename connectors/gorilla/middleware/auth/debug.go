@@ -4,7 +4,6 @@ import (
 	"github.com/panyam/relay/connectors/gorilla/common"
 	msgcore "github.com/panyam/relay/services/msg/core"
 	"github.com/panyam/relay/utils"
-	"log"
 	"net/http"
 )
 
@@ -34,7 +33,6 @@ func (validator *DebugValidator) ValidateRequest(request *http.Request, context 
 	if len(users) > 0 {
 		userid := utils.String2ID(users[0])
 		if userid == validator.userid {
-			log.Println("Validator: ", validator)
 			user, err := validator.userService.GetUserById(validator.userid)
 			if user != nil && err == nil {
 				return user
