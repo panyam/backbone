@@ -1,6 +1,6 @@
 //
-//  BackboneDemoTests.m
-//  BackboneDemoTests
+//  RelayDemoTests.m
+//  RelayDemoTests
 //
 //  Created by Sri Panyam on 28/02/2015.
 //  Copyright (c) 2015 Panyam. All rights reserved.
@@ -9,11 +9,11 @@
 #import <UIKit/UIKit.h>
 #import <XCTest/XCTest.h>
 
-@interface BackboneDemoTests : XCTestCase
+@interface RelayDemoTests : XCTestCase
 
 @end
 
-@implementation BackboneDemoTests
+@implementation RelayDemoTests
 
 - (void)setUp {
     [super setUp];

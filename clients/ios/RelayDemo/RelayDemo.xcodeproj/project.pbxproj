@@ -14,7 +14,7 @@
 		107218431AA2FD340081D416 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 107218411AA2FD340081D416 /* Main.storyboard */; };
 		107218451AA2FD340081D416 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 107218441AA2FD340081D416 /* Images.xcassets */; };
 		107218481AA2FD340081D416 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 107218461AA2FD340081D416 /* LaunchScreen.xib */; };
-		107218541AA2FD340081D416 /* BackboneDemoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 107218531AA2FD340081D416 /* BackboneDemoTests.m */; };
+		107218541AA2FD340081D416 /* RelayDemoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 107218531AA2FD340081D416 /* RelayDemoTests.m */; };
 		1072185F1AA2FDB90081D416 /* TeamsTableVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 1072185E1AA2FDB90081D416 /* TeamsTableVC.m */; };
 /* End PBXBuildFile section */
 
@@ -24,12 +24,12 @@
 			containerPortal = 107218291AA2FD340081D416 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 107218301AA2FD340081D416;
-			remoteInfo = BackboneDemo;
+			remoteInfo = RelayDemo;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		107218311AA2FD340081D416 /* BackboneDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BackboneDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		107218311AA2FD340081D416 /* RelayDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RelayDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		107218351AA2FD340081D416 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		107218361AA2FD340081D416 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		107218381AA2FD340081D416 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -41,9 +41,9 @@
 		107218421AA2FD340081D416 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		107218441AA2FD340081D416 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		107218471AA2FD340081D416 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
-		1072184D1AA2FD340081D416 /* BackboneDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BackboneDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1072184D1AA2FD340081D416 /* RelayDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RelayDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		107218521AA2FD340081D416 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		107218531AA2FD340081D416 /* BackboneDemoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BackboneDemoTests.m; sourceTree = "<group>"; };
+		107218531AA2FD340081D416 /* RelayDemoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RelayDemoTests.m; sourceTree = "<group>"; };
 		1072185D1AA2FDB90081D416 /* TeamsTableVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TeamsTableVC.h; path = Sources/TeamsTableVC.h; sourceTree = "<group>"; };
 		1072185E1AA2FDB90081D416 /* TeamsTableVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TeamsTableVC.m; path = Sources/TeamsTableVC.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -69,8 +69,8 @@
 		107218281AA2FD340081D416 = {
 			isa = PBXGroup;
 			children = (
-				107218331AA2FD340081D416 /* BackboneDemo */,
-				107218501AA2FD340081D416 /* BackboneDemoTests */,
+				107218331AA2FD340081D416 /* RelayDemo */,
+				107218501AA2FD340081D416 /* RelayDemoTests */,
 				107218321AA2FD340081D416 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -78,13 +78,13 @@
 		107218321AA2FD340081D416 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				107218311AA2FD340081D416 /* BackboneDemo.app */,
-				1072184D1AA2FD340081D416 /* BackboneDemoTests.xctest */,
+				107218311AA2FD340081D416 /* RelayDemo.app */,
+				1072184D1AA2FD340081D416 /* RelayDemoTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		107218331AA2FD340081D416 /* BackboneDemo */ = {
+		107218331AA2FD340081D416 /* RelayDemo */ = {
 			isa = PBXGroup;
 			children = (
 				107218381AA2FD340081D416 /* AppDelegate.h */,
@@ -100,7 +100,7 @@
 				1072185D1AA2FDB90081D416 /* TeamsTableVC.h */,
 				1072185E1AA2FDB90081D416 /* TeamsTableVC.m */,
 			);
-			path = BackboneDemo;
+			path = RelayDemo;
 			sourceTree = "<group>";
 		};
 		107218341AA2FD340081D416 /* Supporting Files */ = {
@@ -112,13 +112,13 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		107218501AA2FD340081D416 /* BackboneDemoTests */ = {
+		107218501AA2FD340081D416 /* RelayDemoTests */ = {
 			isa = PBXGroup;
 			children = (
-				107218531AA2FD340081D416 /* BackboneDemoTests.m */,
+				107218531AA2FD340081D416 /* RelayDemoTests.m */,
 				107218511AA2FD340081D416 /* Supporting Files */,
 			);
-			path = BackboneDemoTests;
+			path = RelayDemoTests;
 			sourceTree = "<group>";
 		};
 		107218511AA2FD340081D416 /* Supporting Files */ = {
@@ -132,9 +132,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		107218301AA2FD340081D416 /* BackboneDemo */ = {
+		107218301AA2FD340081D416 /* RelayDemo */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 107218571AA2FD340081D416 /* Build configuration list for PBXNativeTarget "BackboneDemo" */;
+			buildConfigurationList = 107218571AA2FD340081D416 /* Build configuration list for PBXNativeTarget "RelayDemo" */;
 			buildPhases = (
 				1072182D1AA2FD340081D416 /* Sources */,
 				1072182E1AA2FD340081D416 /* Frameworks */,
@@ -144,14 +144,14 @@
 			);
 			dependencies = (
 			);
-			name = BackboneDemo;
-			productName = BackboneDemo;
-			productReference = 107218311AA2FD340081D416 /* BackboneDemo.app */;
+			name = RelayDemo;
+			productName = RelayDemo;
+			productReference = 107218311AA2FD340081D416 /* RelayDemo.app */;
 			productType = "com.apple.product-type.application";
 		};
-		1072184C1AA2FD340081D416 /* BackboneDemoTests */ = {
+		1072184C1AA2FD340081D416 /* RelayDemoTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1072185A1AA2FD340081D416 /* Build configuration list for PBXNativeTarget "BackboneDemoTests" */;
+			buildConfigurationList = 1072185A1AA2FD340081D416 /* Build configuration list for PBXNativeTarget "RelayDemoTests" */;
 			buildPhases = (
 				107218491AA2FD340081D416 /* Sources */,
 				1072184A1AA2FD340081D416 /* Frameworks */,
@@ -162,9 +162,9 @@
 			dependencies = (
 				1072184F1AA2FD340081D416 /* PBXTargetDependency */,
 			);
-			name = BackboneDemoTests;
-			productName = BackboneDemoTests;
-			productReference = 1072184D1AA2FD340081D416 /* BackboneDemoTests.xctest */;
+			name = RelayDemoTests;
+			productName = RelayDemoTests;
+			productReference = 1072184D1AA2FD340081D416 /* RelayDemoTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -185,7 +185,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 1072182C1AA2FD340081D416 /* Build configuration list for PBXProject "BackboneDemo" */;
+			buildConfigurationList = 1072182C1AA2FD340081D416 /* Build configuration list for PBXProject "RelayDemo" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -198,8 +198,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				107218301AA2FD340081D416 /* BackboneDemo */,
-				1072184C1AA2FD340081D416 /* BackboneDemoTests */,
+				107218301AA2FD340081D416 /* RelayDemo */,
+				1072184C1AA2FD340081D416 /* RelayDemoTests */,
 			);
 		};
 /* End PBXProject section */
@@ -241,7 +241,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				107218541AA2FD340081D416 /* BackboneDemoTests.m in Sources */,
+				107218541AA2FD340081D416 /* RelayDemoTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -250,7 +250,7 @@
 /* Begin PBXTargetDependency section */
 		1072184F1AA2FD340081D416 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 107218301AA2FD340081D416 /* BackboneDemo */;
+			target = 107218301AA2FD340081D416 /* RelayDemo */;
 			targetProxy = 1072184E1AA2FD340081D416 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -357,7 +357,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				INFOPLIST_FILE = BackboneDemo/Info.plist;
+				INFOPLIST_FILE = RelayDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -367,7 +367,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				INFOPLIST_FILE = BackboneDemo/Info.plist;
+				INFOPLIST_FILE = RelayDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -385,10 +385,10 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = BackboneDemoTests/Info.plist;
+				INFOPLIST_FILE = RelayDemoTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BackboneDemo.app/BackboneDemo";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RelayDemo.app/RelayDemo";
 			};
 			name = Debug;
 		};
@@ -400,17 +400,17 @@
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = BackboneDemoTests/Info.plist;
+				INFOPLIST_FILE = RelayDemoTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BackboneDemo.app/BackboneDemo";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RelayDemo.app/RelayDemo";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1072182C1AA2FD340081D416 /* Build configuration list for PBXProject "BackboneDemo" */ = {
+		1072182C1AA2FD340081D416 /* Build configuration list for PBXProject "RelayDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				107218551AA2FD340081D416 /* Debug */,
@@ -419,7 +419,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		107218571AA2FD340081D416 /* Build configuration list for PBXNativeTarget "BackboneDemo" */ = {
+		107218571AA2FD340081D416 /* Build configuration list for PBXNativeTarget "RelayDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				107218581AA2FD340081D416 /* Debug */,
@@ -427,7 +427,7 @@
 			);
 			defaultConfigurationIsVisible = 0;
 		};
-		1072185A1AA2FD340081D416 /* Build configuration list for PBXNativeTarget "BackboneDemoTests" */ = {
+		1072185A1AA2FD340081D416 /* Build configuration list for PBXNativeTarget "RelayDemoTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1072185B1AA2FD340081D416 /* Debug */,

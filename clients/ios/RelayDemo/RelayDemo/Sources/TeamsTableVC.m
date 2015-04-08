@@ -1,6 +1,6 @@
 //
 //  TeamsTableVC.m
-//  BackboneDemo
+//  RelayDemo
 //
 //  Created by Sri Panyam on 28/02/2015.
 //  Copyright (c) 2015 Panyam. All rights reserved.
