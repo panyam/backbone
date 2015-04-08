@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"math/rand"
 	"strconv"
@@ -38,4 +40,22 @@ func String2ID(strid string) int64 {
 		return 0
 	}
 	return val
+}
+
+func JsonNumberToInt(value interface{}) (int, error) {
+	out, err := JsonNumberToInt64(value)
+	return int(out), err
+}
+
+func JsonNumberToInt64(value interface{}) (int64, error) {
+	out, ok := value.(int64)
+	if ok {
+		return out, nil
+	}
+
+	outNum, ok := value.(json.Number)
+	if ok {
+		return outNum.Int64()
+	}
+	return 0, errors.New("Invalid int64")
 }

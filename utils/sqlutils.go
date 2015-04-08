@@ -37,6 +37,9 @@ func CreateTable(db *sql.DB, tableName string, columns []string, tableConstraint
 }
 
 func formatSqlValue(value interface{}) string {
+	if value == nil {
+		return "NULL"
+	}
 	v := reflect.ValueOf(value)
 	// t := v.Type()
 	kind := v.Kind()
@@ -45,6 +48,7 @@ func formatSqlValue(value interface{}) string {
 	} else if kind == reflect.Uint || kind == reflect.Uint8 || kind == reflect.Uint16 || kind == reflect.Uint32 || kind == reflect.Uint64 {
 		return fmt.Sprintf("%d", value)
 	} else if kind == reflect.String {
+		// TODO: Format this to prevent injection
 		return fmt.Sprintf("'%s'", value)
 	}
 	return "'<unknown_type>'"

@@ -1,6 +1,7 @@
 package core
 
 import (
+	. "github.com/panyam/relay/utils"
 	"time"
 )
 
@@ -26,6 +27,11 @@ type Channel struct {
 	Name string
 
 	/**
+	 * Is this a public a channel or only visible to members?
+	 */
+	Public bool
+
+	/**
 	 * When the last message was posted on this channel.
 	 */
 	LastMessageAt time.Time
@@ -48,5 +54,22 @@ func NewChannel(team *Team, creator *User, id int64, name string) *Channel {
 }
 
 func ChannelFromDict(data map[string]interface{}) (*Channel, error) {
-	return nil, nil
+	channel := Channel{}
+	channel.Name = data["Name"].(string)
+	channel.Public = data["Public"].(bool)
+	channel.Status, _ = JsonNumberToInt(data["Status"])
+	channel.Id = String2ID(data["Id"].(string))
+	return &channel, nil
+}
+
+func (c *Channel) ToDict() map[string]interface{} {
+	out := map[string]interface{}{
+		"Id":     ID2String(c.Id),
+		"Name":   c.Name,
+		"Public": c.Public,
+		"Status": c.Status,
+		"TeamId": ID2String(c.Team.Id),
+		"UserId": ID2String(c.Creator.Id),
+	}
+	return out
 }

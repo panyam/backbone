@@ -34,14 +34,15 @@ func (svc *ChannelService) InitDB() {
 			"UserId bigint DEFAULT(0) REFERENCES users (Id) ON DELETE SET DEFAULT",
 			"Created TIMESTAMP WITHOUT TIME ZONE DEFAULT statement_timestamp()",
 			"Name TEXT DEFAULT ('')",
+			"Public BOOL DEFAULT (true)",
 			"LastMessageAt TIMESTAMP WITHOUT TIME ZONE",
 			"Status INT DEFAULT (0)",
 		})
 
 	CreateTable(svc.DB, CHANNEL_MEMBERS_TABLE,
 		[]string{
-			"UserId bigint NOT NULL REFERENCES users (Id) ON DELETE CASCADE",
 			"ChannelId bigint NOT NULL REFERENCES channels (Id) ON DELETE CASCADE",
+			"UserId bigint NOT NULL REFERENCES users (Id) ON DELETE CASCADE",
 			"JoinedAt TIMESTAMP WITHOUT TIME ZONE DEFAULT statement_timestamp()",
 			"LeftAt TIMESTAMP WITHOUT TIME ZONE DEFAULT NULL",
 			"Status INT DEFAULT (0)",
@@ -62,6 +63,7 @@ func (svc *ChannelService) SaveChannel(channel *Channel, override bool) error {
 			"TeamId", channel.Team.Id,
 			"UserId", channel.Creator.Id,
 			"Name", channel.Name,
+			"Public", channel.Public,
 			"Status", channel.Status)
 		if err == nil {
 			channel.Id = id
@@ -72,6 +74,7 @@ func (svc *ChannelService) SaveChannel(channel *Channel, override bool) error {
 			"TeamId", channel.Team.Id,
 			"UserId", channel.Creator.Id,
 			"Name", channel.Name,
+			"Public", channel.Public,
 			"Status", channel.Status)
 	}
 }
@@ -80,13 +83,13 @@ func (svc *ChannelService) SaveChannel(channel *Channel, override bool) error {
  * Retrieve a channel by Name.
  */
 func (svc *ChannelService) GetChannelById(id int64) (*Channel, error) {
-	query := fmt.Sprintf("SELECT TeamId, UserId, Status, Created, Name from %s where Id = %d", CHANNELS_TABLE, id)
+	query := fmt.Sprintf("SELECT TeamId, UserId, Public, Status, Created, Name from %s where Id = %d", CHANNELS_TABLE, id)
 	row := svc.DB.QueryRow(query)
 
 	var channel Channel
 	var teamId int64
 	var userId int64
-	err := row.Scan(&teamId, &userId, &channel.Status, &channel.Created, &channel.Name)
+	err := row.Scan(&teamId, &userId, &channel.Public, &channel.Status, &channel.Created, &channel.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -112,6 +115,24 @@ func (svc *ChannelService) GetChannelMembers(channel *Channel) []ChannelMember {
 		members = append(members, member)
 	}
 	return members
+}
+
+/**
+ * Adds users to a channel.
+ */
+func (svc *ChannelService) AddChannelMembers(channel *Channel, userids []int64) error {
+	for _, userid := range userids {
+		err := InsertRow(svc.DB, CHANNEL_MEMBERS_TABLE,
+			"ChannelId", channel.Team.Id,
+			"UserId", channel.Creator.Id,
+			"Status", 0,
+			"LeftAt", nil)
+		if err != nil {
+			// then update
+			UpdateRows(svc.DB, CHANNEL_MEMBERS_TABLE, fmt.Sprintf("ChannelId = %d AND UserId = %d", channel.Id, userid), "Status", 0, "LeftAt", nil)
+		}
+	}
+	return nil
 }
 
 /**

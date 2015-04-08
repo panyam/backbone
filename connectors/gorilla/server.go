@@ -111,7 +111,7 @@ func (s *Server) createApiRouter(parent *mux.Router) *mux.Router {
 	teamsRouter.Methods("POST").HandlerFunc(mwWithLogin.Apply(s.CreateTeamHandler()))
 
 	// Channel specific APi for a particular team
-	teamChannelsRouter := apiRouter.PathPrefix("/teams/{teamid}/channels").Subrouter()
+	teamChannelsRouter := apiRouter.PathPrefix("/teams/{teamId}/channels").Subrouter()
 	teamChannelsRouter.Methods("GET", "POST").HandlerFunc(mwWithLogin.Apply(s.CreateChannelHandler()))
 
 	// Other teams API

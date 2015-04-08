@@ -1,7 +1,6 @@
 package gorilla
 
 import (
-	// "github.com/panyam/relay/services"
 	"github.com/gorilla/mux"
 	. "github.com/panyam/relay/connectors/gorilla/common"
 	authcore "github.com/panyam/relay/services/auth/core"

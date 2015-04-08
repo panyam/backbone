@@ -129,6 +129,11 @@ type IChannelService interface {
 	GetChannelMembers(channel *Channel) []ChannelMember
 
 	/**
+	 * Adds users to a channel.
+	 */
+	AddChannelMembers(channel *Channel, userids []int64) error
+
+	/**
 	 * Tells if a channe contains a user.
 	 */
 	ContainsUser(channel *Channel, user *User) bool
