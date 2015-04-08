@@ -2,7 +2,6 @@ package middleware
 
 import (
 	. "github.com/panyam/relay/connectors/gorilla/common"
-	"log"
 	"net/http"
 )
 
@@ -124,7 +123,6 @@ func (mchain *MiddlewareChain) Apply(handler RequestHandlerFunc) HttpHandlerFunc
 
 			if err != nil {
 				// start going backwards
-				log.Println("Adding error..., forward: ", forward)
 				context.AddError(err)
 				forward = false
 			}

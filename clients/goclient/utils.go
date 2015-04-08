@@ -40,7 +40,6 @@ func SendRequest(req *http.Request, output interface{}) (*http.Response, error) 
 	if err != nil {
 		return resp, err
 	}
-	log.Println("Gaaaaaaaaaaah 2")
 	if resp == nil || resp.Body == nil || output == nil || resp.ContentLength == 0 {
 		return resp, err
 	}

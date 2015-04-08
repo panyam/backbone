@@ -24,7 +24,7 @@ func NewRequestContext() *RequestContext {
 
 func (rc *RequestContext) AddError(err error) {
 	rc.errors = append(rc.errors, err)
-	log.Println("Added error, errs: ", rc.errors)
+	log.Println("Added error: ", err)
 }
 
 func (rc *RequestContext) Set(key string, value interface{}) {

@@ -91,7 +91,7 @@ type DebugAuthenticator struct {
 
 func (auth *DebugAuthenticator) AuthenticateRequest(req *http.Request) (*http.Request, error) {
 	// Append the username param to a request
-	baseUrl := req.URL.Scheme + "://" + req.URL.Host + "/" + req.URL.Path
+	baseUrl := req.URL.Scheme + "://" + req.URL.Host + req.URL.Path
 	query := req.URL.RawQuery
 	if query != "" {
 		query += "&"

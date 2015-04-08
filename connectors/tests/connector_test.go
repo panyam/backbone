@@ -22,7 +22,7 @@ type TestSuite struct {
 	DebugUserId  int64
 }
 
-var _ = Suite(&TestSuite{ServerPort: 9999, DebugUserId: 666})
+var _ = Suite(&TestSuite{ServerPort: 8000, DebugUserId: 666})
 
 // Hook up gocheck into the "go test" runner.
 func Test(t *testing.T) { TestingT(t) }
