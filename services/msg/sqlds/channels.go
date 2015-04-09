@@ -42,12 +42,12 @@ func (svc *ChannelService) InitDB() {
 	CreateTable(svc.DB, CHANNEL_MEMBERS_TABLE,
 		[]string{
 			"ChannelId bigint NOT NULL REFERENCES channels (Id) ON DELETE CASCADE",
-			"UserId bigint NOT NULL REFERENCES users (Id) ON DELETE CASCADE",
+			"Username TEXT NOT NULL",
 			"JoinedAt TIMESTAMP WITHOUT TIME ZONE DEFAULT statement_timestamp()",
 			"LeftAt TIMESTAMP WITHOUT TIME ZONE DEFAULT NULL",
 			"Status INT DEFAULT (0)",
 		},
-		", CONSTRAINT unique_channel_membership UNIQUE (UserId, ChannelId)")
+		", CONSTRAINT unique_channel_membership UNIQUE (ChannelId, Username)")
 
 	CreateMetadataTable(svc.DB, CHANNEL_METADATA_TABLE, CHANNELS_TABLE, "Channel")
 }
@@ -100,7 +100,7 @@ func (svc *ChannelService) GetChannelById(id int64) (*Channel, error) {
 }
 
 func (svc *ChannelService) GetChannelMembers(channel *Channel) []ChannelMember {
-	query := fmt.Sprintf("SELECT UserId, JoinedAt, LeftAt, Status FROM %s where ChannelId = %d", CHANNEL_MEMBERS_TABLE, channel.Id)
+	query := fmt.Sprintf("SELECT Username, JoinedAt, LeftAt, Status FROM %s where ChannelId = %d", CHANNEL_MEMBERS_TABLE, channel.Id)
 	rows, err := svc.DB.Query(query)
 	if err == nil {
 		defer rows.Close()
@@ -109,9 +109,9 @@ func (svc *ChannelService) GetChannelMembers(channel *Channel) []ChannelMember {
 	members := make([]ChannelMember, 0, 0)
 	for rows.Next() {
 		var member ChannelMember
-		var userId int64
-		rows.Scan(&userId, &member.JoinedAt, &member.LeftAt, &member.Status)
-		member.User, _ = svc.SG.UserService.GetUserById(userId)
+		var username string
+		rows.Scan(&username, &member.JoinedAt, &member.LeftAt, &member.Status)
+		member.User, _ = svc.SG.UserService.GetUser(username, channel.Team)
 		members = append(members, member)
 	}
 	return members
@@ -120,16 +120,16 @@ func (svc *ChannelService) GetChannelMembers(channel *Channel) []ChannelMember {
 /**
  * Adds users to a channel.
  */
-func (svc *ChannelService) AddChannelMembers(channel *Channel, userids []int64) error {
-	for _, userid := range userids {
+func (svc *ChannelService) AddChannelMembers(channel *Channel, usernames []string) error {
+	for _, username := range usernames {
 		err := InsertRow(svc.DB, CHANNEL_MEMBERS_TABLE,
-			"ChannelId", channel.Team.Id,
-			"UserId", channel.Creator.Id,
+			"ChannelId", channel.Id,
+			"Username", username,
 			"Status", 0,
 			"LeftAt", nil)
 		if err != nil {
 			// then update
-			UpdateRows(svc.DB, CHANNEL_MEMBERS_TABLE, fmt.Sprintf("ChannelId = %d AND UserId = %d", channel.Id, userid), "Status", 0, "LeftAt", nil)
+			err = UpdateRows(svc.DB, CHANNEL_MEMBERS_TABLE, fmt.Sprintf("ChannelId = %d AND Username = '%s'", channel.Id, username), "Status", 0, "LeftAt", nil)
 		}
 	}
 	return nil

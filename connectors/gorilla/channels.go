@@ -35,19 +35,17 @@ func (s *Server) CreateChannelHandler() RequestHandlerFunc {
 		publicParam := request.FormValue("public")
 		nameParam := request.FormValue("name")
 
-		channel := msgcore.NewChannel(team, context.Get("user").(*msgcore.User), 0, nameParam)
+		creator := context.Get("user").(*msgcore.User)
+		channel := msgcore.NewChannel(team, creator, 0, nameParam)
 		channel.Public = (publicParam != "false")
-		s.serviceGroup.ChannelService.SaveChannel(channel, false)
-
-		participantIDs := make([]int64, 0, len(participantsParam))
-		for index, participantID := range participantsParam {
-			log.Println("Index, partID: ", index, participantID, participantIDs)
-			partID, err := strconv.ParseInt(participantID, 10, 64)
-			if err == nil {
-				participantIDs = append(participantIDs, partID)
-			}
+		err := s.serviceGroup.ChannelService.SaveChannel(channel, false)
+		if err != nil {
+			http.Error(rw, err.Error(), http.StatusInternalServerError)
+			return
 		}
-		s.serviceGroup.ChannelService.AddChannelMembers(channel, participantIDs)
+
+		s.serviceGroup.ChannelService.AddChannelMembers(channel, []string{creator.Username})
+		s.serviceGroup.ChannelService.AddChannelMembers(channel, participantsParam)
 		utils.SendJsonResponse(rw, channel.ToDict())
 	}
 }

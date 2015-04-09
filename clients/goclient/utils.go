@@ -44,8 +44,13 @@ func SendRequest(req *http.Request, output interface{}) (*http.Response, error) 
 		return resp, err
 	}
 
+	contType := resp.Header.Get("Content-Type")
+	log.Println("ContType: ", contType)
 	defer resp.Body.Close()
-	decoder := json.NewDecoder(resp.Body)
-	decoder.UseNumber()
-	return resp, decoder.Decode(output)
+	if contType == "application/json" {
+		decoder := json.NewDecoder(resp.Body)
+		decoder.UseNumber()
+		return resp, decoder.Decode(output)
+	}
+	return resp, nil
 }

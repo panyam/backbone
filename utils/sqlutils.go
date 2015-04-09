@@ -43,7 +43,12 @@ func formatSqlValue(value interface{}) string {
 	v := reflect.ValueOf(value)
 	// t := v.Type()
 	kind := v.Kind()
-	if kind == reflect.Int || kind == reflect.Int8 || kind == reflect.Int16 || kind == reflect.Int32 || kind == reflect.Int64 {
+	if kind == reflect.Bool {
+		if value.(bool) == true {
+			return "true"
+		}
+		return "false"
+	} else if kind == reflect.Int || kind == reflect.Int8 || kind == reflect.Int16 || kind == reflect.Int32 || kind == reflect.Int64 {
 		return fmt.Sprintf("%d", value)
 	} else if kind == reflect.Uint || kind == reflect.Uint8 || kind == reflect.Uint16 || kind == reflect.Uint32 || kind == reflect.Uint64 {
 		return fmt.Sprintf("%d", value)

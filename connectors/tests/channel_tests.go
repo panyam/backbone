@@ -21,9 +21,14 @@ func (s *TestSuite) TestCreateChannels(c *C) {
 
 	// Login and repeat above
 	s.LoginClient()
-	channel, err = s.client.CreateChannel(s.testTeam, "testchannel", true, nil)
+	channel, err = s.client.CreateChannel(s.testTeam, "testchannel", true, []string{"1", "2", "3", "4"})
 	c.Assert(err, IsNil)
 	c.Assert(channel, Not(IsNil))
+	c.Assert(channel.Name, Equals, "testchannel")
+
+	channel.Team = s.testTeam
+	channelMembers := s.serviceGroup.ChannelService.GetChannelMembers(channel)
+	c.Assert(len(channelMembers), Equals, 5)
 }
 
 /**
