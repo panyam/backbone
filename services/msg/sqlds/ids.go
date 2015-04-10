@@ -59,7 +59,7 @@ func (svc *IDService) NextID(domain string) (int64, error) {
 /**
  * Removes all entries.
  */
-func (svc *IDService) RemoveAllSequences() {
+func (svc *IDService) RemoveAllDomains() {
 	query := fmt.Sprintf("SELECT Domain FROM %s", SEQUENCES_TABLE)
 	rows, err := svc.DB.Query(query)
 	if err == nil {
@@ -69,6 +69,6 @@ func (svc *IDService) RemoveAllSequences() {
 	for rows.Next() {
 		var domain string
 		rows.Scan(&domain)
-		svc.DB.QueryRow("DROP SEQUENCE %s CASCADE", domain)
+		svc.DB.QueryRow(fmt.Sprintf("ALTER SEQUENCE %s START 1", domain))
 	}
 }

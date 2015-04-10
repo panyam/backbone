@@ -12,6 +12,11 @@ type IIDService interface {
 	 * Gets the next ID in a given domain
 	 */
 	NextID(domain string) (int64, error)
+
+	/**
+	 * Removes all entries.
+	 */
+	RemoveAllDomains()
 }
 
 /**
@@ -121,7 +126,7 @@ type IChannelService interface {
 	/**
 	 * Get channels meeting particular criterea
 	 */
-	GetChannels(teamId int64, ownerName string, orderBy string, participants []string, matchType int) []*Channel
+	GetChannels(team *Team, creator *User, orderBy string, participants []string, matchType int) []*Channel
 
 	/**
 	 * Get channel by Id
@@ -136,7 +141,7 @@ type IChannelService interface {
 	/**
 	 * Adds users to a channel.
 	 */
-	AddChannelMembers(channel *Channel, usernames []string) error
+	AddChannelMembers(channel *Channel, users []*User) error
 
 	/**
 	 * Tells if a channe contains a user.
@@ -147,11 +152,6 @@ type IChannelService interface {
 	 * Delete a channel.
 	 */
 	DeleteChannel(channel *Channel) error
-
-	/**
-	 * Returns the channels the user belongs to in a given team.
-	 */
-	ListChannels(user *User, team *Team) ([]*Channel, error)
 
 	/**
 	 * Lets a user to join a channel (if allowed)

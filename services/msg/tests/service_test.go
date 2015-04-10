@@ -20,6 +20,7 @@ func (s *TestSuite) SetUpSuite(c *C) {
 }
 
 func (s *TestSuite) SetUpTest(c *C) {
+	s.serviceGroup.IDService.RemoveAllDomains()
 	s.serviceGroup.ChannelService.RemoveAllChannels()
 	s.serviceGroup.TeamService.RemoveAllTeams()
 	s.serviceGroup.UserService.RemoveAllUsers()
@@ -27,8 +28,4 @@ func (s *TestSuite) SetUpTest(c *C) {
 }
 
 func (s *TestSuite) TearDownTest(c *C) {
-	s.serviceGroup.ChannelService.RemoveAllChannels()
-	s.serviceGroup.TeamService.RemoveAllTeams()
-	s.serviceGroup.UserService.RemoveAllUsers()
-	s.serviceGroup.MessageService.RemoveAllMessages()
 }

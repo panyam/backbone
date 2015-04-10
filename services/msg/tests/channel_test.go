@@ -1,10 +1,11 @@
 package services
 
 import (
+	"fmt"
 	. "github.com/panyam/relay/services/msg/core"
 	. "gopkg.in/check.v1"
 	// "code.google.com/p/gomock/gomock"
-	// "log"
+	"log"
 	// "time"
 )
 
@@ -30,13 +31,13 @@ func (s *TestSuite) TestSaveChannelNew(c *C) {
 func (s *TestSuite) TestSaveChannelExistsById(c *C) {
 	svc := s.serviceGroup.UserService
 	team, err := s.serviceGroup.TeamService.CreateTeam(1, "org", "team")
+	c.Assert(err, IsNil)
+	c.Assert(team, Not(IsNil))
 	user := NewUser(0, "user1", team)
 	_ = svc.SaveUser(user, false)
 	channel := NewChannel(team, user, 0, "test")
 	_ = s.serviceGroup.ChannelService.SaveChannel(channel, true)
 
-	//err = s.serviceGroup.ChannelService.SaveChannel(channel, false)
-	//c.Assert(err, Not(IsNil))
 	err = s.serviceGroup.ChannelService.SaveChannel(channel, true)
 	c.Assert(err, IsNil)
 }
@@ -88,4 +89,29 @@ func (s *TestSuite) TestLeaveChannel(c *C) {
 	c.Assert(s.serviceGroup.ChannelService.ContainsUser(channel, user), Equals, false)
 	s.serviceGroup.ChannelService.JoinChannel(channel, user)
 	c.Assert(s.serviceGroup.ChannelService.ContainsUser(channel, user), Equals, true)
+}
+
+/**
+ * Test searching of channels
+ */
+func (s *TestSuite) TestGetChannels(c *C) {
+	svc := s.serviceGroup.UserService
+	team, _ := s.serviceGroup.TeamService.CreateTeam(1, "org", "team")
+
+	users := make([]*User, 0, 0)
+	for i := 1; i <= 10; i++ {
+		creator := NewUser(int64(i), fmt.Sprintf("user%d", i), team)
+		_ = svc.SaveUser(creator, false)
+		users = append(users, creator)
+		channel := NewChannel(team, creator, int64(i), fmt.Sprintf("channel%d", i))
+		err := s.serviceGroup.ChannelService.SaveChannel(channel, true)
+		log.Println("Err: ", err)
+
+		// add the creator and 4 next users as members
+		members := make([]*User, 0, 4)
+		for j := 0; j < 5; j++ {
+			members = append(members, users[(i+j)%len(users)])
+		}
+		s.serviceGroup.ChannelService.AddChannelMembers(channel, members)
+	}
 }

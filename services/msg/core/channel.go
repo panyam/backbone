@@ -48,7 +48,7 @@ type ChannelMember struct {
 }
 
 func NewChannel(team *Team, creator *User, id int64, name string) *Channel {
-	channel := &Channel{Team: team, Name: name, Creator: creator}
+	channel := &Channel{Team: team, Name: name, Creator: creator, Public: true}
 	channel.Object = Object{Id: id}
 	return channel
 }
