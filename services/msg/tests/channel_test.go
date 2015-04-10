@@ -4,8 +4,8 @@ import (
 	"fmt"
 	. "github.com/panyam/relay/services/msg/core"
 	. "gopkg.in/check.v1"
-	// "code.google.com/p/gomock/gomock"
 	"log"
+	// "code.google.com/p/gomock/gomock"
 	// "time"
 )
 
@@ -105,7 +105,9 @@ func (s *TestSuite) TestGetChannels(c *C) {
 		users = append(users, creator)
 		channel := NewChannel(team, creator, int64(i), fmt.Sprintf("channel%d", i))
 		err := s.serviceGroup.ChannelService.SaveChannel(channel, true)
-		log.Println("Err: ", err)
+		if err != nil {
+			log.Println("SaveChannel Error: ", err)
+		}
 
 		// add the creator and 4 next users as members
 		members := make([]*User, 0, 4)
@@ -118,6 +120,8 @@ func (s *TestSuite) TestGetChannels(c *C) {
 	// Test owner filter
 	channels := s.serviceGroup.ChannelService.GetChannels(team, users[0], "", nil, 0)
 	c.Assert(len(channels), Equals, 1)
+	// ensure all users have the same creator
+	c.Assert(channels[0].Creator.Id, Equals, users[0].Id)
 
 	// Test participants
 	channels = s.serviceGroup.ChannelService.GetChannels(team, nil, "", []string{"2", "3"}, 0)

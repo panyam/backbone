@@ -95,26 +95,41 @@ func (svc *ChannelService) SaveChannel(channel *Channel, override bool) error {
 }
 
 func (svc *ChannelService) GetChannels(team *Team, creator *User, orderBy string, participants []string, matchType int) []*Channel {
-	query := "SELECT DISTINCT(channels.Id), channels.Name, channels.LastMessageAt " +
-		"FROM channels, channel_members " +
-		"WHERE " +
-		fmt.Sprintf(" 	channel.TeamId = %d AND channels.Id = channel_members.ChannelId ", team.Id)
+	query := "SELECT DISTINCT(C.Id), C.Name, C.LastMessageAt, C.Public, C.Status " +
+		"FROM channels C, channel_members M " +
+		"WHERE" +
+		fmt.Sprintf(" C.TeamId = %d AND C.Id = M.ChannelId", team.Id)
 
 	if creator != nil {
-		query += fmt.Sprintf(" AND UserId = %d ", creator.Id)
+		query += fmt.Sprintf(" AND C.UserId = %d", creator.Id)
 	}
 
 	if len(participants) > 0 {
 		if matchType == 0 { // channel members must contain
 		}
-		query += fmt.Sprintf(" AND UserId = %d ", creator.Id)
 	}
 
 	if orderBy != "" {
 		query += " ORDER BY " + orderBy
 	}
 	log.Println("Query: ", query)
-	return nil
+	rows, err := svc.DB.Query(query)
+	if err == nil {
+		defer rows.Close()
+	}
+
+	channels := make([]*Channel, 0, 0)
+	for rows.Next() {
+		var creatorId int64
+		channel := Channel{Team: team, Creator: creator}
+		channel.Team = team
+		rows.Scan(&channel.Id, &creatorId, &channel.Name, &channel.LastMessageAt, &channel.Public, &channel.Status)
+		if creator == nil {
+			channel.Creator, _ = svc.SG.UserService.GetUserById(creatorId)
+		}
+		channels = append(channels, &channel)
+	}
+	return channels
 }
 
 /**
