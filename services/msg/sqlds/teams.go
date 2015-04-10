@@ -27,6 +27,7 @@ func NewTeamService(db *sql.DB, sg *ServiceGroup) *TeamService {
 }
 
 func (svc *TeamService) InitDB() {
+	svc.SG.IDService.CreateDomain("teamids", 1, 2)
 	CreateTable(svc.DB, TEAMS_TABLE,
 		[]string{
 			"Id bigint PRIMARY KEY",
@@ -60,7 +61,11 @@ func (svc *TeamService) RemoveAllTeams() {
  */
 func (svc *TeamService) CreateTeam(id int64, org string, name string) (*Team, error) {
 	if id == 0 {
-		id = UUIDGen()
+		id2, err := svc.SG.IDService.NextID("teamids")
+		if err != nil {
+			return nil, err
+		}
+		id = id2
 	}
 	team := Team{Organization: org, Name: name}
 	team.Object = Object{Id: id}

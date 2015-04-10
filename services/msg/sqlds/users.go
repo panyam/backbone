@@ -26,6 +26,7 @@ func NewUserService(db *sql.DB, sg *ServiceGroup) *UserService {
 }
 
 func (svc *UserService) InitDB() {
+	svc.SG.IDService.CreateDomain("userids", 1, 2)
 	CreateTable(svc.DB, USERS_TABLE,
 		[]string{
 			"Id bigint PRIMARY KEY",
@@ -93,8 +94,11 @@ func (svc *UserService) GetUser(username string, team *Team) (*User, error) {
  */
 func (svc *UserService) SaveUser(user *User, override bool) error {
 	if user.Id == 0 {
-		id := UUIDGen()
-		err := InsertRow(svc.DB, USERS_TABLE,
+		id, err := svc.SG.IDService.NextID("userids")
+		if err != nil {
+			return err
+		}
+		err = InsertRow(svc.DB, USERS_TABLE,
 			"Id", id,
 			"TeamId", user.Team.Id,
 			"Username", user.Username,

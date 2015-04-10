@@ -4,14 +4,14 @@ import ()
 
 type IIDService interface {
 	/**
-	 * Creates a new ID.
+	 * Creates a domain over which IDs can be obtained.
 	 */
-	CreateID(domain string) string
+	CreateDomain(domain string, startVal int64, increment int) error
 
 	/**
-	 * Releases an ID back to the domain.
+	 * Gets the next ID in a given domain
 	 */
-	ReleaseID(domain string, id int64)
+	NextID(domain string) (int64, error)
 }
 
 /**
@@ -117,6 +117,11 @@ type IChannelService interface {
 	 * 		existing channel with the same ID exists.
 	 */
 	SaveChannel(channel *Channel, override bool) error
+
+	/**
+	 * Get channels meeting particular criterea
+	 */
+	GetChannels(teamId int64, ownerName string, orderBy string, participants []string, matchType int) []*Channel
 
 	/**
 	 * Get channel by Id

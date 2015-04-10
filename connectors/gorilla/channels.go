@@ -7,13 +7,19 @@ import (
 	"github.com/panyam/relay/utils"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 )
 
 func (s *Server) GetChannelsHandler() RequestHandlerFunc {
 	return func(rw http.ResponseWriter, request *http.Request, context *RequestContext) {
-		log.Println("Get Channels")
+		teamIdParam := mux.Vars(request)["teamId"]
+		teamId := utils.String2ID(teamIdParam)
+
+		team, _ := s.serviceGroup.TeamService.GetTeamById(teamId)
+		if team == nil {
+			http.Error(rw, "No such team", http.StatusNotFound)
+			return
+		}
 	}
 }
 
@@ -29,8 +35,12 @@ func (s *Server) CreateChannelHandler() RequestHandlerFunc {
 			}
 		}
 
-		teamId, _ := strconv.ParseInt(teamIdParam, 10, 64)
+		teamId := utils.String2ID(teamIdParam)
 		team, _ := s.serviceGroup.TeamService.GetTeamById(teamId)
+		if team == nil {
+			http.Error(rw, "No such team", http.StatusNotFound)
+			return
+		}
 		participantsParam := strings.Split(request.FormValue("participants"), ",")
 		publicParam := request.FormValue("public")
 		nameParam := request.FormValue("name")

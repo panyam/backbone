@@ -182,3 +182,51 @@ func (client *ApiClient) CreateChannel(team *msgcore.Team, name string, public b
 	}
 	return msgcore.ChannelFromDict(data)
 }
+
+// Get channels for a user
+//
+// **Endpoints:** GET /teams/{teamid}/channels/
+//
+// **Auth Required:** YES
+//
+// **Parameters:**
+//
+// - predicate:				The predicate used to filter the results.
+// 							Predicates can contain the following operators (for now):
+// 								Bool operators - AND, OR and NOT
+// 								Grouping - ( and )
+// 								Comparison Ops - <, <=, >, >=, ==, !=, IN and CONTAINS
+//
+// 							The following fields can be targets of a predicate:
+// 							   status
+// 							   name
+// 							   participants
+// 							   last_message
+// 							   created
+// - metadata.<keypath>: 	Filter by predicates on metadata entries. See metadata filtering.
+// - order_by: 				Order by fields (prefixed by - indicates descending order):
+//     * name 			- order by name of the channel
+//     * created 		- order by created date
+//     * updated 		- order by last updated
+//     * last_messaged 	- order by last message date
+//
+// **Return:**
+//
+// HTTP Status 200 on success along with list of a channels matching the result.
+func (client *ApiClient) GetChannels(team *msgcore.Team, order_by string) ([]*msgcore.Channel, error) {
+	params := map[string]string{"name": name,
+		"participants": strings.Join(participants, ","),
+		"public":       "true",
+	}
+	url := fmt.Sprintf("/teams/%s/channels/", utils.ID2String(team.Id))
+	req, err := client.MakeAuthRequest("POST", url, params, nil)
+	var data map[string]interface{}
+	resp, err := SendRequest(req, &data)
+	log.Println("Response: ", resp)
+	if err != nil {
+		return nil, err
+	} else if resp.StatusCode != 200 {
+		return nil, errors.New(resp.Status)
+	}
+	return msgcore.ChannelFromDict(data)
+}

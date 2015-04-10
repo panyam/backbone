@@ -37,6 +37,7 @@ func CreateServiceGroup() core.ServiceGroup {
 			log.Fatal(err)
 		}
 
+		sg.IDService = sqlds.NewIDService(db, &sg)
 		sg.TeamService = sqlds.NewTeamService(db, &sg)
 		sg.UserService = sqlds.NewUserService(db, &sg)
 		sg.ChannelService = sqlds.NewChannelService(db, &sg)

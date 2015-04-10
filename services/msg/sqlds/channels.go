@@ -27,6 +27,7 @@ func NewChannelService(db *sql.DB, sg *ServiceGroup) *ChannelService {
 }
 
 func (svc *ChannelService) InitDB() {
+	svc.SG.IDService.CreateDomain("channelids", 1, 2)
 	CreateTable(svc.DB, CHANNELS_TABLE,
 		[]string{
 			"Id bigint PRIMARY KEY",
@@ -57,8 +58,11 @@ func (svc *ChannelService) InitDB() {
  */
 func (svc *ChannelService) SaveChannel(channel *Channel, override bool) error {
 	if channel.Id == 0 {
-		id := UUIDGen()
-		err := InsertRow(svc.DB, CHANNELS_TABLE,
+		id, err := svc.SG.IDService.NextID("channelids")
+		if err != nil {
+			return err
+		}
+		err = InsertRow(svc.DB, CHANNELS_TABLE,
 			"Id", id,
 			"TeamId", channel.Team.Id,
 			"UserId", channel.Creator.Id,
@@ -77,6 +81,10 @@ func (svc *ChannelService) SaveChannel(channel *Channel, override bool) error {
 			"Public", channel.Public,
 			"Status", channel.Status)
 	}
+}
+
+func (svc *ChannelService) GetChannels(teamId int64, ownerName string, orderBy string, participants []string, matchType int) []*Channel {
+	return nil
 }
 
 /**
@@ -159,8 +167,8 @@ func (svc *ChannelService) ContainsUser(channel *Channel, user *User) bool {
  * Lets a user to join a channel (if allowed)
  */
 func (svc *ChannelService) JoinChannel(channel *Channel, user *User) error {
-	query := fmt.Sprintf(`INSERT INTO %s ( UserId, ChannelId ) VALUES (%d, %d)`,
-		CHANNEL_MEMBERS_TABLE, user.Id, channel.Id)
+	query := fmt.Sprintf(`INSERT INTO %s ( ChannelId, Username) VALUES (%d, '%s')`,
+		CHANNEL_MEMBERS_TABLE, channel.Id, user.Username)
 	_, err := svc.DB.Exec(query)
 	return err
 }

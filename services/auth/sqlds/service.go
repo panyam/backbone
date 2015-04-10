@@ -30,6 +30,8 @@ func NewAuthService(db *sql.DB, userService msgcore.IUserService, teamService ms
 }
 
 func (svc *AuthService) InitDB() {
+	svc.DB.QueryRow("CREATE SEQUENCE registrationids MINVALUE 1")
+	svc.DB.QueryRow("CREATE SEQUENCE loginids MINVALUE 1")
 	CreateTable(svc.DB, REGISTRATIONS_TABLE,
 		[]string{
 			"Id bigint PRIMARY KEY",
@@ -120,6 +122,7 @@ func (svc *AuthService) DeleteRegistration(registration *authcore.Registration) 
  */
 func (svc *AuthService) RemoveAllRegistrations() {
 	ClearTable(svc.DB, REGISTRATIONS_TABLE)
+	svc.DB.QueryRow("DROP SEQUENCE registrationids")
 }
 
 /**
@@ -127,6 +130,7 @@ func (svc *AuthService) RemoveAllRegistrations() {
  */
 func (svc *AuthService) RemoveAllLogins() {
 	ClearTable(svc.DB, LOGINS_TABLE)
+	svc.DB.QueryRow("DROP SEQUENCE loginids")
 }
 
 /**

@@ -32,15 +32,6 @@ func (s *TestSuite) TestCreateChannels(c *C) {
 }
 
 /**
- * Getting teams.  Cases:
- *
- * Without login - return 4xx
- * With login - return teams user is subscribed to or invited to.
- */
-func (s *TestSuite) TestGetChannels(c *C) {
-}
-
-/**
  * Get team details:
  *
  * Public team - return it with or without login
@@ -49,6 +40,15 @@ func (s *TestSuite) TestGetChannels(c *C) {
  * 	With login if part of team otherwise 4xx
  */
 func (s *TestSuite) TestGetChannelDetails(c *C) {
+	// create a channel
+	s.LoginClient()
+	channel, err = s.client.CreateChannel(s.testTeam, "testchannel", true, []string{"1", "2", "3", "4"})
+	c.Assert(err, IsNil)
+	c.Assert(channel, Not(IsNil))
+	c.Assert(channel.Name, Equals, "testchannel")
+
+	s.LogoutClient()
+	channels, err := s.client.GetChannels
 }
 
 /**

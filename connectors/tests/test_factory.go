@@ -29,6 +29,10 @@ func (s *TestSuite) LoginClient() {
 	s.client.EnableAuthentication(&goclient.DebugAuthenticator{Userid: s.DebugUserId})
 }
 
+func (s *TestSuite) LogoutClient() {
+	s.client.DisableAuthentication()
+}
+
 func (s *TestSuite) CreateTestServices() (*msg_core.ServiceGroup, auth_core.IAuthService) {
 	sg := msg_core.ServiceGroup{}
 	var authService auth_core.IAuthService = nil

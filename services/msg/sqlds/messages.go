@@ -27,6 +27,7 @@ func NewMessageService(db *sql.DB, sg *ServiceGroup) *MessageService {
 }
 
 func (svc *MessageService) InitDB() {
+	svc.SG.IDService.CreateDomain("messageids", 1, 2)
 	CreateTable(svc.DB, MESSAGES_TABLE,
 		[]string{
 			"Id bigint PRIMARY KEY",
@@ -63,8 +64,11 @@ func (svc *MessageService) InitDB() {
  */
 func (svc *MessageService) SaveMessage(message *Message) error {
 	if message.Id == 0 {
-		id := UUIDGen()
-		err := InsertRow(svc.DB, MESSAGES_TABLE,
+		id, err := svc.SG.IDService.NextID("messageids")
+		if err != nil {
+			return err
+		}
+		err = InsertRow(svc.DB, MESSAGES_TABLE,
 			"Id", id,
 			"ChannelId", message.Channel.Id,
 			"SenderId", message.Sender.Id,
