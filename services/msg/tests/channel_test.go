@@ -114,4 +114,12 @@ func (s *TestSuite) TestGetChannels(c *C) {
 		}
 		s.serviceGroup.ChannelService.AddChannelMembers(channel, members)
 	}
+
+	// Test owner filter
+	channels := s.serviceGroup.ChannelService.GetChannels(team, users[0], "", nil, 0)
+	c.Assert(len(channels), Equals, 1)
+
+	// Test participants
+	channels = s.serviceGroup.ChannelService.GetChannels(team, nil, "", []string{"2", "3"}, 0)
+	c.Assert(len(channels), Equals, 2)
 }
