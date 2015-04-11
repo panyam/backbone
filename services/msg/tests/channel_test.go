@@ -99,8 +99,9 @@ func (s *TestSuite) TestGetChannels(c *C) {
 	team, _ := s.serviceGroup.TeamService.CreateTeam(1, "org", "team")
 
 	users := make([]*User, 0, 0)
+	channels := make([]*Channel, 0, 0)
 	for i := 1; i <= 10; i++ {
-		creator := NewUser(int64(i), fmt.Sprintf("user%d", i), team)
+		creator := NewUser(int64(i), fmt.Sprintf("%d", i), team)
 		_ = svc.SaveUser(creator, false)
 		users = append(users, creator)
 		channel := NewChannel(team, creator, int64(i), fmt.Sprintf("channel%d", i))
@@ -108,22 +109,30 @@ func (s *TestSuite) TestGetChannels(c *C) {
 		if err != nil {
 			log.Println("SaveChannel Error: ", err)
 		}
+		channels = append(channels, channel)
+	}
 
+	for i := 1; i <= 10; i++ {
 		// add the creator and 4 next users as members
 		members := make([]*User, 0, 4)
 		for j := 0; j < 5; j++ {
-			members = append(members, users[(i+j)%len(users)])
+			members = append(members, users[(i+j-1)%len(users)])
 		}
-		s.serviceGroup.ChannelService.AddChannelMembers(channel, members)
+		s.serviceGroup.ChannelService.AddChannelMembers(channels[i-1], members)
 	}
 
 	// Test owner filter
-	channels := s.serviceGroup.ChannelService.GetChannels(team, users[0], "", nil, 0)
-	c.Assert(len(channels), Equals, 1)
+	fetched_channels, channel_members := s.serviceGroup.ChannelService.GetChannels(team, users[0], "", nil, true)
+	c.Assert(len(fetched_channels), Equals, 1)
+	c.Assert(len(channel_members), Equals, 1)
 	// ensure all users have the same creator
-	c.Assert(channels[0].Creator.Id, Equals, users[0].Id)
+	c.Assert(fetched_channels[0].Creator.Id, Equals, users[0].Id)
+	c.Assert(len(channel_members[0]), Equals, 5)
 
 	// Test participants
-	channels = s.serviceGroup.ChannelService.GetChannels(team, nil, "", []string{"2", "3"}, 0)
-	c.Assert(len(channels), Equals, 2)
+	fetched_channels, channel_members = s.serviceGroup.ChannelService.GetChannels(team, nil, "", []*User{users[1], users[2]}, true)
+	c.Assert(len(fetched_channels), Equals, 4)
+	for i := 0; i < 4; i++ {
+		c.Assert(len(channel_members[i]), Equals, 5)
+	}
 }

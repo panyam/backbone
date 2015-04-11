@@ -36,7 +36,7 @@ func CreateTable(db *sql.DB, tableName string, columns []string, tableConstraint
 	return error
 }
 
-func formatSqlValue(value interface{}) string {
+func FormatSqlValue(value interface{}) string {
 	if value == nil {
 		return "NULL"
 	}
@@ -75,7 +75,7 @@ func InsertRow(db *sql.DB, tableName string, args ...interface{}) error {
 			valuesString += ", "
 		}
 		columnsString += colName
-		valuesString += formatSqlValue(args[i+1])
+		valuesString += FormatSqlValue(args[i+1])
 	}
 
 	columnsString = columnsString + ")"
@@ -99,7 +99,7 @@ func UpdateRows(db *sql.DB, tableName string, whereClause string, args ...interf
 		if i > 0 {
 			columnsString = columnsString + ", "
 		}
-		columnsString += fmt.Sprintf("%s = %s", colName, formatSqlValue(args[i+1]))
+		columnsString += fmt.Sprintf("%s = %s", colName, FormatSqlValue(args[i+1]))
 	}
 
 	query = query + columnsString

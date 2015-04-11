@@ -126,7 +126,7 @@ type IChannelService interface {
 	/**
 	 * Get channels meeting particular criterea
 	 */
-	GetChannels(team *Team, creator *User, orderBy string, participants []string, matchType int) []*Channel
+	GetChannels(team *Team, creator *User, orderBy string, participants []*User, matchAll bool) ([]*Channel, [][]ChannelMember)
 
 	/**
 	 * Get channel by Id
