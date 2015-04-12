@@ -198,9 +198,15 @@ func (svc *ChannelService) GetChannelMembers(channel *Channel) []ChannelMember {
 /**
  * Adds users to a channel.
  */
-func (svc *ChannelService) AddChannelMembers(channel *Channel, users []*User) error {
-	for _, user := range users {
-		err := InsertRow(svc.DB, CHANNEL_MEMBERS_TABLE,
+func (svc *ChannelService) AddChannelMembers(channel *Channel, usernames []string) error {
+	for _, username := range usernames {
+		user, err := svc.SG.UserService.GetUser(username, channel.Team)
+		if err != nil {
+			// then create it
+			user = NewUser(0, username, channel.Team)
+			svc.SG.UserService.SaveUser(user, false)
+		}
+		err = InsertRow(svc.DB, CHANNEL_MEMBERS_TABLE,
 			"ChannelId", channel.Id,
 			"UserId", user.Id,
 			"Status", 0,

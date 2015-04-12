@@ -36,7 +36,7 @@ type Object struct {
 	/**
 	 * Status of the user account.
 	 * 0 = valid and active
-	 * everything else = invalid
+	 * everything else depends on the object type
 	 */
 	Status int
 }

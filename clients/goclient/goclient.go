@@ -152,7 +152,7 @@ func (client *ApiClient) CreateTeam(name string, organization string) (*msgcore.
 // **Parameters:**
 //
 // - name: Name of the channel (required)
-// - participants: List of usernames participating in the channel.
+// - participants: Comma seperated list of usernames
 // - public: Whether the channel is public or not (public by default)
 //
 // **Return:**
@@ -163,10 +163,7 @@ func (client *ApiClient) CreateTeam(name string, organization string) (*msgcore.
 // {"id": "123", "name": "Dream Team", "organization": "Dream Owner"}
 // ```
 func (client *ApiClient) CreateChannel(team *msgcore.Team, name string, public bool, participants []string) (*msgcore.Channel, error) {
-	params := map[string]string{"name": name,
-		"participants": strings.Join(participants, ","),
-		"public":       "true",
-	}
+	params := map[string]string{"name": name, "public": "true", "participants": strings.Join(participants, ",")}
 	if !public {
 		params["public"] = "false"
 	}
@@ -183,6 +180,30 @@ func (client *ApiClient) CreateChannel(team *msgcore.Team, name string, public b
 	return msgcore.ChannelFromDict(data)
 }
 
+// Invite users to a channel.
+//
+// **Endpoints:** POST /channels/<id>/
+//
+// **Auth Required:** YES and user must be a participant in the channel AND have
+// "invite_<channelid>" permission.
+//
+// **Parameters:**
+//
+// - participants: Comma seperated list of usernames
+// - createusers: Whether to create users who are not registered yet.  Requires
+// "createusers" permissions.
+//
+// **Return:**
+//
+// HTTP Status 200 on success along with team details, eg:
+//
+// ```
+// {"id": "123", "name": "Dream Team", "organization": "Dream Owner"}
+// ```
+func (client *ApiClient) InviteToChannel(channel *msgcore.Channel, participants []string) error {
+	return nil
+}
+
 // Get channels for a user
 //
 // **Endpoints:** GET /teams/{teamid}/channels/
@@ -190,43 +211,45 @@ func (client *ApiClient) CreateChannel(team *msgcore.Team, name string, public b
 // **Auth Required:** YES
 //
 // **Parameters:**
-//
-// - predicate:				The predicate used to filter the results.
-// 							Predicates can contain the following operators (for now):
-// 								Bool operators - AND, OR and NOT
-// 								Grouping - ( and )
-// 								Comparison Ops - <, <=, >, >=, ==, !=, IN and CONTAINS
-//
-// 							The following fields can be targets of a predicate:
-// 							   status
-// 							   name
-// 							   participants
-// 							   last_message
-// 							   created
-// - metadata.<keypath>: 	Filter by predicates on metadata entries. See metadata filtering.
-// - order_by: 				Order by fields (prefixed by - indicates descending order):
-//     * name 			- order by name of the channel
-//     * created 		- order by created date
-//     * updated 		- order by last updated
-//     * last_messaged 	- order by last message date
+//		owner:	Channels with this user as the owner will be returned.
+//		participants:	Comma seperate usernames to filter channels by (ie
+//						contains these participants)
+//		matchall: 		Whether to match ALL participants or ANY
+//						participant in the above list
+// 		order_by: 		Channel fields to order by (prefixed by - indicates descending order):
+//     		* name 				- order by name of the channel
+//     		* created 			- order by created date
+//     		* updated 			- order by last updated
+//     		* last_messaged 	- order by last message date
 //
 // **Return:**
 //
-// HTTP Status 200 on success along with list of a channels matching the result.
-func (client *ApiClient) GetChannels(team *msgcore.Team, order_by string) ([]*msgcore.Channel, error) {
-	params := map[string]string{"name": name,
+// HTTP Status 200 on success along with list of a channels and their members
+// matching the result.  If the owner AND participants parameters are not
+// specified then only public channels are returned.
+func (client *ApiClient) GetChannels(team *msgcore.Team,
+	owner string,
+	participants []string,
+	matchall bool,
+	order_by string) ([]*msgcore.Channel, []msgcore.ChannelMember, error) {
+
+	params := map[string]string{"owner": owner,
 		"participants": strings.Join(participants, ","),
-		"public":       "true",
+		"matchall":     "false",
 	}
+	if matchall {
+		params["matchall"] = "true"
+	}
+
 	url := fmt.Sprintf("/teams/%s/channels/", utils.ID2String(team.Id))
-	req, err := client.MakeAuthRequest("POST", url, params, nil)
+	req, err := client.MakeAuthRequest("GET", url, params, nil)
 	var data map[string]interface{}
 	resp, err := SendRequest(req, &data)
-	log.Println("Response: ", resp)
+	log.Println("Response: ", data)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	} else if resp.StatusCode != 200 {
-		return nil, errors.New(resp.Status)
+		return nil, nil, errors.New(resp.Status)
 	}
-	return msgcore.ChannelFromDict(data)
+	return nil, nil, nil // msgcore.ChannelFromDict(data)
 }

@@ -20,6 +20,37 @@ func (s *Server) GetChannelsHandler() RequestHandlerFunc {
 			http.Error(rw, "No such team", http.StatusNotFound)
 			return
 		}
+
+		ownerParam := request.FormValue("owner")
+		var owner *msgcore.User = nil
+		var err error = nil
+		if ownerParam != "" {
+			owner, err = s.serviceGroup.UserService.GetUser(ownerParam, team)
+			if err != nil {
+				http.Error(rw, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
+
+		matchall := request.FormValue("matchall") == "true"
+
+		participantsParam := strings.Split(request.FormValue("participants"), ",")
+		var participants []*msgcore.User = nil
+		for _, participant := range participantsParam {
+			user, err := s.serviceGroup.UserService.GetUser(participant, team)
+			if err == nil {
+				participants = append(participants, user)
+			} else if matchall {
+				// since this user does not exist then it cannot be matched
+				// so return an empty list
+				http.Error(rw, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
+		order_by := request.FormValue("order_by")
+
+		channels, members := s.serviceGroup.ChannelService.GetChannels(team, owner, order_by, participants, matchall)
+		utils.SendJsonResponse(rw, map[string]interface{}{"channels": channels, "members": members})
 	}
 }
 
@@ -41,7 +72,6 @@ func (s *Server) CreateChannelHandler() RequestHandlerFunc {
 			http.Error(rw, "No such team", http.StatusNotFound)
 			return
 		}
-		participantsParam := strings.Split(request.FormValue("participants"), ",")
 		publicParam := request.FormValue("public")
 		nameParam := request.FormValue("name")
 
@@ -55,7 +85,11 @@ func (s *Server) CreateChannelHandler() RequestHandlerFunc {
 		}
 
 		s.serviceGroup.ChannelService.AddChannelMembers(channel, []string{creator.Username})
-		s.serviceGroup.ChannelService.AddChannelMembers(channel, participantsParam)
+
+		participantsParam := strings.Split(request.FormValue("participants"), ",")
+		if len(participantsParam) > 0 {
+			s.serviceGroup.ChannelService.AddChannelMembers(channel, participantsParam)
+		}
 		utils.SendJsonResponse(rw, channel.ToDict())
 	}
 }

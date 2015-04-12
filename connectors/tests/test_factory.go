@@ -42,6 +42,7 @@ func (s *TestSuite) CreateTestServices() (*msg_core.ServiceGroup, auth_core.IAut
 			log.Fatal(err)
 		}
 
+		sg.IDService = msg_sqlds.NewIDService(db, &sg)
 		sg.TeamService = msg_sqlds.NewTeamService(db, &sg)
 		sg.UserService = msg_sqlds.NewUserService(db, &sg)
 		sg.ChannelService = msg_sqlds.NewChannelService(db, &sg)

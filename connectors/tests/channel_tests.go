@@ -1,8 +1,10 @@
 package connectors
 
 import (
+	"fmt"
+	"log"
 	// authcore "github.com/panyam/relay/services/auth/core"
-	// msgcore "github.com/panyam/relay/services/msg/core"
+	. "github.com/panyam/relay/services/msg/core"
 	. "gopkg.in/check.v1"
 )
 
@@ -32,7 +34,48 @@ func (s *TestSuite) TestCreateChannels(c *C) {
 }
 
 /**
- * Get team details:
+ * Get channels
+ *
+ * Public team - return it with or without login
+ * Private team:
+ * 	Without login - return 4xx
+ * 	With login if part of team otherwise 4xx
+ */
+func (s *TestSuite) TestGetChannels(c *C) {
+	team := s.testTeam
+	users := make([]*User, 0, 0)
+	channels := make([]*Channel, 0, 0)
+	for i := 1; i <= 10; i++ {
+		creator := NewUser(int64(i), fmt.Sprintf("%d", i), team)
+		_ = s.serviceGroup.UserService.SaveUser(creator, false)
+		users = append(users, creator)
+		channel := NewChannel(team, creator, int64(i), fmt.Sprintf("channel%d", i))
+		err := s.serviceGroup.ChannelService.SaveChannel(channel, true)
+		if err != nil {
+			log.Println("SaveChannel Error: ", err)
+		}
+		channels = append(channels, channel)
+	}
+
+	for i := 1; i <= 10; i++ {
+		// add the creator and 4 next users as members
+		members := make([]string, 0, 4)
+		for j := 0; j < 5; j++ {
+			members = append(members, users[(i+j-1)%len(users)].Username)
+		}
+		s.serviceGroup.ChannelService.AddChannelMembers(channels[i-1], members)
+	}
+
+	// create a channel
+	s.LoginClient()
+	channels, members, err := s.client.GetChannels(team, users[0].Username, nil, true, "")
+	log.Println("Error: ", err)
+	log.Println("Channels: ", channels)
+	log.Println("Members: ", members)
+}
+
+/**
+ * Get channel details:
  *
  * Public team - return it with or without login
  * Private team:
@@ -42,13 +85,12 @@ func (s *TestSuite) TestCreateChannels(c *C) {
 func (s *TestSuite) TestGetChannelDetails(c *C) {
 	// create a channel
 	s.LoginClient()
-	channel, err = s.client.CreateChannel(s.testTeam, "testchannel", true, []string{"1", "2", "3", "4"})
+	channel, err := s.client.CreateChannel(s.testTeam, "testchannel", true, []string{"1", "2", "3", "4"})
 	c.Assert(err, IsNil)
 	c.Assert(channel, Not(IsNil))
 	c.Assert(channel.Name, Equals, "testchannel")
 
 	s.LogoutClient()
-	channels, err := s.client.GetChannels
 }
 
 /**
