@@ -37,17 +37,18 @@ func (svc *IDService) InitDB() {
 /**
  * Create a domain of IDs
  */
-func (svc *IDService) CreateDomain(domain string, startVal int64, increment int) error {
-	svc.DB.QueryRow(fmt.Sprintf("CREATE SEQUENCE %s INCREMENT BY %d MINVALUE %d", domain, increment, startVal))
+func (svc *IDService) CreateDomain(request *CreateDomainRequest) error {
+	svc.DB.QueryRow(fmt.Sprintf("CREATE SEQUENCE %s INCREMENT BY %d MINVALUE %d",
+		request.Domain, request.Increment, request.StartValue))
 	InsertRow(svc.DB, SEQUENCES_TABLE,
-		"Domain", domain,
-		"StartVal", startVal,
-		"Increment", increment)
+		"Domain", request.Domain,
+		"StartVal", request.StartValue,
+		"Increment", request.Increment)
 	return nil
 }
 
-func (svc *IDService) NextID(domain string) (int64, error) {
-	row := svc.DB.QueryRow(fmt.Sprintf("SELECT nextval('%s')", domain))
+func (svc *IDService) NextID(request *NextIDRequest) (int64, error) {
+	row := svc.DB.QueryRow(fmt.Sprintf("SELECT nextval('%s')", request.Domain))
 	var nextVal int64 = 0
 	err := row.Scan(&nextVal)
 	if err != nil {
@@ -59,7 +60,7 @@ func (svc *IDService) NextID(domain string) (int64, error) {
 /**
  * Removes all entries.
  */
-func (svc *IDService) RemoveAllDomains() {
+func (svc *IDService) RemoveAllDomains(request *Request) {
 	query := fmt.Sprintf("SELECT Domain FROM %s", SEQUENCES_TABLE)
 	rows, err := svc.DB.Query(query)
 	if err == nil {

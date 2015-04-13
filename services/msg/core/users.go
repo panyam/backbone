@@ -1,7 +1,7 @@
 package core
 
 type GetUserRequest struct {
-	Request
+	*Request
 
 	/**
 	 * ID of the user to fetch.  If this is - then the username/team is looked
@@ -15,7 +15,7 @@ type GetUserRequest struct {
 }
 
 type SaveUserRequest struct {
-	Request
+	*Request
 
 	/**
 	 * The user to save.
@@ -60,7 +60,7 @@ type IUserService interface {
 	 * 		otherwise if IDs of curr and existing are different errow is thrown,
 	 * 		otherwise object is updated.
 	 */
-	SaveUser(request SaveUserRequest) error
+	SaveUser(request *SaveUserRequest) error
 }
 
 /**

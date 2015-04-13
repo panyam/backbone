@@ -1,7 +1,7 @@
 package core
 
 type CreateDomainRequest struct {
-	Request
+	*Request
 
 	Domain     string
 	StartValue int64
@@ -9,7 +9,7 @@ type CreateDomainRequest struct {
 }
 
 type NextIDRequest struct {
-	Request
+	*Request
 	Domain string
 }
 

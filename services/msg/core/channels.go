@@ -6,13 +6,13 @@ import (
 )
 
 type SaveChannelRequest struct {
-	Request
+	*Request
 	Channel  *Channel
 	Override bool
 }
 
 type GetChannelsRequest struct {
-	Request
+	*Request
 	Team         *Team
 	Creator      *User
 	OrderBy      string
@@ -26,7 +26,7 @@ type GetChannelsResult struct {
 }
 
 type GetChannelRequest struct {
-	Request
+	*Request
 	Id int64
 }
 
@@ -36,19 +36,19 @@ type GetChannelResult struct {
 }
 
 type InviteMembersRequest struct {
-	Request
+	*Request
 	Channel   *Channel
 	Usernames []string
 }
 
 type ChannelMembershipRequest struct {
-	Request
+	*Request
 	Channel *Channel
 	User    *User
 }
 
 type DeleteChannelRequest struct {
-	Request
+	*Request
 	Channel *Channel
 }
 

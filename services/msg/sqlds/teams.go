@@ -27,7 +27,7 @@ func NewTeamService(db *sql.DB, sg *ServiceGroup) *TeamService {
 }
 
 func (svc *TeamService) InitDB() {
-	svc.SG.IDService.CreateDomain("teamids", 1, 2)
+	svc.SG.IDService.CreateDomain(&CreateDomainRequest{nil, "teamids", 1, 2})
 	CreateTable(svc.DB, TEAMS_TABLE,
 		[]string{
 			"Id bigint PRIMARY KEY",
@@ -48,7 +48,7 @@ func (svc *TeamService) InitDB() {
 /**
  * Removes all entries.
  */
-func (svc *TeamService) RemoveAllTeams() {
+func (svc *TeamService) RemoveAllTeams(request *Request) {
 	ClearTable(svc.DB, TEAMS_TABLE)
 }
 
@@ -59,17 +59,17 @@ func (svc *TeamService) RemoveAllTeams() {
  * A valid Team object on return WILL have an ID if the backend can
  * auto generate IDs
  */
-func (svc *TeamService) CreateTeam(id int64, org string, name string) (*Team, error) {
-	if id == 0 {
-		id2, err := svc.SG.IDService.NextID("teamids")
+func (svc *TeamService) CreateTeam(request *CreateTeamRequest) (*Team, error) {
+	if request.Id == 0 {
+		id2, err := svc.SG.IDService.NextID(&NextIDRequest{nil, "teamids"})
 		if err != nil {
 			return nil, err
 		}
-		id = id2
+		request.Id = id2
 	}
-	team := Team{Organization: org, Name: name}
-	team.Object = Object{Id: id}
-	query := fmt.Sprintf(`INSERT INTO %s ( Id, Organization, Name ) VALUES (%d, '%s', '%s')`, TEAMS_TABLE, id, org, name)
+	team := Team{Organization: request.Organization, Name: request.Name}
+	team.Object = Object{Id: request.Id}
+	query := fmt.Sprintf(`INSERT INTO %s ( Id, Organization, Name ) VALUES (%d, '%s', '%s')`, TEAMS_TABLE, request.Id, request.Organization, request.Name)
 	_, err := svc.DB.Exec(query)
 	if err != nil {
 		return nil, err
@@ -80,19 +80,19 @@ func (svc *TeamService) CreateTeam(id int64, org string, name string) (*Team, er
 /**
  * Retrieve teams in a org
  */
-func (svc *TeamService) GetTeamsInOrg(org string, offset int, count int) ([]*Team, error) {
+func (svc *TeamService) GetTeamsInOrg(request *GetTeamsRequest) ([]*Team, error) {
 	return nil, nil
 }
 
 /**
  * Retrieve a team by ID.
  */
-func (svc *TeamService) GetTeamById(id int64) (*Team, error) {
-	query := fmt.Sprintf("SELECT Organization, Name from %s where Id = %d", TEAMS_TABLE, id)
+func (svc *TeamService) GetTeamById(request *GetTeamRequest) (*Team, error) {
+	query := fmt.Sprintf("SELECT Organization, Name from %s where Id = %d", TEAMS_TABLE, request.Id)
 	row := svc.DB.QueryRow(query)
 
 	var team Team
-	team.Id = id
+	team.Id = request.Id
 	err := row.Scan(&team.Organization, &team.Name)
 	return &team, err
 }
@@ -100,8 +100,9 @@ func (svc *TeamService) GetTeamById(id int64) (*Team, error) {
 /**
  * Retrieve a team by Name.
  */
-func (svc *TeamService) GetTeamByName(org string, name string) (*Team, error) {
-	query := fmt.Sprintf("SELECT Id from %s where Organization = '%s' and Name = '%s'", TEAMS_TABLE, org, name)
+func (svc *TeamService) GetTeamByName(request *GetTeamRequest) (*Team, error) {
+	query := fmt.Sprintf("SELECT Id from %s where Organization = '%s' and Name = '%s'",
+		TEAMS_TABLE, request.Organization, request.Name)
 	rows, err := svc.DB.Query(query)
 	if err != nil {
 		return nil, err
@@ -113,7 +114,7 @@ func (svc *TeamService) GetTeamByName(org string, name string) (*Team, error) {
 	if err != nil {
 		return nil, err
 	}
-	team := Team{Organization: org, Name: name}
+	team := Team{Organization: request.Organization, Name: request.Name}
 	team.Object = Object{Id: id}
 	return &team, err
 }
@@ -121,27 +122,27 @@ func (svc *TeamService) GetTeamByName(org string, name string) (*Team, error) {
 /**
  * Delete a team.
  */
-func (svc *TeamService) DeleteTeam(team *Team) error {
-	return DeleteById(svc.DB, TEAMS_TABLE, team.Id)
+func (svc *TeamService) DeleteTeam(request *DeleteTeamRequest) error {
+	return DeleteById(svc.DB, TEAMS_TABLE, request.Team.Id)
 }
 
 /**
  * Lets a user to join a team (if allowed) and does not already exist.
  */
-func (svc *TeamService) JoinTeam(team *Team, username string) (*User, error) {
+func (svc *TeamService) JoinTeam(request *TeamMembershipRequest) (*User, error) {
 	return nil, nil
 }
 
 /**
  * Tells if a user belongs to a team.
  */
-func (svc *TeamService) TeamContains(team *Team, username string) bool {
+func (svc *TeamService) TeamContains(request *TeamMembershipRequest) bool {
 	return false
 }
 
 /**
  * Lets a user leave a team or be kicked out.
  */
-func (svc *TeamService) LeaveTeam(team *Team, user *User) error {
+func (svc *TeamService) LeaveTeam(request *TeamMembershipRequest) error {
 	return nil
 }

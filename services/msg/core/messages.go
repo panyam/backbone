@@ -5,21 +5,21 @@ import (
 )
 
 type GetMessagesRequest struct {
-	Request
+	*Request
 	Channel *Channel
-	User    *User
+	Sender  *User
 	Offset  int
 	Count   int
 }
 
 type SaveMessageRequest struct {
-	Request
+	*Request
 
 	Message *Message
 }
 
 type GetMessageRequest struct {
-	Request
+	*Request
 	Id int64
 }
 
@@ -30,7 +30,7 @@ type GetMessageResult struct {
 }
 
 type DeleteMessageRequest struct {
-	Request
+	*Request
 	Message *Message
 }
 
@@ -59,7 +59,7 @@ type IMessageService interface {
 	/**
 	 * Gets a message by ID
 	 */
-	GetMessageById(request GetMessageRequest) (*GetMessageResult, error)
+	GetMessageById(request *GetMessageRequest) (*GetMessageResult, error)
 
 	/**
 	 * Gets the fragments of a message.

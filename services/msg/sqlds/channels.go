@@ -51,50 +51,52 @@ func (svc *ChannelService) InitDB() {
 		", CONSTRAINT unique_channel_membership UNIQUE (ChannelId, UserId)")
 
 	CreateMetadataTable(svc.DB, CHANNEL_METADATA_TABLE, CHANNELS_TABLE, "Channel")
-	svc.SG.IDService.CreateDomain("channelids", 1, 2)
+	request := &CreateDomainRequest{nil, "channelids", 1, 2}
+	svc.SG.IDService.CreateDomain(request)
 }
 
 /**
  * Lets a user create a channel.
  */
-func (svc *ChannelService) SaveChannel(channel *Channel, override bool) error {
-	if channel.Id == 0 {
-		id, err := svc.SG.IDService.NextID("channelids")
+func (svc *ChannelService) SaveChannel(request *SaveChannelRequest) error {
+	if request.Channel.Id == 0 {
+		nextid_request := &NextIDRequest{nil, "channelids"}
+		id, err := svc.SG.IDService.NextID(nextid_request)
 		if err != nil {
 			return err
 		}
 		err = InsertRow(svc.DB, CHANNELS_TABLE,
 			"Id", id,
-			"TeamId", channel.Team.Id,
-			"UserId", channel.Creator.Id,
-			"Name", channel.Name,
-			"Public", channel.Public,
-			"Status", channel.Status)
+			"TeamId", request.Channel.Team.Id,
+			"UserId", request.Channel.Creator.Id,
+			"Name", request.Channel.Name,
+			"Public", request.Channel.Public,
+			"Status", request.Channel.Status)
 		if err == nil {
-			channel.Id = id
+			request.Channel.Id = id
 		}
 		return err
 	} else {
-		err := UpdateRows(svc.DB, CHANNELS_TABLE, fmt.Sprintf("Id = %d", channel.Id),
-			"TeamId", channel.Team.Id,
-			"UserId", channel.Creator.Id,
-			"Name", channel.Name,
-			"Public", channel.Public,
-			"Status", channel.Status)
+		err := UpdateRows(svc.DB, CHANNELS_TABLE, fmt.Sprintf("Id = %d", request.Channel.Id),
+			"TeamId", request.Channel.Team.Id,
+			"UserId", request.Channel.Creator.Id,
+			"Name", request.Channel.Name,
+			"Public", request.Channel.Public,
+			"Status", request.Channel.Status)
 		if err != nil && err.Error() == "No rows found" {
 			err = InsertRow(svc.DB, CHANNELS_TABLE,
-				"Id", channel.Id,
-				"TeamId", channel.Team.Id,
-				"UserId", channel.Creator.Id,
-				"Name", channel.Name,
-				"Public", channel.Public,
-				"Status", channel.Status)
+				"Id", request.Channel.Id,
+				"TeamId", request.Channel.Team.Id,
+				"UserId", request.Channel.Creator.Id,
+				"Name", request.Channel.Name,
+				"Public", request.Channel.Public,
+				"Status", request.Channel.Status)
 		}
 		return err
 	}
 }
 
-func (svc *ChannelService) GetChannels(team *Team, creator *User, orderBy string, participants []*User, matchAll bool) ([]*Channel, [][]ChannelMember) {
+func (svc *ChannelService) GetChannels(request *GetChannelsRequest) (*GetChannelsResult, error) {
 	query := "SELECT A.Id, A.Name, A.CreatorId, A.LastMessageAt, A.Public, A.Status, A.NumUsers FROM " +
 		"( SELECT " +
 		"C.Id as Id, C.Name as Name, C.UserId as CreatorId, " +
@@ -102,10 +104,10 @@ func (svc *ChannelService) GetChannels(team *Team, creator *User, orderBy string
 		"COUNT(M.UserId) as NumUsers " +
 		"FROM channels C, channel_members M where C.Id = M.ChannelId "
 
-	matchingParticipants := participants != nil && len(participants) > 0
+	matchingParticipants := request.Participants != nil && len(request.Participants) > 0
 	if matchingParticipants {
 		query += "AND M.UserId in ("
-		for index, part := range participants {
+		for index, part := range request.Participants {
 			if index > 0 {
 				query += ", "
 			}
@@ -114,17 +116,17 @@ func (svc *ChannelService) GetChannels(team *Team, creator *User, orderBy string
 		query += ")"
 	}
 
-	if creator != nil {
-		query += fmt.Sprintf(" AND C.UserId = %d", creator.Id)
+	if request.Creator != nil {
+		query += fmt.Sprintf(" AND C.UserId = %d", request.Creator.Id)
 	}
 	query += " AND M.Status = 0 GROUP BY (C.Id) ) A"
 
-	if matchingParticipants && matchAll {
-		query += fmt.Sprintf(" WHERE A.NumUsers = %d", len(participants))
+	if matchingParticipants && request.MatchAll {
+		query += fmt.Sprintf(" WHERE A.NumUsers = %d", len(request.Participants))
 	}
 
-	if orderBy != "" {
-		query += " ORDER BY C." + orderBy
+	if request.OrderBy != "" {
+		query += " ORDER BY C." + request.OrderBy
 	}
 
 	log.Println("Query: ", query)
@@ -134,34 +136,35 @@ func (svc *ChannelService) GetChannels(team *Team, creator *User, orderBy string
 	}
 
 	channels := make([]*Channel, 0, 0)
-	members := make([][]ChannelMember, 0, 0)
+	members := make([][]*ChannelMember, 0, 0)
 	for rows.Next() {
 		var creatorId int64
 		var numUsers int = 10
 		var lastMsgAt NullTime
 
-		channel := Channel{Team: team, Creator: creator}
-		channel.Team = team
+		channel := Channel{Team: request.Team, Creator: request.Creator}
+		channel.Team = request.Team
 		// id name creatorid lastmessageat public status numusers users statuses
 		err := rows.Scan(&channel.Id, &channel.Name, &creatorId,
 			&lastMsgAt, &channel.Public, &channel.Status, &numUsers)
 		if err != nil {
 			log.Println("Scan Error: ", err)
 		}
-		if creator == nil {
-			channel.Creator, _ = svc.SG.UserService.GetUserById(creatorId)
+		if request.Creator == nil {
+			request := &GetUserRequest{nil, creatorId, "", nil}
+			channel.Creator, _ = svc.SG.UserService.GetUserById(request)
 		}
 		channels = append(channels, &channel)
 		members = append(members, svc.GetChannelMembers(&channel))
 	}
-	return channels, members
+	return &GetChannelsResult{channels, members}, nil
 }
 
 /**
  * Retrieve a channel by Name.
  */
-func (svc *ChannelService) GetChannelById(id int64) (*Channel, error) {
-	query := fmt.Sprintf("SELECT TeamId, UserId, Public, Status, Created, Name from %s where Id = %d", CHANNELS_TABLE, id)
+func (svc *ChannelService) GetChannelById(request *GetChannelRequest) (*GetChannelResult, error) {
+	query := fmt.Sprintf("SELECT TeamId, UserId, Public, Status, Created, Name from %s where Id = %d", CHANNELS_TABLE, request.Id)
 	row := svc.DB.QueryRow(query)
 
 	var channel Channel
@@ -171,13 +174,15 @@ func (svc *ChannelService) GetChannelById(id int64) (*Channel, error) {
 	if err != nil {
 		return nil, err
 	}
-	channel.Id = id
-	channel.Team, err = svc.SG.TeamService.GetTeamById(teamId)
-	channel.Creator, err = svc.SG.UserService.GetUserById(userId)
-	return &channel, err
+	channel.Id = request.Id
+	channel.Team, err = svc.SG.TeamService.GetTeamById(&GetTeamRequest{nil, teamId, "", ""})
+	channel.Creator, err = svc.SG.UserService.GetUserById(&GetUserRequest{nil, userId, "", nil})
+	result := GetChannelResult{Channel: &channel,
+		Members: svc.GetChannelMembers(&channel)}
+	return &result, err
 }
 
-func (svc *ChannelService) GetChannelMembers(channel *Channel) []ChannelMember {
+func (svc *ChannelService) GetChannelMembers(channel *Channel) []*ChannelMember {
 	query := fmt.Sprintf("SELECT U.Username, U.Id, M.JoinedAt, M.Status FROM %s M, %s U ", CHANNEL_MEMBERS_TABLE, USERS_TABLE)
 	query += fmt.Sprintf(" WHERE ChannelId = %d AND M.Status = 0 AND M.UserId = U.Id", channel.Id)
 	rows, err := svc.DB.Query(query)
@@ -185,12 +190,12 @@ func (svc *ChannelService) GetChannelMembers(channel *Channel) []ChannelMember {
 		defer rows.Close()
 	}
 
-	members := make([]ChannelMember, 0, 0)
+	members := make([]*ChannelMember, 0, 0)
 	for rows.Next() {
 		var user = User{Team: channel.Team}
 		var member = ChannelMember{User: &user}
 		rows.Scan(&user.Username, &user.Id, &member.JoinedAt, &member.Status)
-		members = append(members, member)
+		members = append(members, &member)
 	}
 	return members
 }
@@ -198,22 +203,24 @@ func (svc *ChannelService) GetChannelMembers(channel *Channel) []ChannelMember {
 /**
  * Adds users to a channel.
  */
-func (svc *ChannelService) AddChannelMembers(channel *Channel, usernames []string) error {
-	for _, username := range usernames {
-		user, err := svc.SG.UserService.GetUser(username, channel.Team)
+func (svc *ChannelService) AddChannelMembers(request *InviteMembersRequest) error {
+	for _, username := range request.Usernames {
+		getuser_request := &GetUserRequest{nil, 0, username, request.Channel.Team}
+		user, err := svc.SG.UserService.GetUser(getuser_request)
 		if err != nil {
 			// then create it
-			user = NewUser(0, username, channel.Team)
-			svc.SG.UserService.SaveUser(user, false)
+			user = NewUser(0, username, request.Channel.Team)
+			save_request := &SaveUserRequest{nil, user, false}
+			svc.SG.UserService.SaveUser(save_request)
 		}
 		err = InsertRow(svc.DB, CHANNEL_MEMBERS_TABLE,
-			"ChannelId", channel.Id,
+			"ChannelId", request.Channel.Id,
 			"UserId", user.Id,
 			"Status", 0,
 			"LeftAt", nil)
 		if err != nil {
 			// then update
-			err = UpdateRows(svc.DB, CHANNEL_MEMBERS_TABLE, fmt.Sprintf("ChannelId = %d AND UserId = %d", channel.Id, user.Id), "Status", 0, "LeftAt", nil)
+			err = UpdateRows(svc.DB, CHANNEL_MEMBERS_TABLE, fmt.Sprintf("ChannelId = %d AND UserId = %d", request.Channel.Id, user.Id), "Status", 0, "LeftAt", nil)
 		}
 	}
 	return nil
@@ -222,18 +229,18 @@ func (svc *ChannelService) AddChannelMembers(channel *Channel, usernames []strin
 /**
  * Delete a channel.
  */
-func (svc *ChannelService) DeleteChannel(channel *Channel) error {
-	return DeleteById(svc.DB, CHANNELS_TABLE, channel.Id)
+func (svc *ChannelService) DeleteChannel(request *DeleteChannelRequest) error {
+	return DeleteById(svc.DB, CHANNELS_TABLE, request.Channel.Id)
 }
 
 /**
  * Tells if a user belongs to a channel.
  */
-func (svc *ChannelService) ContainsUser(channel *Channel, user *User) bool {
-	members := svc.GetChannelMembers(channel)
+func (svc *ChannelService) ContainsUser(request *ChannelMembershipRequest) bool {
+	members := svc.GetChannelMembers(request.Channel)
 	log.Println("Members in test: ", members)
 	for _, value := range members {
-		if value.User.Id == user.Id {
+		if value.User.Id == request.User.Id {
 			return true
 		}
 	}
@@ -243,9 +250,9 @@ func (svc *ChannelService) ContainsUser(channel *Channel, user *User) bool {
 /**
  * Lets a user to join a channel (if allowed)
  */
-func (svc *ChannelService) JoinChannel(channel *Channel, user *User) error {
+func (svc *ChannelService) JoinChannel(request *ChannelMembershipRequest) error {
 	query := fmt.Sprintf(`INSERT INTO %s ( ChannelId, UserId) VALUES (%d, %d)`,
-		CHANNEL_MEMBERS_TABLE, channel.Id, user.Id)
+		CHANNEL_MEMBERS_TABLE, request.Channel.Id, request.User.Id)
 	_, err := svc.DB.Exec(query)
 	return err
 }
@@ -253,8 +260,8 @@ func (svc *ChannelService) JoinChannel(channel *Channel, user *User) error {
 /**
  * Lets a user leave a channel or be kicked out.
  */
-func (svc *ChannelService) LeaveChannel(channel *Channel, user *User) error {
-	query := fmt.Sprintf(`UPDATE %s set UserId = %d, ChannelId = %d LeftAt = timestamp_now()`, CHANNEL_MEMBERS_TABLE, user.Id, channel.Id)
+func (svc *ChannelService) LeaveChannel(request *ChannelMembershipRequest) error {
+	query := fmt.Sprintf(`UPDATE %s set UserId = %d, ChannelId = %d LeftAt = timestamp_now()`, CHANNEL_MEMBERS_TABLE, request.User.Id, request.Channel.Id)
 	_, err := svc.DB.Exec(query)
 	return err
 }
@@ -262,6 +269,6 @@ func (svc *ChannelService) LeaveChannel(channel *Channel, user *User) error {
 /**
  * Removes all entries.
  */
-func (svc *ChannelService) RemoveAllChannels() {
+func (svc *ChannelService) RemoveAllChannels(request *Request) {
 	ClearTable(svc.DB, CHANNELS_TABLE)
 }

@@ -1,7 +1,7 @@
 package core
 
 type CreateTeamRequest struct {
-	Request
+	*Request
 
 	Id int64
 
@@ -11,7 +11,7 @@ type CreateTeamRequest struct {
 }
 
 type GetTeamsRequest struct {
-	Request
+	*Request
 
 	Organization string
 
@@ -21,7 +21,7 @@ type GetTeamsRequest struct {
 }
 
 type GetTeamRequest struct {
-	Request
+	*Request
 
 	Id int64
 
@@ -31,13 +31,13 @@ type GetTeamRequest struct {
 }
 
 type DeleteTeamRequest struct {
-	Request
+	*Request
 
 	Team *Team
 }
 
 type TeamMembershipRequest struct {
-	Request
+	*Request
 
 	Team *Team
 

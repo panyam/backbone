@@ -26,7 +26,7 @@ func NewUserService(db *sql.DB, sg *ServiceGroup) *UserService {
 }
 
 func (svc *UserService) InitDB() {
-	svc.SG.IDService.CreateDomain("userids", 1, 2)
+	svc.SG.IDService.CreateDomain(&CreateDomainRequest{nil, "userids", 1, 2})
 	CreateTable(svc.DB, USERS_TABLE,
 		[]string{
 			"Id bigint PRIMARY KEY",
@@ -41,34 +41,34 @@ func (svc *UserService) InitDB() {
 /**
  * Removes all entries.
  */
-func (svc *UserService) RemoveAllUsers() {
+func (svc *UserService) RemoveAllUsers(request *Request) {
 	ClearTable(svc.DB, USERS_TABLE)
 }
 
 /**
  * Get user info by ID
  */
-func (svc *UserService) GetUserById(id int64) (*User, error) {
-	query := fmt.Sprintf("SELECT Username, TeamId, Status, Created from %s where Id = %d", USERS_TABLE, id)
+func (svc *UserService) GetUserById(request *GetUserRequest) (*User, error) {
+	query := fmt.Sprintf("SELECT Username, TeamId, Status, Created from %s where Id = %d", USERS_TABLE, request.Id)
 	row := svc.DB.QueryRow(query)
 
 	var user User
 	var teamId int64
 	err := row.Scan(&user.Username, &teamId, &user.Status, &user.Created)
-	user.Id = id
+	user.Id = request.Id
 	if err != nil {
 		return nil, err
 	}
-	user.Id = id
-	user.Team, err = svc.SG.TeamService.GetTeamById(teamId)
+	user.Id = request.Id
+	user.Team, err = svc.SG.TeamService.GetTeamById(&GetTeamRequest{nil, teamId, "", ""})
 	return &user, err
 }
 
 /**
  * Get a user by username in a particular team.
  */
-func (svc *UserService) GetUser(username string, team *Team) (*User, error) {
-	query := fmt.Sprintf("SELECT Id, Status, Created from %s where Username = '%s' and TeamId = %d", USERS_TABLE, username, team.Id)
+func (svc *UserService) GetUser(request *GetUserRequest) (*User, error) {
+	query := fmt.Sprintf("SELECT Id, Status, Created from %s where Username = '%s' and TeamId = %d", USERS_TABLE, request.Username, request.Team.Id)
 	row := svc.DB.QueryRow(query)
 
 	var user User
@@ -76,8 +76,8 @@ func (svc *UserService) GetUser(username string, team *Team) (*User, error) {
 	if err != nil {
 		return nil, err
 	}
-	user.Username = username
-	user.Team = team
+	user.Username = request.Username
+	user.Team = request.Team
 	return &user, err
 }
 
@@ -92,35 +92,35 @@ func (svc *UserService) GetUser(username string, team *Team) (*User, error) {
  * 		otherwise if IDs of curr and existing are different errow is thrown,
  * 		otherwise object is updated.
  */
-func (svc *UserService) SaveUser(user *User, override bool) error {
-	if user.Id == 0 {
-		id, err := svc.SG.IDService.NextID("userids")
+func (svc *UserService) SaveUser(request *SaveUserRequest) error {
+	if request.User.Id == 0 {
+		id, err := svc.SG.IDService.NextID(&NextIDRequest{nil, "userids"})
 		if err != nil {
 			return err
 		}
 		err = InsertRow(svc.DB, USERS_TABLE,
 			"Id", id,
-			"TeamId", user.Team.Id,
-			"Username", user.Username,
-			"Status", user.Status)
+			"TeamId", request.User.Team.Id,
+			"Username", request.User.Username,
+			"Status", request.User.Status)
 		if err == nil {
-			user.Id = id
+			request.User.Id = id
 		} else {
 			log.Println("Insert error.  Should retry: ", err)
 		}
 		return err
 	} else {
-		err := UpdateRows(svc.DB, USERS_TABLE, fmt.Sprintf("Id = %d", user.Id),
-			"TeamId", user.Team.Id,
-			"Username", user.Username,
-			"Status", user.Status)
+		err := UpdateRows(svc.DB, USERS_TABLE, fmt.Sprintf("Id = %d", request.User.Id),
+			"TeamId", request.User.Team.Id,
+			"Username", request.User.Username,
+			"Status", request.User.Status)
 		if err.Error() == "No rows found" {
 			// then Insert
 			err = InsertRow(svc.DB, USERS_TABLE,
-				"Id", user.Id,
-				"TeamId", user.Team.Id,
-				"Username", user.Username,
-				"Status", user.Status)
+				"Id", request.User.Id,
+				"TeamId", request.User.Team.Id,
+				"Username", request.User.Username,
+				"Status", request.User.Status)
 		}
 		return err
 	}

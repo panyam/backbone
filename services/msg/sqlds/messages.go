@@ -27,7 +27,7 @@ func NewMessageService(db *sql.DB, sg *ServiceGroup) *MessageService {
 }
 
 func (svc *MessageService) InitDB() {
-	svc.SG.IDService.CreateDomain("messageids", 1, 2)
+	svc.SG.IDService.CreateDomain(&CreateDomainRequest{nil, "messageids", 1, 2})
 	CreateTable(svc.DB, MESSAGES_TABLE,
 		[]string{
 			"Id bigint PRIMARY KEY",
@@ -62,30 +62,31 @@ func (svc *MessageService) InitDB() {
  * Send messages to particular recipients in this channel.
  * If Channel, message or user is nil an error is returned.
  */
-func (svc *MessageService) SaveMessage(message *Message) error {
-	if message.Id == 0 {
-		id, err := svc.SG.IDService.NextID("messageids")
+func (svc *MessageService) SaveMessage(request *SaveMessageRequest) error {
+	if request.Message.Id == 0 {
+		id, err := svc.SG.IDService.NextID(&NextIDRequest{nil, "messageids"})
 		if err != nil {
 			return err
 		}
 		err = InsertRow(svc.DB, MESSAGES_TABLE,
 			"Id", id,
-			"ChannelId", message.Channel.Id,
-			"SenderId", message.Sender.Id,
-			"Status", message.Status,
-			"MsgType", message.MsgType,
-			"MsgData", message.MsgData)
+			"ChannelId", request.Message.Channel.Id,
+			"SenderId", request.Message.Sender.Id,
+			"Status", request.Message.Status,
+			"MsgType", request.Message.MsgType,
+			"MsgData", request.Message.MsgData)
 		if err == nil {
-			message.Id = id
+			request.Message.Id = id
 		}
 		return err
 	} else {
-		return UpdateRows(svc.DB, MESSAGES_TABLE, fmt.Sprintf("Id = %d", message.Id),
-			"ChannelId", message.Channel.Id,
-			"SenderId", message.Sender.Id,
-			"Status", message.Status,
-			"MsgType", message.MsgType,
-			"MsgData", message.MsgData)
+		return UpdateRows(svc.DB, MESSAGES_TABLE,
+			fmt.Sprintf("Id = %d", request.Message.Id),
+			"ChannelId", request.Message.Channel.Id,
+			"SenderId", request.Message.Sender.Id,
+			"Status", request.Message.Status,
+			"MsgType", request.Message.MsgType,
+			"MsgData", request.Message.MsgData)
 	}
 }
 
@@ -96,34 +97,34 @@ func (svc *MessageService) SaveMessage(message *Message) error {
  * Pagination is possible with offset and count.
  * Messages are also ordered by the created time stamp.
  */
-func (svc *MessageService) GetMessages(channel *Channel, sender *User, offset int, count int) ([]*Message, error) {
+func (svc *MessageService) GetMessages(request *GetMessagesRequest) ([]*Message, error) {
 	reverse := false
 	descending := false
-	if count <= 0 {
-		count = 50
+	if request.Count <= 0 {
+		request.Count = 50
 	}
-	if offset < 0 {
-		offset = (-offset) - 1
+	if request.Offset < 0 {
+		request.Offset = (-request.Offset) - 1
 		descending = true
 		reverse = true
 	}
-	whereClause := fmt.Sprintf("WHERE ChannelId = %d", channel.Id)
-	if sender != nil {
-		whereClause += fmt.Sprintf(" AND SenderId = %d")
+	whereClause := fmt.Sprintf("WHERE ChannelId = %d", request.Channel.Id)
+	if request.Sender != nil {
+		whereClause += fmt.Sprintf(" AND SenderId = %d", request.Sender.Id)
 	}
 	orderClause := "ORDER BY Created"
 	if descending {
 		orderClause += " DESC"
 	}
 
-	query := fmt.Sprintf("SELECT Id, Created, Status, MsgType, MsgData, SenderId from %s %s %s LIMIT %d OFFSET %d", MESSAGES_TABLE, whereClause, orderClause, count, offset)
+	query := fmt.Sprintf("SELECT Id, Created, Status, MsgType, MsgData, SenderId from %s %s %s LIMIT %d OFFSET %d", MESSAGES_TABLE, whereClause, orderClause, request.Count, request.Offset)
 	rows, err := svc.DB.Query(query)
 	if err != nil {
 		return nil, err
 	}
 
 	defer rows.Close()
-	out := make([]*Message, 0, count)
+	out := make([]*Message, 0, request.Count)
 	for rows.Next() {
 		var senderId int64 = 0
 		msg := &Message{}
@@ -131,10 +132,10 @@ func (svc *MessageService) GetMessages(channel *Channel, sender *User, offset in
 		if err != nil {
 			return nil, err
 		}
-		if sender == nil {
-			msg.Sender, err = svc.SG.UserService.GetUserById(senderId)
+		if request.Sender == nil {
+			msg.Sender, err = svc.SG.UserService.GetUserById(&GetUserRequest{nil, senderId, "", nil})
 		} else {
-			msg.Sender = sender
+			msg.Sender = request.Sender
 		}
 		out = append(out, msg)
 	}
@@ -155,34 +156,34 @@ func (svc *MessageService) GetMessages(channel *Channel, sender *User, offset in
 /**
  * Gets a message by ID
  */
-func (svc *MessageService) GetMessageById(id int64) (*Message, error) {
+func (svc *MessageService) GetMessageById(request *GetMessageRequest) (*GetMessageResult, error) {
 	return nil, nil
 }
 
 /**
  * Gets the fragments of a message.
  */
-func (svc *MessageService) GetMessageFragments(message *Message) []*MessageFragment {
-	return nil
+func (svc *MessageService) GetMessageFragments(request *GetMessageRequest) (*GetMessageResult, error) {
+	return nil, nil
 }
 
 /**
  * Get receipts of a particular message.
  */
-func (svc *MessageService) GetMessageReceipts(message *Message) []*MessageReceipt {
-	return nil
+func (svc *MessageService) GetMessageReceipts(request *GetMessageRequest) (*GetMessageResult, error) {
+	return nil, nil
 }
 
 /**
  * Remove a particular message.
  */
-func (svc *MessageService) DeleteMessage(message *Message) error {
-	return DeleteById(svc.DB, MESSAGES_TABLE, message.Id)
+func (svc *MessageService) DeleteMessage(request *DeleteMessageRequest) error {
+	return DeleteById(svc.DB, MESSAGES_TABLE, request.Message.Id)
 }
 
 /**
  * Removes all entries.
  */
-func (svc *MessageService) RemoveAllMessages() {
+func (svc *MessageService) RemoveAllMessages(request *Request) {
 	ClearTable(svc.DB, MESSAGES_TABLE)
 }
