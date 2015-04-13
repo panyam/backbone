@@ -2,7 +2,7 @@ package services
 
 import (
 	"fmt"
-	. "github.com/panyam/relay/services/msg/core"
+	msgcore "github.com/panyam/relay/services/msg/core"
 	. "gopkg.in/check.v1"
 	"log"
 	// "code.google.com/p/gomock/gomock"
@@ -11,84 +11,85 @@ import (
 
 func (s *TestSuite) TestSaveChannelNew(c *C) {
 	svc := s.serviceGroup.UserService
-	team, err := s.serviceGroup.TeamService.CreateTeam(1, "org", "team")
-	user := NewUser(0, "user1", team)
-	_ = svc.SaveUser(user, false)
+	team, err := s.serviceGroup.TeamService.CreateTeam(&msgcore.CreateTeamRequest{nil, 1, "org", "team"})
+	user := msgcore.NewUser(0, "user1", team)
+	_ = svc.SaveUser(&msgcore.SaveUserRequest{nil, user, false})
 
-	channel := NewChannel(team, user, 0, "test")
-	err = s.serviceGroup.ChannelService.SaveChannel(channel, true)
+	channel := msgcore.NewChannel(team, user, 0, "test")
+	err = s.serviceGroup.ChannelService.SaveChannel(&msgcore.SaveChannelRequest{nil, channel, true})
 
 	c.Assert(err, IsNil)
 	c.Assert(channel, Not(IsNil))
 	c.Assert(channel.Id, Not(Equals), "")
 	c.Assert(channel.Name, Equals, "test")
-	channel, err = s.serviceGroup.ChannelService.GetChannelById(channel.Id)
+	result, err := s.serviceGroup.ChannelService.GetChannelById(&msgcore.GetChannelRequest{nil, channel.Id})
 	c.Assert(err, IsNil)
-	c.Assert(channel, Not(IsNil))
-	c.Assert(channel.Name, Equals, "test")
+	c.Assert(result, Not(IsNil))
+	c.Assert(result.Channel, Not(IsNil))
+	c.Assert(result.Channel.Name, Equals, "test")
 }
 
 func (s *TestSuite) TestSaveChannelExistsById(c *C) {
 	svc := s.serviceGroup.UserService
-	team, err := s.serviceGroup.TeamService.CreateTeam(1, "org", "team")
+	team, err := s.serviceGroup.TeamService.CreateTeam(&msgcore.CreateTeamRequest{nil, 1, "org", "team"})
 	c.Assert(err, IsNil)
 	c.Assert(team, Not(IsNil))
-	user := NewUser(0, "user1", team)
-	_ = svc.SaveUser(user, false)
-	channel := NewChannel(team, user, 0, "test")
-	_ = s.serviceGroup.ChannelService.SaveChannel(channel, true)
+	user := msgcore.NewUser(0, "user1", team)
+	_ = svc.SaveUser(&msgcore.SaveUserRequest{nil, user, false})
+	channel := msgcore.NewChannel(team, user, 0, "test")
+	_ = s.serviceGroup.ChannelService.SaveChannel(&msgcore.SaveChannelRequest{nil, channel, true})
 
-	err = s.serviceGroup.ChannelService.SaveChannel(channel, true)
+	err = s.serviceGroup.ChannelService.SaveChannel(&msgcore.SaveChannelRequest{nil, channel, true})
 	c.Assert(err, IsNil)
 }
 
 func (s *TestSuite) TestDeleteChannel(c *C) {
 	svc := s.serviceGroup.UserService
-	team, err := s.serviceGroup.TeamService.CreateTeam(1, "org", "team")
-	user := NewUser(0, "user1", team)
-	_ = svc.SaveUser(user, false)
-	channel := NewChannel(team, user, 0, "test")
-	_ = s.serviceGroup.ChannelService.SaveChannel(channel, true)
+	team, err := s.serviceGroup.TeamService.CreateTeam(&msgcore.CreateTeamRequest{nil, 1, "org", "team"})
+	user := msgcore.NewUser(0, "user1", team)
+	_ = svc.SaveUser(&msgcore.SaveUserRequest{nil, user, false})
+	channel := msgcore.NewChannel(team, user, 0, "test")
+	_ = s.serviceGroup.ChannelService.SaveChannel(&msgcore.SaveChannelRequest{nil, channel, true})
 
 	c.Assert(err, IsNil)
 	c.Assert(channel.Id, Not(Equals), 0)
 
-	err = s.serviceGroup.ChannelService.DeleteChannel(channel)
+	err = s.serviceGroup.ChannelService.DeleteChannel(&msgcore.DeleteChannelRequest{nil, channel})
 	c.Assert(err, IsNil)
 
-	channel, err = s.serviceGroup.ChannelService.GetChannelById(channel.Id)
+	result, err := s.serviceGroup.ChannelService.GetChannelById(&msgcore.GetChannelRequest{nil, channel.Id})
 	c.Assert(err, Not(IsNil))
-	c.Assert(channel, IsNil)
+	c.Assert(result, IsNil)
 }
 
 func (s *TestSuite) TestJoinChannel(c *C) {
 	svc := s.serviceGroup.UserService
-	team, _ := s.serviceGroup.TeamService.CreateTeam(1, "org", "team")
-	user := NewUser(0, "user1", team)
-	_ = svc.SaveUser(user, false)
-	user2 := NewUser(0, "user2", team)
-	_ = svc.SaveUser(user2, false)
+	team, _ := s.serviceGroup.TeamService.CreateTeam(&msgcore.CreateTeamRequest{nil, 1, "org", "team"})
+	user := msgcore.NewUser(0, "user1", team)
+	_ = svc.SaveUser(&msgcore.SaveUserRequest{nil, user, false})
+	user2 := msgcore.NewUser(0, "user2", team)
+	_ = svc.SaveUser(&msgcore.SaveUserRequest{nil, user2, false})
 
-	channel := NewChannel(team, user, 0, "test")
-	_ = s.serviceGroup.ChannelService.SaveChannel(channel, true)
+	channel := msgcore.NewChannel(team, user, 0, "test")
+	_ = s.serviceGroup.ChannelService.SaveChannel(&msgcore.SaveChannelRequest{nil, channel, true})
 
-	s.serviceGroup.ChannelService.JoinChannel(channel, user)
-	s.serviceGroup.ChannelService.JoinChannel(channel, user2)
-	c.Assert(s.serviceGroup.ChannelService.ContainsUser(channel, user), Equals, true)
-	c.Assert(s.serviceGroup.ChannelService.ContainsUser(channel, user2), Equals, true)
+	s.serviceGroup.ChannelService.JoinChannel(&msgcore.ChannelMembershipRequest{nil, channel, user})
+	s.serviceGroup.ChannelService.JoinChannel(&msgcore.ChannelMembershipRequest{nil, channel, user2})
+	c.Assert(s.serviceGroup.ChannelService.ContainsUser(&msgcore.ChannelMembershipRequest{nil, channel, user2}), Equals, true)
+	c.Assert(s.serviceGroup.ChannelService.ContainsUser(&msgcore.ChannelMembershipRequest{nil, channel, user2}), Equals, true)
 }
 
 func (s *TestSuite) TestLeaveChannel(c *C) {
 	svc := s.serviceGroup.UserService
-	team, _ := s.serviceGroup.TeamService.CreateTeam(1, "org", "team")
-	user := NewUser(0, "user1", team)
-	_ = svc.SaveUser(user, false)
-	channel := NewChannel(team, user, 0, "test")
-	_ = s.serviceGroup.ChannelService.SaveChannel(channel, true)
+	team, _ := s.serviceGroup.TeamService.CreateTeam(&msgcore.CreateTeamRequest{nil, 1, "org", "team"})
+	user := msgcore.NewUser(0, "user1", team)
+	_ = svc.SaveUser(&msgcore.SaveUserRequest{nil, user, false})
+	channel := msgcore.NewChannel(team, user, 0, "test")
+	_ = s.serviceGroup.ChannelService.SaveChannel(&msgcore.SaveChannelRequest{nil, channel, true})
 
-	c.Assert(s.serviceGroup.ChannelService.ContainsUser(channel, user), Equals, false)
-	s.serviceGroup.ChannelService.JoinChannel(channel, user)
-	c.Assert(s.serviceGroup.ChannelService.ContainsUser(channel, user), Equals, true)
+	c.Assert(s.serviceGroup.ChannelService.ContainsUser(&msgcore.ChannelMembershipRequest{nil, channel, user}), Equals, false)
+	s.serviceGroup.ChannelService.JoinChannel(&msgcore.ChannelMembershipRequest{nil, channel, user})
+	c.Assert(s.serviceGroup.ChannelService.ContainsUser(&msgcore.ChannelMembershipRequest{nil, channel, user}), Equals, true)
 }
 
 /**
@@ -96,16 +97,16 @@ func (s *TestSuite) TestLeaveChannel(c *C) {
  */
 func (s *TestSuite) TestGetChannels(c *C) {
 	svc := s.serviceGroup.UserService
-	team, _ := s.serviceGroup.TeamService.CreateTeam(1, "org", "team")
+	team, _ := s.serviceGroup.TeamService.CreateTeam(&msgcore.CreateTeamRequest{nil, 1, "org", "team"})
 
-	users := make([]*User, 0, 0)
-	channels := make([]*Channel, 0, 0)
+	users := make([]*msgcore.User, 0, 0)
+	channels := make([]*msgcore.Channel, 0, 0)
 	for i := 1; i <= 10; i++ {
-		creator := NewUser(int64(i), fmt.Sprintf("%d", i), team)
-		_ = svc.SaveUser(creator, false)
+		creator := msgcore.NewUser(int64(i), fmt.Sprintf("%d", i), team)
+		_ = svc.SaveUser(&msgcore.SaveUserRequest{nil, creator, false})
 		users = append(users, creator)
-		channel := NewChannel(team, creator, int64(i), fmt.Sprintf("channel%d", i))
-		err := s.serviceGroup.ChannelService.SaveChannel(channel, true)
+		channel := msgcore.NewChannel(team, creator, int64(i), fmt.Sprintf("channel%d", i))
+		err := s.serviceGroup.ChannelService.SaveChannel(&msgcore.SaveChannelRequest{nil, channel, true})
 		if err != nil {
 			log.Println("SaveChannel Error: ", err)
 		}
@@ -114,25 +115,27 @@ func (s *TestSuite) TestGetChannels(c *C) {
 
 	for i := 1; i <= 10; i++ {
 		// add the creator and 4 next users as members
-		members := make([]*User, 0, 4)
+		members := make([]string, 0, 4)
 		for j := 0; j < 5; j++ {
-			members = append(members, users[(i+j-1)%len(users)])
+			members = append(members, users[(i+j-1)%len(users)].Username)
 		}
-		s.serviceGroup.ChannelService.AddChannelMembers(channels[i-1], members)
+		s.serviceGroup.ChannelService.AddChannelMembers(&msgcore.InviteMembersRequest{nil, channels[i-1], members})
 	}
 
 	// Test owner filter
-	fetched_channels, channel_members := s.serviceGroup.ChannelService.GetChannels(team, users[0], "", nil, true)
-	c.Assert(len(fetched_channels), Equals, 1)
-	c.Assert(len(channel_members), Equals, 1)
+	request := &msgcore.GetChannelsRequest{nil, team, users[0], "", nil, true}
+	result, _ := s.serviceGroup.ChannelService.GetChannels(request)
+	c.Assert(len(result.Channels), Equals, 1)
+	c.Assert(len(result.Members), Equals, 1)
 	// ensure all users have the same creator
-	c.Assert(fetched_channels[0].Creator.Id, Equals, users[0].Id)
-	c.Assert(len(channel_members[0]), Equals, 5)
+	c.Assert(result.Channels[0].Creator.Id, Equals, users[0].Id)
+	c.Assert(len(result.Members[0]), Equals, 5)
 
 	// Test participants
-	fetched_channels, channel_members = s.serviceGroup.ChannelService.GetChannels(team, nil, "", []*User{users[1], users[2]}, true)
-	c.Assert(len(fetched_channels), Equals, 4)
+	request = &msgcore.GetChannelsRequest{nil, team, nil, "", []*msgcore.User{users[1], users[2]}, true}
+	result, _ = s.serviceGroup.ChannelService.GetChannels(request)
+	c.Assert(len(result.Channels), Equals, 4)
 	for i := 0; i < 4; i++ {
-		c.Assert(len(channel_members[i]), Equals, 5)
+		c.Assert(len(result.Members[i]), Equals, 5)
 	}
 }

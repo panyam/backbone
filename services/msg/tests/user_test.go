@@ -1,7 +1,7 @@
 package services
 
 import (
-	. "github.com/panyam/relay/services/msg/core"
+	msgcore "github.com/panyam/relay/services/msg/core"
 	. "gopkg.in/check.v1"
 )
 
@@ -12,19 +12,19 @@ func (s *TestSuite) TestCreateUserService(c *C) {
 
 func (s *TestSuite) TestSaveUserEmptyId_ShouldCreateId(c *C) {
 	svc := s.serviceGroup.UserService
-	team, err := s.serviceGroup.TeamService.CreateTeam(1, "org", "team")
-	user := NewUser(0, "user1", team)
-	err = svc.SaveUser(user, false)
+	team, err := s.serviceGroup.TeamService.CreateTeam(&msgcore.CreateTeamRequest{nil, 1, "org", "team"})
+	user := msgcore.NewUser(0, "user1", team)
+	err = svc.SaveUser(&msgcore.SaveUserRequest{nil, user, false})
 	c.Assert(err, IsNil)
 	c.Assert(user.Id, Not(Equals), 0)
 	c.Assert(user.Username, Equals, "user1")
 
-	fetched_user, err := svc.GetUserById(user.Id)
+	fetched_user, err := svc.GetUserById(&msgcore.GetUserRequest{nil, user.Id, "", nil})
 	c.Assert(fetched_user.Id, Equals, user.Id)
 	c.Assert(fetched_user.Team, Not(IsNil))
 	c.Assert(fetched_user.Team.Id, Equals, user.Team.Id)
 
-	fetched_user, _ = svc.GetUser("user1", team)
+	fetched_user, _ = svc.GetUser(&msgcore.GetUserRequest{nil, 0, "user1", team})
 	c.Assert(fetched_user.Id, Equals, user.Id)
 	c.Assert(fetched_user.Team, Not(IsNil))
 	c.Assert(fetched_user.Team.Id, Equals, user.Team.Id)
@@ -32,31 +32,31 @@ func (s *TestSuite) TestSaveUserEmptyId_ShouldCreateId(c *C) {
 
 func (s *TestSuite) TestGetUserFirstTime(c *C) {
 	svc := s.serviceGroup.UserService
-	team, _ := s.serviceGroup.TeamService.CreateTeam(1, "org", "team")
-	user, _ := svc.GetUserById(1)
+	team, _ := s.serviceGroup.TeamService.CreateTeam(&msgcore.CreateTeamRequest{nil, 1, "org", "team"})
+	user, _ := svc.GetUserById(&msgcore.GetUserRequest{nil, 1, "", nil})
 	c.Assert(user, IsNil)
-	_, err := svc.GetUser("user1", team)
+	_, err := svc.GetUser(&msgcore.GetUserRequest{nil, 0, "user1", team})
 	c.Assert(err, Not(IsNil))
 }
 
 func (s *TestSuite) TestSaveUserNormal(c *C) {
 	svc := s.serviceGroup.UserService
-	team, _ := s.serviceGroup.TeamService.CreateTeam(1, "org", "team")
-	user := NewUser(0, "user1", team)
-	user.Object = Object{Id: 1}
-	err := svc.SaveUser(user, false)
+	team, _ := s.serviceGroup.TeamService.CreateTeam(&msgcore.CreateTeamRequest{nil, 1, "org", "team"})
+	user := msgcore.NewUser(0, "user1", team)
+	user.Object = msgcore.Object{Id: 1}
+	err := svc.SaveUser(&msgcore.SaveUserRequest{nil, user, false})
 	c.Assert(err, IsNil)
 }
 
 func (s *TestSuite) TestCreateUserDuplicate(c *C) {
 	svc := s.serviceGroup.UserService
-	team, _ := s.serviceGroup.TeamService.CreateTeam(1, "org", "team")
-	user := User{Username: "user1", Team: team}
+	team, _ := s.serviceGroup.TeamService.CreateTeam(&msgcore.CreateTeamRequest{nil, 1, "org", "team"})
+	user := msgcore.User{Username: "user1", Team: team}
 
-	err := svc.SaveUser(&user, false)
+	err := svc.SaveUser(&msgcore.SaveUserRequest{nil, &user, false})
 	c.Assert(err, IsNil)
 
-	// err = svc.SaveUser(&user, false)
+	// err = svc.SaveUser(&msgcore.SaveUserRequest{nil, &user, false})
 	// c.Assert(err, Not(IsNil))
 }
 
