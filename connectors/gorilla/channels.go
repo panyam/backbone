@@ -27,6 +27,7 @@ func (s *Server) GetChannelsHandler() RequestHandlerFunc {
 		if ownerParam != "" {
 			owner, err = s.serviceGroup.UserService.GetUser(ownerParam, team)
 			if err != nil {
+				log.Println("Get Owner Error: ", err)
 				http.Error(rw, err.Error(), http.StatusInternalServerError)
 				return
 			}
@@ -37,19 +38,25 @@ func (s *Server) GetChannelsHandler() RequestHandlerFunc {
 		participantsParam := strings.Split(request.FormValue("participants"), ",")
 		var participants []*msgcore.User = nil
 		for _, participant := range participantsParam {
-			user, err := s.serviceGroup.UserService.GetUser(participant, team)
-			if err == nil {
-				participants = append(participants, user)
-			} else if matchall {
-				// since this user does not exist then it cannot be matched
-				// so return an empty list
-				http.Error(rw, err.Error(), http.StatusInternalServerError)
-				return
+			if participant != "" {
+				user, err := s.serviceGroup.UserService.GetUser(participant, team)
+				if err == nil {
+					participants = append(participants, user)
+				} else if matchall {
+					// since this user does not exist then it cannot be matched
+					// so return an empty list
+					log.Println("Here, Parts: ", participant, err)
+					http.Error(rw, err.Error(), http.StatusInternalServerError)
+					return
+				}
 			}
 		}
 		order_by := request.FormValue("order_by")
 
 		channels, members := s.serviceGroup.ChannelService.GetChannels(team, owner, order_by, participants, matchall)
+
+		log.Println("Channels: ", channels)
+		log.Println("Members: ", members)
 		utils.SendJsonResponse(rw, map[string]interface{}{"channels": channels, "members": members})
 	}
 }

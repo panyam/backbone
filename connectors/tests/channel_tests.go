@@ -68,10 +68,20 @@ func (s *TestSuite) TestGetChannels(c *C) {
 
 	// create a channel
 	s.LoginClient()
-	channels, members, err := s.client.GetChannels(team, users[0].Username, nil, true, "")
-	log.Println("Error: ", err)
-	log.Println("Channels: ", channels)
-	log.Println("Members: ", members)
+	fetched_channels, channel_members, err := s.client.GetChannels(team, users[0].Username, nil, true, "")
+	c.Assert(err, IsNil)
+	c.Assert(len(fetched_channels), Equals, 1)
+	c.Assert(len(channel_members), Equals, 1)
+	// ensure all users have the same creator
+	c.Assert(fetched_channels[0].Creator.Id, Equals, users[0].Id)
+	c.Assert(len(channel_members[0]), Equals, 5)
+
+	// Test participants
+	fetched_channels, channel_members = s.serviceGroup.ChannelService.GetChannels(team, nil, "", []*User{users[1], users[2]}, true)
+	c.Assert(len(fetched_channels), Equals, 4)
+	for i := 0; i < 4; i++ {
+		c.Assert(len(channel_members[i]), Equals, 5)
+	}
 }
 
 /**

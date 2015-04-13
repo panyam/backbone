@@ -231,7 +231,7 @@ func (client *ApiClient) GetChannels(team *msgcore.Team,
 	owner string,
 	participants []string,
 	matchall bool,
-	order_by string) ([]*msgcore.Channel, []msgcore.ChannelMember, error) {
+	order_by string) ([]*msgcore.Channel, [][]msgcore.ChannelMember, error) {
 
 	params := map[string]string{"owner": owner,
 		"participants": strings.Join(participants, ","),
@@ -245,7 +245,8 @@ func (client *ApiClient) GetChannels(team *msgcore.Team,
 	req, err := client.MakeAuthRequest("GET", url, params, nil)
 	var data map[string]interface{}
 	resp, err := SendRequest(req, &data)
-	log.Println("Response: ", data)
+	log.Println("GetChannels Response: ", resp)
+	log.Println("GetChannels Response Data: ", data)
 	if err != nil {
 		return nil, nil, err
 	} else if resp.StatusCode != 200 {

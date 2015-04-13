@@ -1,19 +1,66 @@
 package core
 
-import ()
-
-type Team struct {
-	Object
+type GetUserRequest struct {
+	Request
 
 	/**
-	 * Name of this team.
+	 * ID of the user to fetch.  If this is - then the username/team is looked
+	 * up
 	 */
-	Name string
+	Id int64
+
+	Username string
+
+	Team *Team
+}
+
+type SaveUserRequest struct {
+	Request
 
 	/**
-	 * Organization this team belongs to. (Org + Name must be unique)
+	 * The user to save.
 	 */
-	Organization string
+	User *User
+
+	/**
+	 * Whether to override an existing user.
+	 */
+	Override bool
+}
+
+/**
+ * Base service operations.  These dont care about authorization for now and
+ * assume the user is authorized.  Authn (and possible Authz) have to be taken
+ * care of seperately.
+ */
+type IUserService interface {
+	/**
+	 * Removes all entries.
+	 */
+	RemoveAllUsers(request *Request)
+
+	/**
+	 * Get user info by ID
+	 */
+	GetUserById(request *GetUserRequest) (*User, error)
+
+	/**
+	 * Get a user by username in a particular team.
+	 */
+	GetUser(request *GetUserRequest) (*User, error)
+
+	/**
+	 * Saves a user.
+	 * 	If the ID param is empty:
+	 * 		If username/team does not already exist a new one is created.
+	 * 		otherwise, it is updated and returned if override=true otherwise
+	 * 		false is returned.
+	 * 	Otherwise:
+	 * 		If username/team does not exist then it is written as is (Create or Update)
+	 * 		otherwise if IDs of curr and existing are different errow is thrown,
+	 * 		otherwise object is updated.
+	 */
+	SaveUser(request SaveUserRequest) error
 }
 
 /**
@@ -40,10 +87,4 @@ func NewUser(id int64, username string, team *Team) *User {
 	user := User{Username: username, Team: team}
 	user.Object = Object{Id: id}
 	return &user
-}
-
-func NewTeam(id int64, org string, name string) *Team {
-	team := Team{Organization: org, Name: name}
-	team.Object = Object{Id: id}
-	return &team
 }
