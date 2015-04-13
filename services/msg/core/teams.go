@@ -1,5 +1,49 @@
 package core
 
+type CreateTeamRequest struct {
+	Request
+
+	Id int64
+
+	Organization string
+
+	Name string
+}
+
+type GetTeamsRequest struct {
+	Request
+
+	Organization string
+
+	Offset int
+
+	Count int
+}
+
+type GetTeamRequest struct {
+	Request
+
+	Id int64
+
+	Organization string
+
+	Name string
+}
+
+type DeleteTeamRequest struct {
+	Request
+
+	Team *Team
+}
+
+type TeamMembershipRequest struct {
+	Request
+
+	Team *Team
+
+	Username string
+}
+
 type ITeamService interface {
 	/**
 	 * Removes all entries.
