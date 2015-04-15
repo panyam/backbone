@@ -12,7 +12,7 @@ import (
 func (s *TestSuite) TestCreateChannelNew(c *C) {
 	svc := s.serviceGroup.UserService
 	team, err := s.serviceGroup.TeamService.SaveTeam(msgcore.NewTeam(1, "org", "team"))
-	user := msgcore.NewUser(0, "user1", team)
+	user := msgcore.NewUserByName("user1", team)
 	_ = svc.SaveUser(&msgcore.SaveUserRequest{nil, user, false})
 
 	channel := msgcore.NewChannel(team, user, 0, "test")
@@ -34,7 +34,7 @@ func (s *TestSuite) TestCreateChannelExistsById(c *C) {
 	team, err := s.serviceGroup.TeamService.SaveTeam(msgcore.NewTeam(1, "org", "team"))
 	c.Assert(err, IsNil)
 	c.Assert(team, Not(IsNil))
-	user := msgcore.NewUser(0, "user1", team)
+	user := msgcore.NewUserByName("user1", team)
 	_ = svc.SaveUser(&msgcore.SaveUserRequest{nil, user, false})
 	channel := msgcore.NewChannel(team, user, 0, "test")
 	channel, _ = s.serviceGroup.ChannelService.CreateChannel(&msgcore.CreateChannelRequest{channel, true})
@@ -46,7 +46,7 @@ func (s *TestSuite) TestCreateChannelExistsById(c *C) {
 func (s *TestSuite) TestDeleteChannel(c *C) {
 	svc := s.serviceGroup.UserService
 	team, err := s.serviceGroup.TeamService.SaveTeam(msgcore.NewTeam(1, "org", "team"))
-	user := msgcore.NewUser(0, "user1", team)
+	user := msgcore.NewUserByName("user1", team)
 	_ = svc.SaveUser(&msgcore.SaveUserRequest{nil, user, false})
 	channel := msgcore.NewChannel(team, user, 0, "test")
 	channel, _ = s.serviceGroup.ChannelService.CreateChannel(&msgcore.CreateChannelRequest{channel, true})
@@ -65,9 +65,9 @@ func (s *TestSuite) TestDeleteChannel(c *C) {
 func (s *TestSuite) TestJoinChannel(c *C) {
 	svc := s.serviceGroup.UserService
 	team, _ := s.serviceGroup.TeamService.SaveTeam(msgcore.NewTeam(1, "org", "team"))
-	user := msgcore.NewUser(0, "user1", team)
+	user := msgcore.NewUserByName("user1", team)
 	_ = svc.SaveUser(&msgcore.SaveUserRequest{nil, user, false})
-	user2 := msgcore.NewUser(0, "user2", team)
+	user2 := msgcore.NewUserByName("user2", team)
 	_ = svc.SaveUser(&msgcore.SaveUserRequest{nil, user2, false})
 
 	channel := msgcore.NewChannel(team, user, 0, "test")
@@ -82,7 +82,7 @@ func (s *TestSuite) TestJoinChannel(c *C) {
 func (s *TestSuite) TestLeaveChannel(c *C) {
 	svc := s.serviceGroup.UserService
 	team, _ := s.serviceGroup.TeamService.SaveTeam(msgcore.NewTeam(1, "org", "team"))
-	user := msgcore.NewUser(0, "user1", team)
+	user := msgcore.NewUserByName("user1", team)
 	_ = svc.SaveUser(&msgcore.SaveUserRequest{nil, user, false})
 	channel := msgcore.NewChannel(team, user, 0, "test")
 	channel, _ = s.serviceGroup.ChannelService.CreateChannel(&msgcore.CreateChannelRequest{channel, true})

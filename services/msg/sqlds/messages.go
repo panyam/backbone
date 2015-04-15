@@ -133,7 +133,7 @@ func (svc *MessageService) GetMessages(request *GetMessagesRequest) ([]*Message,
 			return nil, err
 		}
 		if request.Sender == nil {
-			msg.Sender, err = svc.SG.UserService.GetUser(NewUser(senderId, "", nil))
+			msg.Sender, err = svc.SG.UserService.GetUser(NewUserById(senderId))
 		} else {
 			msg.Sender = request.Sender
 		}

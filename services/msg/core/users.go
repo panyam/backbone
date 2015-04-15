@@ -69,3 +69,11 @@ func NewUser(id int64, username string, team *Team) *User {
 	user.Object = Object{Id: id}
 	return &user
 }
+
+func NewUserByName(username string, team *Team) *User {
+	return NewUser(0, username, team)
+}
+
+func NewUserById(id int64) *User {
+	return NewUser(id, "", nil)
+}

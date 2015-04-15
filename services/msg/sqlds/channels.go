@@ -199,7 +199,7 @@ func (svc *ChannelService) GetChannels(request *GetChannelsRequest) (*GetChannel
 			log.Println("Scan Error: ", err)
 		}
 		if request.Creator == nil {
-			channel.Creator, _ = svc.SG.UserService.GetUser(NewUser(creatorId, "", nil))
+			channel.Creator, _ = svc.SG.UserService.GetUser(NewUserById(creatorId))
 		}
 		channels = append(channels, &channel)
 		members = append(members, svc.GetChannelMembers(&channel))
@@ -223,7 +223,7 @@ func (svc *ChannelService) GetChannelById(channelId int64) (*GetChannelResult, e
 	}
 	channel.Id = channelId
 	channel.Team, err = svc.SG.TeamService.GetTeam(NewTeam(teamId, "", ""))
-	channel.Creator, err = svc.SG.UserService.GetUser(NewUser(userId, "", nil))
+	channel.Creator, err = svc.SG.UserService.GetUser(NewUserById(userId))
 	result := GetChannelResult{Channel: &channel,
 		Members: svc.GetChannelMembers(&channel)}
 	if err == nil {
@@ -255,10 +255,10 @@ func (svc *ChannelService) GetChannelMembers(channel *Channel) []*ChannelMember 
  */
 func (svc *ChannelService) AddChannelMembers(request *InviteMembersRequest) error {
 	for _, username := range request.Usernames {
-		user, err := svc.SG.UserService.GetUser(NewUser(0, username, request.Channel.Team))
+		user, err := svc.SG.UserService.GetUser(NewUserByName(username, request.Channel.Team))
 		if err != nil {
 			// then create it
-			user = NewUser(0, username, request.Channel.Team)
+			user = NewUserByName(username, request.Channel.Team)
 			save_request := &SaveUserRequest{nil, user, false}
 			svc.SG.UserService.SaveUser(save_request)
 		}
