@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	// authcore "github.com/panyam/relay/services/auth/core"
-	. "github.com/panyam/relay/services/msg/core"
+	msgcore "github.com/panyam/relay/services/msg/core"
 	. "gopkg.in/check.v1"
 )
 
@@ -43,10 +43,10 @@ func (s *TestSuite) TestCreateChannels(c *C) {
  */
 func (s *TestSuite) TestGetChannels(c *C) {
 	team := s.testTeam
-	users := make([]*User, 0, 0)
-	channels := make([]*Channel, 0, 0)
+	users := make([]*msgcore.User, 0, 0)
+	channels := make([]*msgcore.Channel, 0, 0)
 	for i := 1; i <= 10; i++ {
-		creator := NewUser(int64(i), fmt.Sprintf("%d", i), team)
+		creator := msgcore.NewUser(int64(i), fmt.Sprintf("%d", i), team)
 		_ = s.serviceGroup.UserService.SaveUser(creator, false)
 		users = append(users, creator)
 		channel := NewChannel(team, creator, int64(i), fmt.Sprintf("channel%d", i))

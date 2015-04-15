@@ -10,11 +10,12 @@ import (
 )
 
 func GetChannelRequestMaker(request *http.Request) (interface{}, error) {
-	req := msgcore.GetChannelRequest{}
+	req := msgcore.Channel{}
 	return &req, nil
 }
 
-func GetChannelResponsePresenter(http.ResponseWriter, *http.Request, interface{}, error) {
+func GetChannelResponsePresenter(rw http.ResponseWriter, req *http.Request, result interface{}, err error) {
+	DefaultResponsePresenter(rw, req, result, err)
 }
 
 func GetChannelsRequestMaker(request *http.Request) (interface{}, error) {
@@ -22,7 +23,8 @@ func GetChannelsRequestMaker(request *http.Request) (interface{}, error) {
 	return &req, nil
 }
 
-func GetChannelsResponsePresenter(http.ResponseWriter, *http.Request, interface{}, error) {
+func GetChannelsResponsePresenter(rw http.ResponseWriter, req *http.Request, result interface{}, err error) {
+	DefaultResponsePresenter(rw, req, result, err)
 }
 
 func CreateChannelRequestMaker(request *http.Request) (interface{}, error) {
@@ -39,7 +41,7 @@ func CreateChannelRequestMaker(request *http.Request) (interface{}, error) {
 		}
 
 		teamId := utils.String2ID(teamIdParam)
-		team, _ := s.serviceGroup.TeamService.GetTeamById(teamId)
+		team, _ := s.serviceGroup.TeamService.GetTeam(msgcore.NewTeamById(teamId))
 		if team == nil {
 			http.Error(rw, "No such team", http.StatusNotFound)
 			return
@@ -66,15 +68,17 @@ func CreateChannelRequestMaker(request *http.Request) (interface{}, error) {
 	*/
 }
 
-func CreateChannelResponsePresenter(http.ResponseWriter, *http.Request, interface{}, error) {
+func CreateChannelResponsePresenter(rw http.ResponseWriter, req *http.Request, result interface{}, err error) {
+	DefaultResponsePresenter(rw, req, result, err)
 }
 
 func UpdateChannelRequestMaker(request *http.Request) (interface{}, error) {
-	req := msgcore.UpdateChannelRequest{}
+	req := msgcore.Channel{}
 	return &req, nil
 }
 
-func UpdateChannelResponsePresenter(http.ResponseWriter, *http.Request, interface{}, error) {
+func UpdateChannelResponsePresenter(rw http.ResponseWriter, req *http.Request, result interface{}, err error) {
+	DefaultResponsePresenter(rw, req, result, err)
 }
 
 func DeleteChannelRequestMaker(request *http.Request) (interface{}, error) {
@@ -82,5 +86,6 @@ func DeleteChannelRequestMaker(request *http.Request) (interface{}, error) {
 	return &req, nil
 }
 
-func DeleteChannelResponsePresenter(http.ResponseWriter, *http.Request, interface{}, error) {
+func DeleteChannelResponsePresenter(rw http.ResponseWriter, req *http.Request, result interface{}, err error) {
+	DefaultResponsePresenter(rw, req, result, err)
 }

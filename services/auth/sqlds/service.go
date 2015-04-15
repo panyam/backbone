@@ -63,7 +63,7 @@ func (svc *AuthService) InitDB() {
  * then an error is returned.  Otherwise a registration object is returned.
  */
 func (svc *AuthService) SaveRegistration(registration *authcore.Registration) error {
-	user, err := svc.UserService.GetUser(registration.Username, registration.Team)
+	user, err := svc.UserService.GetUser(msgcore.NewUserByName(registration.Username, registration.Team))
 	if user != nil || err == nil {
 		return errors.New(fmt.Sprintf("Username (%s) already exists in team", registration.Username))
 	}
@@ -106,7 +106,7 @@ func (svc *AuthService) GetRegistrationById(id int64) (*authcore.Registration, e
 		return nil, err
 	}
 	registration.Id = id
-	registration.Team, err = svc.TeamService.GetTeamById(teamId)
+	registration.Team, err = svc.TeamService.GetTeam(msgcore.NewTeamById(teamId))
 	return &registration, err
 }
 

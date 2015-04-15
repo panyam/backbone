@@ -137,13 +137,6 @@ func (svc *ChannelService) GetChannels(request *GetChannelsRequest) (*GetChannel
 	}
 	request.Participants = newParticipants
 
-	/*
-		teamIdParam := mux.Vars(request)["teamId"]
-		ownerParam := request.FormValue("owner")
-		matchall := request.FormValue("matchall") == "true"
-		participantsParam := strings.Split(request.FormValue("participants"), ",")
-	*/
-
 	// Begin the queries!
 	query := "SELECT A.Id, A.Name, A.CreatorId, A.LastMessageAt, A.Public, A.Status, A.NumUsers FROM " +
 		"( SELECT " +

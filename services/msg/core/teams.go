@@ -79,3 +79,7 @@ func NewTeam(id int64, org string, name string) *Team {
 	team.Object = Object{Id: id}
 	return &team
 }
+
+func NewTeamById(id int64) *Team {
+	return NewTeam(id, "", "")
+}

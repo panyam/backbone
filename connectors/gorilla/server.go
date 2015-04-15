@@ -144,8 +144,8 @@ func (s *Server) createApiRouter(parent *mux.Router) *mux.Router {
 	teamChannelsRouter.Methods("POST").HandlerFunc(s.MakeHandlerFunc(channelService.CreateChannel, CreateChannelRequestMaker, CreateChannelResponsePresenter))
 
 	// Other teams API
-	teamRouter := apiRouter.PathPrefix("/teams/{teamid}").Subrouter()
-	teamRouter.Methods("GET").HandlerFunc(s.MakeHandlerFunc(teamService.GetTeamById, GetTeamRequestMaker, GetTeamResponsePresenter))
+	teamRouter := apiRouter.PathPrefix("/teams/{teamId}").Subrouter()
+	teamRouter.Methods("GET").HandlerFunc(s.MakeHandlerFunc(teamService.GetTeam, GetTeamRequestMaker, GetTeamResponsePresenter))
 	teamRouter.Methods("PUT", "POST").HandlerFunc(s.MakeHandlerFunc(teamService.SaveTeam, SaveTeamRequestMaker, SaveTeamResponsePresenter))
 	teamRouter.Methods("DELETE").HandlerFunc(s.MakeHandlerFunc(teamService.DeleteTeam, DeleteTeamRequestMaker, DeleteTeamResponsePresenter))
 
