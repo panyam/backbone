@@ -5,14 +5,12 @@ import (
 	"time"
 )
 
-type SaveChannelRequest struct {
-	*Request
+type CreateChannelRequest struct {
 	Channel  *Channel
 	Override bool
 }
 
 type GetChannelsRequest struct {
-	*Request
 	Team         *Team
 	Creator      *User
 	OrderBy      string
@@ -23,11 +21,6 @@ type GetChannelsRequest struct {
 type GetChannelsResult struct {
 	Channels []*Channel
 	Members  [][]*ChannelMember
-}
-
-type GetChannelRequest struct {
-	*Request
-	Id int64
 }
 
 type GetChannelResult struct {
@@ -59,16 +52,14 @@ type IChannelService interface {
 	RemoveAllChannels(request *Request)
 
 	/**
-	 * Creates a channel.
-	 * If the channel's ID parameter is not set then a new channel is created.
-	 * If the ID parameter IS set:
-	 * 		if override parameter is true, the channel is upserted (updated if it
-	 * 		existed, otherwise created).
-	 * 		If the override parameter is false, then the channel is only saved
-	 * 		if it does not already exist and returns a ChannelExists error if an
-	 * 		existing channel with the same ID exists.
+	 * Creates a new channel.
 	 */
-	SaveChannel(request *SaveChannelRequest) error
+	CreateChannel(request *CreateChannelRequest) (*Channel, error)
+
+	/**
+	 * Updates an existing channel.
+	 */
+	UpdateChannel(channel *Channel) (*Channel, error)
 
 	/**
 	 * Get channels meeting particular criterea
@@ -78,7 +69,7 @@ type IChannelService interface {
 	/**
 	 * Get channel by Id
 	 */
-	GetChannelById(request *GetChannelRequest) (*GetChannelResult, error)
+	GetChannelById(channelId int64) (*GetChannelResult, error)
 
 	/**
 	 * Adds users to a channel.

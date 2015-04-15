@@ -4,16 +4,18 @@ import (
 	"github.com/gorilla/mux"
 	. "github.com/panyam/relay/connectors/gorilla/common"
 	authcore "github.com/panyam/relay/services/auth/core"
+	msgcore "github.com/panyam/relay/services/msg/core"
 	"github.com/panyam/relay/utils"
 	"log"
 	"net/http"
-	"strconv"
+	// "strconv"
 )
 
 func (s *Server) AccountRegisterHandler() RequestHandlerFunc {
 	return func(rw http.ResponseWriter, request *http.Request, context *RequestContext) {
-		teamId, _ := strconv.ParseInt(request.FormValue("teamId"), 10, 64)
-		team, _ := s.serviceGroup.TeamService.GetTeamById(teamId)
+		// teamId, _ := strconv.ParseInt(request.FormValue("teamId"), 10, 64)
+		var team *msgcore.Team = nil
+		// team, _ := s.serviceGroup.TeamService.GetTeamById(teamId)
 		addressType := request.FormValue("address_type")
 		verificationData := ""
 		if addressType == "phone" {

@@ -1,19 +1,5 @@
 package core
 
-type GetUserRequest struct {
-	*Request
-
-	/**
-	 * ID of the user to fetch.  If this is - then the username/team is looked
-	 * up
-	 */
-	Id int64
-
-	Username string
-
-	Team *Team
-}
-
 type SaveUserRequest struct {
 	*Request
 
@@ -40,14 +26,9 @@ type IUserService interface {
 	RemoveAllUsers(request *Request)
 
 	/**
-	 * Get user info by ID
+	 * Get user info by ID or username/team
 	 */
-	GetUserById(request *GetUserRequest) (*User, error)
-
-	/**
-	 * Get a user by username in a particular team.
-	 */
-	GetUser(request *GetUserRequest) (*User, error)
+	GetUser(user *User) (*User, error)
 
 	/**
 	 * Saves a user.

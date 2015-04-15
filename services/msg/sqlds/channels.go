@@ -2,6 +2,7 @@ package sqlds
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	. "github.com/panyam/relay/services/msg/core"
 	. "github.com/panyam/relay/utils"
@@ -58,45 +59,92 @@ func (svc *ChannelService) InitDB() {
 /**
  * Lets a user create a channel.
  */
-func (svc *ChannelService) SaveChannel(request *SaveChannelRequest) error {
-	if request.Channel.Id == 0 {
-		nextid_request := &NextIDRequest{nil, "channelids"}
-		id, err := svc.SG.IDService.NextID(nextid_request)
-		if err != nil {
-			return err
-		}
-		err = InsertRow(svc.DB, CHANNELS_TABLE,
-			"Id", id,
-			"TeamId", request.Channel.Team.Id,
-			"UserId", request.Channel.Creator.Id,
-			"Name", request.Channel.Name,
-			"Public", request.Channel.Public,
-			"Status", request.Channel.Status)
-		if err == nil {
-			request.Channel.Id = id
-		}
-		return err
-	} else {
-		err := UpdateRows(svc.DB, CHANNELS_TABLE, fmt.Sprintf("Id = %d", request.Channel.Id),
-			"TeamId", request.Channel.Team.Id,
-			"UserId", request.Channel.Creator.Id,
-			"Name", request.Channel.Name,
-			"Public", request.Channel.Public,
-			"Status", request.Channel.Status)
-		if err != nil && err.Error() == "No rows found" {
-			err = InsertRow(svc.DB, CHANNELS_TABLE,
-				"Id", request.Channel.Id,
-				"TeamId", request.Channel.Team.Id,
-				"UserId", request.Channel.Creator.Id,
-				"Name", request.Channel.Name,
-				"Public", request.Channel.Public,
-				"Status", request.Channel.Status)
-		}
-		return err
+func (svc *ChannelService) CreateChannel(request *CreateChannelRequest) (*Channel, error) {
+	nextid_request := &NextIDRequest{nil, "channelids"}
+	id, err := svc.SG.IDService.NextID(nextid_request)
+	if err != nil {
+		return nil, err
 	}
+	err = InsertRow(svc.DB, CHANNELS_TABLE,
+		"Id", id,
+		"TeamId", request.Channel.Team.Id,
+		"UserId", request.Channel.Creator.Id,
+		"Name", request.Channel.Name,
+		"Public", request.Channel.Public,
+		"Status", request.Channel.Status)
+	if err == nil {
+		request.Channel.Id = id
+	}
+	return request.Channel, err
+}
+
+func (svc *ChannelService) UpdateChannel(channel *Channel) (*Channel, error) {
+	err := UpdateRows(svc.DB, CHANNELS_TABLE, fmt.Sprintf("Id = %d", channel.Id),
+		"TeamId", channel.Team.Id,
+		"UserId", channel.Creator.Id,
+		"Name", channel.Name,
+		"Public", channel.Public,
+		"Status", channel.Status)
+	if err != nil && err.Error() == "No rows found" {
+		err = InsertRow(svc.DB, CHANNELS_TABLE,
+			"Id", channel.Id,
+			"TeamId", channel.Team.Id,
+			"UserId", channel.Creator.Id,
+			"Name", channel.Name,
+			"Public", channel.Public,
+			"Status", channel.Status)
+	}
+	return channel, err
 }
 
 func (svc *ChannelService) GetChannels(request *GetChannelsRequest) (*GetChannelsResult, error) {
+	if request.Team == nil {
+		return nil, errors.New("Cannot filter channels without team")
+	}
+
+	if !request.Team.Loaded {
+		request.Team, _ = svc.SG.TeamService.GetTeam(request.Team)
+		if request.Team == nil {
+			return nil, errors.New("No such team")
+		}
+	}
+
+	// Verify owner/creator if any
+	if request.Creator != nil {
+		if !request.Creator.Loaded {
+			request.Creator, _ = svc.SG.UserService.GetUser(request.Creator)
+			if request.Creator == nil {
+				return nil, errors.New("No such user")
+			}
+		}
+	}
+
+	// check participants
+	newParticipants := make([]*User, 0, 0)
+	for _, participant := range request.Participants {
+		if !participant.Loaded {
+			// try to load it
+			participant, _ = svc.SG.UserService.GetUser(participant)
+			if participant == nil {
+				if request.MatchAll {
+					// invalid participant means we cant find any channels
+					return nil, nil
+				}
+			} else {
+				newParticipants = append(newParticipants, participant)
+			}
+		}
+	}
+	request.Participants = newParticipants
+
+	/*
+		teamIdParam := mux.Vars(request)["teamId"]
+		ownerParam := request.FormValue("owner")
+		matchall := request.FormValue("matchall") == "true"
+		participantsParam := strings.Split(request.FormValue("participants"), ",")
+	*/
+
+	// Begin the queries!
 	query := "SELECT A.Id, A.Name, A.CreatorId, A.LastMessageAt, A.Public, A.Status, A.NumUsers FROM " +
 		"( SELECT " +
 		"C.Id as Id, C.Name as Name, C.UserId as CreatorId, " +
@@ -151,8 +199,7 @@ func (svc *ChannelService) GetChannels(request *GetChannelsRequest) (*GetChannel
 			log.Println("Scan Error: ", err)
 		}
 		if request.Creator == nil {
-			request := &GetUserRequest{nil, creatorId, "", nil}
-			channel.Creator, _ = svc.SG.UserService.GetUserById(request)
+			channel.Creator, _ = svc.SG.UserService.GetUser(NewUser(creatorId, "", nil))
 		}
 		channels = append(channels, &channel)
 		members = append(members, svc.GetChannelMembers(&channel))
@@ -163,8 +210,8 @@ func (svc *ChannelService) GetChannels(request *GetChannelsRequest) (*GetChannel
 /**
  * Retrieve a channel by Name.
  */
-func (svc *ChannelService) GetChannelById(request *GetChannelRequest) (*GetChannelResult, error) {
-	query := fmt.Sprintf("SELECT TeamId, UserId, Public, Status, Created, Name from %s where Id = %d", CHANNELS_TABLE, request.Id)
+func (svc *ChannelService) GetChannelById(channelId int64) (*GetChannelResult, error) {
+	query := fmt.Sprintf("SELECT TeamId, UserId, Public, Status, Created, Name from %s where Id = %d", CHANNELS_TABLE, channelId)
 	row := svc.DB.QueryRow(query)
 
 	var channel Channel
@@ -174,11 +221,14 @@ func (svc *ChannelService) GetChannelById(request *GetChannelRequest) (*GetChann
 	if err != nil {
 		return nil, err
 	}
-	channel.Id = request.Id
-	channel.Team, err = svc.SG.TeamService.GetTeamById(&GetTeamRequest{nil, teamId, "", ""})
-	channel.Creator, err = svc.SG.UserService.GetUserById(&GetUserRequest{nil, userId, "", nil})
+	channel.Id = channelId
+	channel.Team, err = svc.SG.TeamService.GetTeam(NewTeam(teamId, "", ""))
+	channel.Creator, err = svc.SG.UserService.GetUser(NewUser(userId, "", nil))
 	result := GetChannelResult{Channel: &channel,
 		Members: svc.GetChannelMembers(&channel)}
+	if err == nil {
+		channel.Loaded = true
+	}
 	return &result, err
 }
 
@@ -205,8 +255,7 @@ func (svc *ChannelService) GetChannelMembers(channel *Channel) []*ChannelMember 
  */
 func (svc *ChannelService) AddChannelMembers(request *InviteMembersRequest) error {
 	for _, username := range request.Usernames {
-		getuser_request := &GetUserRequest{nil, 0, username, request.Channel.Team}
-		user, err := svc.SG.UserService.GetUser(getuser_request)
+		user, err := svc.SG.UserService.GetUser(NewUser(0, username, request.Channel.Team))
 		if err != nil {
 			// then create it
 			user = NewUser(0, username, request.Channel.Team)

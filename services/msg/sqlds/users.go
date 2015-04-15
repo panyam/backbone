@@ -48,37 +48,41 @@ func (svc *UserService) RemoveAllUsers(request *Request) {
 /**
  * Get user info by ID
  */
-func (svc *UserService) GetUserById(request *GetUserRequest) (*User, error) {
-	query := fmt.Sprintf("SELECT Username, TeamId, Status, Created from %s where Id = %d", USERS_TABLE, request.Id)
+func (svc *UserService) GetUserById(user *User) (*User, error) {
+	query := fmt.Sprintf("SELECT Username, TeamId, Status, Created from %s where Id = %d", USERS_TABLE, user.Id)
 	row := svc.DB.QueryRow(query)
 
-	var user User
 	var teamId int64
 	err := row.Scan(&user.Username, &teamId, &user.Status, &user.Created)
-	user.Id = request.Id
 	if err != nil {
 		return nil, err
 	}
-	user.Id = request.Id
-	user.Team, err = svc.SG.TeamService.GetTeamById(&GetTeamRequest{nil, teamId, "", ""})
-	return &user, err
+	user.Team, err = svc.SG.TeamService.GetTeam(NewTeam(teamId, "", ""))
+	if err == nil {
+		user.Loaded = true
+	}
+	return user, err
 }
 
 /**
  * Get a user by username in a particular team.
  */
-func (svc *UserService) GetUser(request *GetUserRequest) (*User, error) {
-	query := fmt.Sprintf("SELECT Id, Status, Created from %s where Username = '%s' and TeamId = %d", USERS_TABLE, request.Username, request.Team.Id)
+func (svc *UserService) GetUser(user *User) (*User, error) {
+	if user.Id != 0 {
+		return svc.GetUserById(user)
+	}
+
+	query := fmt.Sprintf("SELECT Id, Status, Created from %s where Username = '%s' and TeamId = %d", USERS_TABLE, user.Username, user.Team.Id)
 	row := svc.DB.QueryRow(query)
 
-	var user User
 	err := row.Scan(&user.Id, &user.Status, &user.Created)
 	if err != nil {
 		return nil, err
 	}
-	user.Username = request.Username
-	user.Team = request.Team
-	return &user, err
+	if err == nil {
+		user.Loaded = true
+	}
+	return user, err
 }
 
 /**

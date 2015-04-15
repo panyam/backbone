@@ -24,6 +24,12 @@ type Object struct {
 	Cls IObject
 
 	/**
+	 * Tells if the object has been loaded from the entity store.
+	 * This should be set by the entity manager when a load has finished.
+	 */
+	Loaded bool
+
+	/**
 	 * Unique system wide ID.
 	 */
 	Id int64

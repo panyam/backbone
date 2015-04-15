@@ -16,14 +16,14 @@ func (s *TestSuite) TestCreateMessageService(c *C) {
 
 func (s *TestSuite) MakeTestChannel() *msgcore.Channel {
 	// create team
-	team, _ := s.serviceGroup.TeamService.CreateTeam(&msgcore.CreateTeamRequest{nil, 1, "org", "team"})
+	team, _ := s.serviceGroup.TeamService.SaveTeam(msgcore.NewTeam(1, "org", "team"))
 
 	user := msgcore.NewUser(0, "user1", team)
 	_ = s.serviceGroup.UserService.SaveUser(&msgcore.SaveUserRequest{nil, user, false})
 
 	// create channel
 	channel := msgcore.NewChannel(team, user, 0, "test")
-	s.serviceGroup.ChannelService.SaveChannel(&msgcore.SaveChannelRequest{nil, channel, true})
+	s.serviceGroup.ChannelService.CreateChannel(&msgcore.CreateChannelRequest{channel, true})
 
 	return channel
 }

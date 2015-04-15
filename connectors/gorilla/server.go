@@ -3,6 +3,7 @@ package gorilla
 import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
+	"github.com/panyam/relay/connectors/gorilla/common"
 	"github.com/panyam/relay/connectors/gorilla/middleware"
 	authmw "github.com/panyam/relay/connectors/gorilla/middleware/auth"
 	authcore "github.com/panyam/relay/services/auth/core"
@@ -66,6 +67,29 @@ func (s *Server) DefaultMiddleware(requiresUser bool) *middleware.MiddlewareChai
 	return out
 }
 
+func (s *Server) MakeHandlerFunc(operation interface{},
+	serviceRequestMaker common.ServiceRequestMaker,
+	serviceResponsePresenter common.ServiceResponseMaker) common.HttpHandlerFunc {
+	return func(rw http.ResponseWriter, request *http.Request) {
+		service_request, err := serviceRequestMaker(request)
+		if err != nil {
+			serviceResponsePresenter(rw, request, nil, err)
+		}
+
+		service_method := operation.(func(interface{}) (interface{}, error))
+		result, err := service_method(service_request)
+
+		serviceResponsePresenter(rw, request, result, err)
+	}
+}
+
+/**
+ * Takes the response from a service operation (or an error) and presents it
+ * back via the response mechanism.
+ */
+func (s *Server) SendServiceResponse(request *http.Request, rw http.ResponseWriter, result interface{}, err error) {
+}
+
 func (s *Server) Run() {
 	log.Println("Starting http server...")
 	r := mux.NewRouter()
@@ -95,7 +119,7 @@ func (s *Server) Stop() {
 func (s *Server) createApiRouter(parent *mux.Router) *mux.Router {
 	apiRouter := parent.Path("/api").Subrouter()
 
-	mwWithLogin := s.DefaultMiddleware(true)
+	// mwWithLogin := s.DefaultMiddleware(true)
 	mwWithoutLogin := s.DefaultMiddleware(false)
 
 	// Users/Login API
@@ -105,31 +129,35 @@ func (s *Server) createApiRouter(parent *mux.Router) *mux.Router {
 	accountRouter.HandleFunc("/login", mwWithoutLogin.Apply(s.AccountLoginHandler()))
 	accountRouter.HandleFunc("/logout", mwWithoutLogin.Apply(s.AccountLogoutHandler()))
 
+	channelService := s.serviceGroup.ChannelService
+	teamService := s.serviceGroup.TeamService
+	// userService := s.serviceGroup.UserService
+	// messageService := s.serviceGroup.MessageService
+
 	// Teams API
 	teamsRouter := apiRouter.Path("/teams/").Subrouter()
-	teamsRouter.Methods("GET").HandlerFunc(mwWithLogin.Apply(s.GetTeamsHandler()))
-	teamsRouter.Methods("POST").HandlerFunc(mwWithLogin.Apply(s.CreateTeamHandler()))
+	teamsRouter.Methods("POST").HandlerFunc(s.MakeHandlerFunc(teamService.SaveTeam, SaveTeamRequestMaker, SaveTeamResponsePresenter))
 
 	// Channel specific APi for a particular team
 	teamChannelsRouter := apiRouter.PathPrefix("/teams/{teamId}/channels").Subrouter()
-	teamChannelsRouter.Methods("GET").HandlerFunc(mwWithLogin.Apply(s.GetChannelsHandler()))
-	teamChannelsRouter.Methods("POST").HandlerFunc(mwWithLogin.Apply(s.CreateChannelHandler()))
+	teamChannelsRouter.Methods("GET").HandlerFunc(s.MakeHandlerFunc(channelService.GetChannels, GetChannelsRequestMaker, GetChannelsResponsePresenter))
+	teamChannelsRouter.Methods("POST").HandlerFunc(s.MakeHandlerFunc(channelService.CreateChannel, CreateChannelRequestMaker, CreateChannelResponsePresenter))
 
 	// Other teams API
 	teamRouter := apiRouter.PathPrefix("/teams/{teamid}").Subrouter()
-	teamRouter.Methods("GET").HandlerFunc(mwWithLogin.Apply(s.TeamDetailsHandler()))
-	teamRouter.Methods("PUT", "POST").HandlerFunc(mwWithLogin.Apply(s.SaveTeamHandler()))
-	teamRouter.Methods("DELETE").HandlerFunc(mwWithLogin.Apply(s.DeleteTeamHandler()))
+	teamRouter.Methods("GET").HandlerFunc(s.MakeHandlerFunc(teamService.GetTeamById, GetTeamRequestMaker, GetTeamResponsePresenter))
+	teamRouter.Methods("PUT", "POST").HandlerFunc(s.MakeHandlerFunc(teamService.SaveTeam, SaveTeamRequestMaker, SaveTeamResponsePresenter))
+	teamRouter.Methods("DELETE").HandlerFunc(s.MakeHandlerFunc(teamService.DeleteTeam, DeleteTeamRequestMaker, DeleteTeamResponsePresenter))
 
 	// Channels API
 	channelsRouter := apiRouter.Path("/channels/").Subrouter()
-	// channelsRouter.Methods("GET").HandlerFunc(mwWithLogin.Apply(s.GetChannelsHandler()))
-	channelsRouter.Methods("POST").HandlerFunc(mwWithLogin.Apply(s.CreateChannelHandler()))
+	// channelsRouter.Methods("GET").HandlerFunc(s.MakeHandlerFunc(channelService.GetChannels, GetChannelsRequestMaker, GetChannelsResponsePresenter))
+	channelsRouter.Methods("POST").HandlerFunc(s.MakeHandlerFunc(channelService.CreateChannel, CreateChannelRequestMaker, CreateChannelResponsePresenter))
 
 	channelRouter := apiRouter.PathPrefix("/channels/{id}").Subrouter()
-	channelRouter.Methods("GET").HandlerFunc(mwWithLogin.Apply(s.ChannelDetailsHandler()))
-	channelRouter.Methods("PUT", "POST").HandlerFunc(mwWithLogin.Apply(s.UpdateChannelHandler()))
-	channelRouter.Methods("DELETE").HandlerFunc(mwWithLogin.Apply(s.DeleteChannelHandler()))
+	channelRouter.Methods("GET").HandlerFunc(s.MakeHandlerFunc(channelService.GetChannelById, GetChannelRequestMaker, GetChannelResponsePresenter))
+	channelRouter.Methods("PUT", "POST").HandlerFunc(s.MakeHandlerFunc(channelService.UpdateChannel, UpdateChannelRequestMaker, UpdateChannelResponsePresenter))
+	channelRouter.Methods("DELETE").HandlerFunc(s.MakeHandlerFunc(channelService.DeleteChannel, DeleteChannelRequestMaker, DeleteChannelResponsePresenter))
 
 	return apiRouter
 }

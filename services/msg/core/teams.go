@@ -1,18 +1,6 @@
 package core
 
-type CreateTeamRequest struct {
-	*Request
-
-	Id int64
-
-	Organization string
-
-	Name string
-}
-
 type GetTeamsRequest struct {
-	*Request
-
 	Organization string
 
 	Offset int
@@ -20,25 +8,7 @@ type GetTeamsRequest struct {
 	Count int
 }
 
-type GetTeamRequest struct {
-	*Request
-
-	Id int64
-
-	Organization string
-
-	Name string
-}
-
-type DeleteTeamRequest struct {
-	*Request
-
-	Team *Team
-}
-
 type TeamMembershipRequest struct {
-	*Request
-
 	Team *Team
 
 	Username string
@@ -57,7 +27,7 @@ type ITeamService interface {
 	 * A valid Team object on return WILL have an ID if the backend can
 	 * auto generate IDs
 	 */
-	CreateTeam(request *CreateTeamRequest) (*Team, error)
+	SaveTeam(team *Team) (*Team, error)
 
 	/**
 	 * Retrieve teams in a org
@@ -65,19 +35,14 @@ type ITeamService interface {
 	GetTeamsInOrg(request *GetTeamsRequest) ([]*Team, error)
 
 	/**
-	 * Retrieve a team by Id
+	 * Retrieve a team by either ID or Name and Organization
 	 */
-	GetTeamById(request *GetTeamRequest) (*Team, error)
-
-	/**
-	 * Retrieve a team by Name.
-	 */
-	GetTeamByName(request *GetTeamRequest) (*Team, error)
+	GetTeam(team *Team) (*Team, error)
 
 	/**
 	 * Delete a team.
 	 */
-	DeleteTeam(request *DeleteTeamRequest) error
+	DeleteTeam(team *Team) error
 
 	/**
 	 * Lets a user with the given username join a team (if allowed)

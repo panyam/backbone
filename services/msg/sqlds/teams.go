@@ -59,22 +59,20 @@ func (svc *TeamService) RemoveAllTeams(request *Request) {
  * A valid Team object on return WILL have an ID if the backend can
  * auto generate IDs
  */
-func (svc *TeamService) CreateTeam(request *CreateTeamRequest) (*Team, error) {
-	if request.Id == 0 {
+func (svc *TeamService) SaveTeam(team *Team) (*Team, error) {
+	if team.Id == 0 {
 		id2, err := svc.SG.IDService.NextID(&NextIDRequest{nil, "teamids"})
 		if err != nil {
 			return nil, err
 		}
-		request.Id = id2
+		team.Id = id2
 	}
-	team := Team{Organization: request.Organization, Name: request.Name}
-	team.Object = Object{Id: request.Id}
-	query := fmt.Sprintf(`INSERT INTO %s ( Id, Organization, Name ) VALUES (%d, '%s', '%s')`, TEAMS_TABLE, request.Id, request.Organization, request.Name)
+	query := fmt.Sprintf(`INSERT INTO %s ( Id, Organization, Name ) VALUES (%d, '%s', '%s')`, TEAMS_TABLE, team.Id, team.Organization, team.Name)
 	_, err := svc.DB.Exec(query)
 	if err != nil {
 		return nil, err
 	}
-	return &team, err
+	return team, err
 }
 
 /**
@@ -87,43 +85,38 @@ func (svc *TeamService) GetTeamsInOrg(request *GetTeamsRequest) ([]*Team, error)
 /**
  * Retrieve a team by ID.
  */
-func (svc *TeamService) GetTeamById(request *GetTeamRequest) (*Team, error) {
-	query := fmt.Sprintf("SELECT Organization, Name from %s where Id = %d", TEAMS_TABLE, request.Id)
-	row := svc.DB.QueryRow(query)
+func (svc *TeamService) GetTeam(team *Team) (*Team, error) {
+	var err error = nil
+	if team.Id != 0 {
+		query := fmt.Sprintf("SELECT Organization, Name from %s where Id = %d", TEAMS_TABLE, team.Id)
+		row := svc.DB.QueryRow(query)
 
-	var team Team
-	team.Id = request.Id
-	err := row.Scan(&team.Organization, &team.Name)
-	return &team, err
-}
-
-/**
- * Retrieve a team by Name.
- */
-func (svc *TeamService) GetTeamByName(request *GetTeamRequest) (*Team, error) {
-	query := fmt.Sprintf("SELECT Id from %s where Organization = '%s' and Name = '%s'",
-		TEAMS_TABLE, request.Organization, request.Name)
-	rows, err := svc.DB.Query(query)
-	if err != nil {
-		return nil, err
+		err = row.Scan(&team.Organization, &team.Name)
+	} else {
+		query := fmt.Sprintf("SELECT Id from %s where Organization = '%s' and Name = '%s'",
+			TEAMS_TABLE, team.Organization, team.Name)
+		rows, err2 := svc.DB.Query(query)
+		if err2 != nil {
+			return nil, err2
+		}
+		defer rows.Close()
+		rows.Next()
+		err = rows.Scan(&team.Id)
+		if err != nil {
+			return nil, err
+		}
 	}
-	defer rows.Close()
-	rows.Next()
-	var id int64 = 0
-	err = rows.Scan(&id)
-	if err != nil {
-		return nil, err
+	if err == nil {
+		team.Loaded = true
 	}
-	team := Team{Organization: request.Organization, Name: request.Name}
-	team.Object = Object{Id: id}
-	return &team, err
+	return team, err
 }
 
 /**
  * Delete a team.
  */
-func (svc *TeamService) DeleteTeam(request *DeleteTeamRequest) error {
-	return DeleteById(svc.DB, TEAMS_TABLE, request.Team.Id)
+func (svc *TeamService) DeleteTeam(team *Team) error {
+	return DeleteById(svc.DB, TEAMS_TABLE, team.Id)
 }
 
 /**

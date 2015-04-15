@@ -1,40 +1,34 @@
 package gorilla
 
 import (
-	// "github.com/panyam/relay/services"
-	. "github.com/panyam/relay/connectors/gorilla/common"
-	"log"
+	msgcore "github.com/panyam/relay/services/msg/core"
+	// "log"
 	"net/http"
 )
 
-func (s *Server) CreateTeamHandler() RequestHandlerFunc {
-	return func(rw http.ResponseWriter, request *http.Request, context *RequestContext) {
-		if context.Get("user") == nil {
-		}
-		log.Println("Create Teams")
-	}
+// type ServiceRequestMaker func(*http.Request) (interface{}, error)
+// type ServiceResponseMaker func(http.ResponseWriter, *http.Request, interface{}, error)
+
+func GetTeamRequestMaker(request *http.Request) (interface{}, error) {
+	req := msgcore.GetTeamRequest{}
+	return &req, nil
 }
 
-func (s *Server) GetTeamsHandler() RequestHandlerFunc {
-	return func(rw http.ResponseWriter, request *http.Request, context *RequestContext) {
-		log.Println("Get Teams")
-	}
+func GetTeamResponsePresenter(http.ResponseWriter, *http.Request, interface{}, error) {
 }
 
-func (s *Server) TeamDetailsHandler() RequestHandlerFunc {
-	return func(rw http.ResponseWriter, request *http.Request, context *RequestContext) {
-		log.Println("GetTeamDetails")
-	}
+func SaveTeamRequestMaker(request *http.Request) (interface{}, error) {
+	req := msgcore.SaveTeamRequest{}
+	return &req, nil
 }
 
-func (s *Server) SaveTeamHandler() RequestHandlerFunc {
-	return func(rw http.ResponseWriter, request *http.Request, context *RequestContext) {
-		log.Println("UpdateTeam")
-	}
+func SaveTeamResponsePresenter(http.ResponseWriter, *http.Request, interface{}, error) {
 }
 
-func (s *Server) DeleteTeamHandler() RequestHandlerFunc {
-	return func(rw http.ResponseWriter, request *http.Request, context *RequestContext) {
-		log.Println("DeleteTeam")
-	}
+func DeleteTeamRequestMaker(request *http.Request) (interface{}, error) {
+	req := msgcore.DeleteTeamRequest{}
+	return &req, nil
+}
+
+func DeleteTeamResponsePresenter(http.ResponseWriter, *http.Request, interface{}, error) {
 }
