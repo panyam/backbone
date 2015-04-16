@@ -1,19 +1,5 @@
 package core
 
-type GetTeamsRequest struct {
-	Organization string
-
-	Offset int
-
-	Count int
-}
-
-type TeamMembershipRequest struct {
-	Team *Team
-
-	Username string
-}
-
 type ITeamService interface {
 	/**
 	 * Removes all entries.
@@ -21,7 +7,7 @@ type ITeamService interface {
 	RemoveAllTeams(request *Request)
 
 	/**
-	 * Create a team.
+	 * Create or update a team.
 	 * If the ID is empty, then it is upto the backend to decide whether to
 	 * throw an error or auto assign an ID.
 	 * A valid Team object on return WILL have an ID if the backend can
@@ -32,7 +18,7 @@ type ITeamService interface {
 	/**
 	 * Retrieve teams in a org
 	 */
-	GetTeamsInOrg(request *GetTeamsRequest) ([]*Team, error)
+	GetTeams(request *GetTeamsRequest) ([]*Team, error)
 
 	/**
 	 * Retrieve a team by either ID or Name and Organization
@@ -58,6 +44,20 @@ type ITeamService interface {
 	 * Lets a user leave a team or be kicked out.
 	 */
 	LeaveTeam(request *TeamMembershipRequest) error
+}
+
+type GetTeamsRequest struct {
+	Organization string
+
+	Offset int
+
+	Count int
+}
+
+type TeamMembershipRequest struct {
+	Team *Team
+
+	Username string
 }
 
 type Team struct {

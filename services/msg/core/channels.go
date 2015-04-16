@@ -5,46 +5,6 @@ import (
 	"time"
 )
 
-type CreateChannelRequest struct {
-	Channel  *Channel
-	Override bool
-}
-
-type GetChannelsRequest struct {
-	Team         *Team
-	Creator      *User
-	OrderBy      string
-	Participants []*User
-	MatchAll     bool
-}
-
-type GetChannelsResult struct {
-	Channels []*Channel
-	Members  [][]*ChannelMember
-}
-
-type GetChannelResult struct {
-	Channel *Channel
-	Members []*ChannelMember
-}
-
-type InviteMembersRequest struct {
-	*Request
-	Channel   *Channel
-	Usernames []string
-}
-
-type ChannelMembershipRequest struct {
-	*Request
-	Channel *Channel
-	User    *User
-}
-
-type DeleteChannelRequest struct {
-	*Request
-	Channel *Channel
-}
-
 type IChannelService interface {
 	/**
 	 * Removes all entries.
@@ -137,6 +97,47 @@ type ChannelMember struct {
 	LeftAt time.Time
 
 	Status int
+}
+
+type CreateChannelRequest struct {
+	Channel      *Channel
+	Participants []string
+	Override     bool
+}
+
+type GetChannelsRequest struct {
+	Team         *Team
+	Creator      *User
+	OrderBy      string
+	Participants []*User
+	MatchAll     bool
+}
+
+type GetChannelsResult struct {
+	Channels []*Channel
+	Members  [][]*ChannelMember
+}
+
+type GetChannelResult struct {
+	Channel *Channel
+	Members []*ChannelMember
+}
+
+type InviteMembersRequest struct {
+	*Request
+	Channel   *Channel
+	Usernames []string
+}
+
+type ChannelMembershipRequest struct {
+	*Request
+	Channel *Channel
+	User    *User
+}
+
+type DeleteChannelRequest struct {
+	*Request
+	Channel *Channel
 }
 
 func NewChannel(team *Team, creator *User, id int64, name string) *Channel {

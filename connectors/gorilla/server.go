@@ -138,7 +138,7 @@ func (s *Server) createApiRouter(parent *mux.Router) *mux.Router {
 	teamsRouter := apiRouter.Path("/teams/").Subrouter()
 	teamsRouter.Methods("POST").HandlerFunc(s.MakeHandlerFunc(teamService.SaveTeam, SaveTeamRequestMaker, SaveTeamResponsePresenter))
 
-	// Channel specific APi for a particular team
+	// Team specific channel API
 	teamChannelsRouter := apiRouter.PathPrefix("/teams/{teamId}/channels").Subrouter()
 	teamChannelsRouter.Methods("GET").HandlerFunc(s.MakeHandlerFunc(channelService.GetChannels, GetChannelsRequestMaker, GetChannelsResponsePresenter))
 	teamChannelsRouter.Methods("POST").HandlerFunc(s.MakeHandlerFunc(channelService.CreateChannel, CreateChannelRequestMaker, CreateChannelResponsePresenter))
@@ -151,7 +151,6 @@ func (s *Server) createApiRouter(parent *mux.Router) *mux.Router {
 
 	// Channels API
 	channelsRouter := apiRouter.Path("/channels/").Subrouter()
-	// channelsRouter.Methods("GET").HandlerFunc(s.MakeHandlerFunc(channelService.GetChannels, GetChannelsRequestMaker, GetChannelsResponsePresenter))
 	channelsRouter.Methods("POST").HandlerFunc(s.MakeHandlerFunc(channelService.CreateChannel, CreateChannelRequestMaker, CreateChannelResponsePresenter))
 
 	channelRouter := apiRouter.PathPrefix("/channels/{id}").Subrouter()
@@ -159,6 +158,7 @@ func (s *Server) createApiRouter(parent *mux.Router) *mux.Router {
 	channelRouter.Methods("PUT", "POST").HandlerFunc(s.MakeHandlerFunc(channelService.UpdateChannel, UpdateChannelRequestMaker, UpdateChannelResponsePresenter))
 	channelRouter.Methods("DELETE").HandlerFunc(s.MakeHandlerFunc(channelService.DeleteChannel, DeleteChannelRequestMaker, DeleteChannelResponsePresenter))
 
+	// Message API
 	return apiRouter
 }
 

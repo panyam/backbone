@@ -78,7 +78,7 @@ func (svc *TeamService) SaveTeam(team *Team) (*Team, error) {
 /**
  * Retrieve teams in a org
  */
-func (svc *TeamService) GetTeamsInOrg(request *GetTeamsRequest) ([]*Team, error) {
+func (svc *TeamService) GetTeams(request *GetTeamsRequest) ([]*Team, error) {
 	return nil, nil
 }
 

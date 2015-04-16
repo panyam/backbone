@@ -16,7 +16,7 @@ func (s *TestSuite) TestCreateChannelNew(c *C) {
 	_ = svc.SaveUser(&msgcore.SaveUserRequest{nil, user, false})
 
 	channel := msgcore.NewChannel(team, user, 0, "test")
-	channel, err = s.serviceGroup.ChannelService.CreateChannel(&msgcore.CreateChannelRequest{channel, true})
+	channel, err = s.serviceGroup.ChannelService.CreateChannel(&msgcore.CreateChannelRequest{Channel: channel, Participants: nil, Override: true})
 
 	c.Assert(err, IsNil)
 	c.Assert(channel, Not(IsNil))
@@ -37,9 +37,9 @@ func (s *TestSuite) TestCreateChannelExistsById(c *C) {
 	user := msgcore.NewUserByName("user1", team)
 	_ = svc.SaveUser(&msgcore.SaveUserRequest{nil, user, false})
 	channel := msgcore.NewChannel(team, user, 0, "test")
-	channel, _ = s.serviceGroup.ChannelService.CreateChannel(&msgcore.CreateChannelRequest{channel, true})
+	channel, _ = s.serviceGroup.ChannelService.CreateChannel(&msgcore.CreateChannelRequest{channel, nil, true})
 
-	channel, err = s.serviceGroup.ChannelService.CreateChannel(&msgcore.CreateChannelRequest{channel, true})
+	channel, err = s.serviceGroup.ChannelService.CreateChannel(&msgcore.CreateChannelRequest{channel, nil, true})
 	c.Assert(err, IsNil)
 }
 
@@ -49,7 +49,7 @@ func (s *TestSuite) TestDeleteChannel(c *C) {
 	user := msgcore.NewUserByName("user1", team)
 	_ = svc.SaveUser(&msgcore.SaveUserRequest{nil, user, false})
 	channel := msgcore.NewChannel(team, user, 0, "test")
-	channel, _ = s.serviceGroup.ChannelService.CreateChannel(&msgcore.CreateChannelRequest{channel, true})
+	channel, _ = s.serviceGroup.ChannelService.CreateChannel(&msgcore.CreateChannelRequest{channel, nil, true})
 
 	c.Assert(err, IsNil)
 	c.Assert(channel.Id, Not(Equals), 0)
@@ -71,7 +71,7 @@ func (s *TestSuite) TestJoinChannel(c *C) {
 	_ = svc.SaveUser(&msgcore.SaveUserRequest{nil, user2, false})
 
 	channel := msgcore.NewChannel(team, user, 0, "test")
-	channel, _ = s.serviceGroup.ChannelService.CreateChannel(&msgcore.CreateChannelRequest{channel, true})
+	channel, _ = s.serviceGroup.ChannelService.CreateChannel(&msgcore.CreateChannelRequest{channel, nil, true})
 
 	s.serviceGroup.ChannelService.JoinChannel(&msgcore.ChannelMembershipRequest{nil, channel, user})
 	s.serviceGroup.ChannelService.JoinChannel(&msgcore.ChannelMembershipRequest{nil, channel, user2})
@@ -85,7 +85,7 @@ func (s *TestSuite) TestLeaveChannel(c *C) {
 	user := msgcore.NewUserByName("user1", team)
 	_ = svc.SaveUser(&msgcore.SaveUserRequest{nil, user, false})
 	channel := msgcore.NewChannel(team, user, 0, "test")
-	channel, _ = s.serviceGroup.ChannelService.CreateChannel(&msgcore.CreateChannelRequest{channel, true})
+	channel, _ = s.serviceGroup.ChannelService.CreateChannel(&msgcore.CreateChannelRequest{channel, nil, true})
 
 	c.Assert(s.serviceGroup.ChannelService.ContainsUser(&msgcore.ChannelMembershipRequest{nil, channel, user}), Equals, false)
 	s.serviceGroup.ChannelService.JoinChannel(&msgcore.ChannelMembershipRequest{nil, channel, user})
@@ -106,7 +106,7 @@ func (s *TestSuite) TestGetChannels(c *C) {
 		_ = svc.SaveUser(&msgcore.SaveUserRequest{nil, creator, false})
 		users = append(users, creator)
 		channel := msgcore.NewChannel(team, creator, int64(i), fmt.Sprintf("channel%d", i))
-		channel, err := s.serviceGroup.ChannelService.CreateChannel(&msgcore.CreateChannelRequest{channel, true})
+		channel, err := s.serviceGroup.ChannelService.CreateChannel(&msgcore.CreateChannelRequest{channel, nil, true})
 		if err != nil {
 			log.Println("CreateChannel Error: ", err)
 		}

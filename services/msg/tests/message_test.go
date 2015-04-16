@@ -23,7 +23,7 @@ func (s *TestSuite) MakeTestChannel() *msgcore.Channel {
 
 	// create channel
 	channel := msgcore.NewChannel(team, user, 0, "test")
-	s.serviceGroup.ChannelService.CreateChannel(&msgcore.CreateChannelRequest{channel, true})
+	s.serviceGroup.ChannelService.CreateChannel(&msgcore.CreateChannelRequest{channel, nil, true})
 
 	return channel
 }
