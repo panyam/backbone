@@ -54,26 +54,35 @@ has serialiser and deserializer of service request objects to and from http
 
 ```
 type ITeamServiceHandler struct {
-	ITeamService teamService
+	teamService ITeamService
+	RequestDecorator func(req *http.Request) (*http.Request, error)
 }
 
-// Handles a http request by extracting a service request, sending it off the
-// appropriate service op, getting the response back and sending it out 
-func (svc ITeamService) CreateTeamHandler(rw http.ResponseWriter, request *http.Http) {
-		createReq := CreateTeamRequest {}
-		err := CreateTeamRequestDeserializer(request, &createReq)
-		if err {
-			CreateTeamResponseSerializer(nil, err)
+func (svc ITeamServiceClient) SendCreateTeam(req *CreateTeamRequest) (*CreateTeamResponse, error) {
+	httpreq, err := SerializeCreateTeamRequest(req)
+	if err != nil {
+		return nil, err
+	}
+	if svc.RequestDecorator != nil {
+		httpreq, err = svc.RequestDecorator(httpreq)
+		if err != nil {
+			return nil, err
 		}
-		resp, err := teamService.CreateTeam(createReq)
-		CreateTeamResponseSerializer(nil, err)
+	}
+	resp, err := SendHttpRequest(httpreq)
+	if err != nil {
+		return nil, err
+	}
+	return DeserializeCreateTeamResponse(resp, httpreq)
 }
 ```
 
-3. In the server creation bind each URL to the appropriate binder:
+What will be generated for each language is:
 
-```
-teamHandlers := ITeamServiceHandlers{teamService}
-teamsRouter := apiRouter.Path("/teams/").Subrouter()
-teamsRouter.Methods("POST").HandlerFunc(teamHandlers.CreateTeamHandler)
-```
+* Serialize<operation>Request
+* Deserialize<operation>Request
+* Serialize<operation>Response
+* Deserialize<operation>Response
+* <Service>Handler class
+* <Service>Client class
+
