@@ -17,16 +17,20 @@ type Type struct {
 	// One of the above type classes
 	TypeClass int
 
-	// A unique ID assigned to each type
-	TypeId int64
-
 	// Package where the type resides
 	Package string
 
-	// Name of the type - can be empty for unnamed types (eg functions)
+	// Name of the type - can be empty for unnamed types (eg functions or tuples or params etc)
 	Name string
 
+	// A generated ID for this type
+	Id int64
+
 	TypeData interface{}
+}
+
+func NewType(typeCls int, pkg string, name string, data interface{}) *Type {
+	return &Type{TypeClass: typeCls, Package: pkg, Name: name, TypeData: data}
 }
 
 type AliasTypeData struct {

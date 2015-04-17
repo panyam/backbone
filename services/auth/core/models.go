@@ -2,13 +2,14 @@ package core
 
 import (
 	. "github.com/panyam/relay/services/msg/core"
+	msgcore "github.com/panyam/relay/services/msg/core"
 	. "github.com/panyam/relay/utils"
 	"time"
 )
 
 type Registration struct {
 	Id               int64
-	Team             *Team
+	Team             *msgcore.Team
 	Username         string
 	Created          time.Time
 	ExpiresAt        time.Time
