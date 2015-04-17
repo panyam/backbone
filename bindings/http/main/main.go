@@ -32,13 +32,15 @@ func main() {
 		parsedFiles[srcFile] = parsedFile
 	}
 
-	fset := token.NewFileSet() // positions are relative to fset
-	pkg, err := ast.NewPackage(fset, parsedFiles, types.GcImporter, types.Universe)
-	if err != nil {
-		log.Println("Package creation err: ", err)
-		return
-	}
-
+	/*
+		fset := token.NewFileSet() // positions are relative to fset
+		pkg, err := ast.NewPackage(fset, parsedFiles, types.GcImporter, types.Universe)
+		if err != nil {
+			log.Println("Package creation err: ", err)
+			return
+		}
+		parsedFile := ast.MergePackageFiles(pkg, 0)
+	*/
 	parsedFile := ast.MergePackageFiles(pkg, 0)
 	log.Println("File Package: ", parsedFile.Name.Name)
 	serviceDecl := gen.FindDecl(parsedFile, serviceName)
