@@ -36,6 +36,11 @@ func NodeToType(node ast.Node) *gen.Type {
 			}
 			return out
 		}
+	case *ast.MapType:
+		typeData := &gen.MapTypeData{}
+		typeData.KeyType = NodeToType(typeExpr.Key)
+		typeData.ValueType = NodeToType(typeExpr.Value)
+		return &gen.Type{TypeClass: gen.MapType, TypeData: typeData}
 	case *ast.ArrayType:
 		return &gen.Type{TypeClass: gen.ArrayType, TypeData: gen.ArrayTypeData{TargetType: NodeToType(typeExpr.Elt)}}
 	case *ast.Ident:
