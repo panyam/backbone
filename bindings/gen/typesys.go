@@ -19,13 +19,12 @@ func NewTypeSystem() *TypeSystem {
  * the existing one is returned otherwise a new type is added and returned.
  * Also the type's ID will be set.
  */
-func (ts *TypeSystem) AddType(t *Type) (alt *Type) {
-	key := t.Package + "." + t.Name
+func (ts *TypeSystem) AddType(pkg string, name string, t *Type) (alt *Type) {
+	key := pkg + "." + name
 	if value, ok := ts.types[key]; ok {
 		return value
 	}
 	ts.typeCounter++
-	t.Id = ts.typeCounter
 	ts.types[key] = t
 	return t
 }
@@ -33,4 +32,8 @@ func (ts *TypeSystem) AddType(t *Type) (alt *Type) {
 func (ts *TypeSystem) GetType(pkg string, name string) *Type {
 	key := pkg + "." + name
 	return ts.types[key]
+}
+
+func (ts *TypeSystem) FindType(typeClass int, typeData interface{}) string {
+	return ""
 }

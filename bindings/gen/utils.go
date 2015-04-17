@@ -63,8 +63,7 @@ func NodeToType(node ast.Node) *Type {
 	case *ast.GenDecl:
 		typeSpec := typeExpr.Specs[0].(*ast.TypeSpec)
 		out := &Type{TypeClass: RecordType}
-		out.Name = typeSpec.Name.Name
-		recordData := &RecordTypeData{}
+		recordData := &RecordTypeData{Name: typeSpec.Name.Name}
 		out.TypeData = recordData
 
 		switch typeExpr := typeSpec.Type.(type) {

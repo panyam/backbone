@@ -37,19 +37,16 @@ func (s *TestSuite) TestNewTypeSystem(c *C) {
 }
 
 func (s *TestSuite) TestNewType(c *C) {
-	t := NewType(BasicType, "", "int64", nil)
+	t := NewType(BasicType, nil)
 	c.Assert(t, Not(IsNil))
 }
 
 func (s *TestSuite) TestAddBasicType(c *C) {
 	ts := NewTypeSystem()
-	t := NewType(BasicType, "", "int64", nil)
-	t = ts.AddType(t)
-	c.Assert(t.Id, Not(Equals), 0)
+	t := NewType(BasicType, nil)
+	t = ts.AddType("", "int64", t)
 	t2 := ts.GetType("", "int64")
 	c.Assert(t2, Not(IsNil))
 	c.Assert(t.TypeClass, Equals, t2.TypeClass)
-	c.Assert(t.Package, Equals, t2.Package)
-	c.Assert(t.Name, Equals, t2.Name)
 	c.Assert(t.TypeData, Equals, t2.TypeData)
 }

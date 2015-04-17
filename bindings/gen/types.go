@@ -17,24 +17,16 @@ type Type struct {
 	// One of the above type classes
 	TypeClass int
 
-	// Package where the type resides
-	Package string
-
-	// Name of the type - can be empty for unnamed types (eg functions or tuples or params etc)
-	Name string
-
-	// A generated ID for this type
-	Id int64
-
 	TypeData interface{}
 }
 
-func NewType(typeCls int, pkg string, name string, data interface{}) *Type {
-	return &Type{TypeClass: typeCls, Package: pkg, Name: name, TypeData: data}
+func NewType(typeCls int, data interface{}) *Type {
+	return &Type{TypeClass: typeCls, TypeData: data}
 }
 
 type AliasTypeData struct {
 	// Type this is an alias/typedef for
+	Name     string
 	AliasFor *Type
 }
 
@@ -60,6 +52,7 @@ type TupleTypeData struct {
 
 type RecordTypeData struct {
 	// Type of each member in the struct
+	Name           string
 	InheritedTypes []*Type
 	FieldTypes     []*Type
 	FieldNames     []string
@@ -81,15 +74,15 @@ func (t *Type) Signature() string {
 	case NullType:
 		return ""
 	case LazyType:
-		return t.Name
+		return t.TypeData.(string)
 	case BasicType:
-		return t.Name
+		return t.TypeData.(string)
 	case AliasType:
-		return t.Name
+		return t.TypeData.(string)
 	case ReferenceType:
 		return "*" + t.TypeData.(ReferenceTypeData).TargetType.Signature()
 	case RecordType:
-		return t.Name
+		return t.TypeData.(RecordTypeData).Name
 	case TupleType:
 		out := "("
 		for index, childType := range t.TypeData.(TupleTypeData).SubTypes {
