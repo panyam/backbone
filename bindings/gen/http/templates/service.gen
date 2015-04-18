@@ -6,6 +6,7 @@ type {{.HandlerName}} struct {
 
 // Request makers for each operation
 {{ range $index, $field := .ServiceType.Fields }}
+{{$field.Type.Signature}}
 func (svc *{{$.HandlerName}}) Send{{$field.Name}}(req *CreateTeamRequest) (*CreateTeamResponse, error) {
 	httpreq, err := SerializeCreateTeamRequest(req)
 	if err != nil {

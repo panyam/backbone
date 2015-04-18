@@ -46,14 +46,14 @@ func NodeToType(node ast.Node, pkg string, typeSystem ITypeSystem) *Type {
 	case *ast.StarExpr:
 		// we have a reference type
 		out := &Type{TypeClass: ReferenceType}
-		out.TypeData = ReferenceTypeData{TargetType: NodeToType(typeExpr.X, pkg, typeSystem)}
+		out.TypeData = &ReferenceTypeData{TargetType: NodeToType(typeExpr.X, pkg, typeSystem)}
 		return out
 	case *ast.FuncType:
 		{
 			out := &Type{TypeClass: FunctionType}
 
 			// create a function type
-			functionType := FunctionTypeData{}
+			functionType := &FunctionTypeData{}
 			out.TypeData = functionType
 			for _, param := range typeExpr.Params.List {
 				paramType := NodeToType(param.Type, pkg, typeSystem)
@@ -74,7 +74,7 @@ func NodeToType(node ast.Node, pkg string, typeSystem ITypeSystem) *Type {
 		return &Type{TypeClass: MapType, TypeData: typeData}
 	case *ast.ArrayType:
 		return &Type{TypeClass: ArrayType,
-			TypeData: ArrayTypeData{TargetType: NodeToType(typeExpr.Elt, pkg, typeSystem)}}
+			TypeData: &ArrayTypeData{TargetType: NodeToType(typeExpr.Elt, pkg, typeSystem)}}
 	case *ast.Ident:
 		t := typeSystem.GetType(pkg, typeExpr.Name)
 		if t == nil {

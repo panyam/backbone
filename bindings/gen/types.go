@@ -84,12 +84,12 @@ func (t *Type) Signature() string {
 	case AliasType:
 		return t.TypeData.(string)
 	case ReferenceType:
-		return "*" + t.TypeData.(ReferenceTypeData).TargetType.Signature()
+		return "*" + t.TypeData.(*ReferenceTypeData).TargetType.Signature()
 	case RecordType:
-		return t.TypeData.(RecordTypeData).Name
+		return t.TypeData.(*RecordTypeData).Name
 	case TupleType:
 		out := "("
-		for index, childType := range t.TypeData.(TupleTypeData).SubTypes {
+		for index, childType := range t.TypeData.(*TupleTypeData).SubTypes {
 			if index > 0 {
 				out += ", "
 			}
@@ -97,7 +97,7 @@ func (t *Type) Signature() string {
 		}
 		return out
 	case FunctionType:
-		funcTypeData := t.TypeData.(FunctionTypeData)
+		funcTypeData := t.TypeData.(*FunctionTypeData)
 		out := "func"
 		out += TypeListSignature(funcTypeData.InputTypes)
 		if funcTypeData.OutputTypes != nil {
@@ -108,9 +108,9 @@ func (t *Type) Signature() string {
 		}
 		return out
 	case ArrayType:
-		return "[]" + t.TypeData.(ArrayTypeData).TargetType.Signature()
+		return "[]" + t.TypeData.(*ArrayTypeData).TargetType.Signature()
 	case MapType:
-		mapTypeData := t.TypeData.(MapTypeData)
+		mapTypeData := t.TypeData.(*MapTypeData)
 		return "map[" + mapTypeData.KeyType.Signature() + "]" + mapTypeData.ValueType.Signature()
 	}
 	return ""
