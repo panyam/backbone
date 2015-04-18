@@ -115,8 +115,8 @@ func NodeToType(node ast.Node, pkg string, typeSystem ITypeSystem) *Type {
 					log.Println("Processing method: ", index, field.Names[0], field.Type, reflect.TypeOf(field.Type))
 					fieldType := NodeToType(field.Type, pkg, typeSystem)
 					for _, fieldName := range field.Names {
-						recordData.FieldNames = append(recordData.FieldNames, fieldName.Name)
-						recordData.FieldTypes = append(recordData.FieldTypes, fieldType)
+						field := &Field{Name: fieldName.Name, Type: fieldType}
+						recordData.Fields = append(recordData.Fields, field)
 					}
 				}
 			}
@@ -131,8 +131,8 @@ func NodeToType(node ast.Node, pkg string, typeSystem ITypeSystem) *Type {
 						recordData.InheritedTypes = append(recordData.InheritedTypes, fieldType)
 					} else {
 						for _, fieldName := range field.Names {
-							recordData.FieldNames = append(recordData.FieldNames, fieldName.Name)
-							recordData.FieldTypes = append(recordData.FieldTypes, fieldType)
+							field := &Field{Name: fieldName.Name, Type: fieldType}
+							recordData.Fields = append(recordData.Fields, field)
 						}
 					}
 				}

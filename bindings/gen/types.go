@@ -54,8 +54,12 @@ type RecordTypeData struct {
 	// Type of each member in the struct
 	Name           string
 	InheritedTypes []*Type
-	FieldTypes     []*Type
-	FieldNames     []string
+	Fields         []*Field
+}
+
+type Field struct {
+	Name string
+	Type *Type
 }
 
 type FunctionTypeData struct {

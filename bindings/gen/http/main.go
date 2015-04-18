@@ -7,7 +7,21 @@ import (
 	"go/parser"
 	"go/token"
 	"log"
+	"os"
+	"text/template"
 )
+
+type HttpTemplateParams struct {
+	Package       string
+	ServiceName   string
+	HandlerPrefix string
+	HandlerSuffix string
+	ServiceType   *gen.RecordTypeData
+}
+
+func (h *HttpTemplateParams) HandlerName() string {
+	return h.HandlerPrefix + h.ServiceName + h.HandlerSuffix
+}
 
 func main() {
 	var serviceName, operation string
@@ -43,10 +57,25 @@ func main() {
 	*/
 
 	parsedFile := parsedFiles[flag.Args()[0]]
-	log.Println("File Package: ", parsedFile, parsedFile.Name.Name)
+	packageName := parsedFile.Name.Name
+	log.Println("File Package: ", parsedFile, packageName)
 	log.Println("Import Spec: ", parsedFile.Imports)
 	log.Println("Unresolved: ", parsedFile.Unresolved)
 	typeSystem := gen.NewTypeSystem()
 	gen.ParseFile(parsedFile, typeSystem)
-	log.Println("ServiceType: ", typeSystem)
+
+	// now take the service and generate it
+	params := &HttpTemplateParams{
+		ServiceType:   typeSystem.GetType(packageName, serviceName).TypeData.(*gen.RecordTypeData),
+		ServiceName:   serviceName,
+		HandlerSuffix: "Handler",
+	}
+	tmpl, err := template.New("service.gen").ParseFiles("templates/service.gen")
+	if err != nil {
+		panic(err)
+	}
+	err = tmpl.Execute(os.Stdout, params)
+	if err != nil {
+		panic(err)
+	}
 }
