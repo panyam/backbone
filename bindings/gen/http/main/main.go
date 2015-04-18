@@ -41,9 +41,12 @@ func main() {
 		}
 		parsedFile := ast.MergePackageFiles(pkg, 0)
 	*/
-	parsedFile := ast.MergePackageFiles(pkg, 0)
-	log.Println("File Package: ", parsedFile.Name.Name)
-	serviceDecl := gen.FindDecl(parsedFile, serviceName)
-	nt := gen.NodeToType(serviceDecl)
-	log.Println("ServiceType: ", nt)
+
+	parsedFile := parsedFiles[flag.Args()[0]]
+	log.Println("File Package: ", parsedFile, parsedFile.Name.Name)
+	log.Println("Import Spec: ", parsedFile.Imports)
+	log.Println("Unresolved: ", parsedFile.Unresolved)
+	typeSystem := gen.NewTypeSystem()
+	gen.ParseFile(parsedFile, typeSystem)
+	log.Println("ServiceType: ", typeSystem)
 }

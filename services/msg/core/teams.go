@@ -1,10 +1,16 @@
 package core
 
+import (
+	"a/b/c/d"
+	a "a/b/c/d"
+	. "x/y/z"
+)
+
 type ITeamService interface {
 	/**
 	 * Removes all entries.
 	 */
-	RemoveAllTeams(request *Request)
+	RemoveAllTeams(request *a.Request)
 
 	/**
 	 * Create or update a team.

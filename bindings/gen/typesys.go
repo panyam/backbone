@@ -1,6 +1,8 @@
 package gen
 
 type ITypeSystem interface {
+	AddType(pkg string, name string, t *Type) (alt *Type)
+	GetType(pkg string, name string) *Type
 }
 
 type TypeSystem struct {
