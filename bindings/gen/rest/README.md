@@ -1,7 +1,7 @@
 
 The binding object should be used by both the server as well as the client
 generator.   This way we dont have repetitions on building this.  So one
-binding is a HTTP binding (others are RCP etc).
+binding is a Restful HTTP binding (others are RCP etc).
 A binding should specify the service, operation and details about the
 transport level endpoint.  eg:
 

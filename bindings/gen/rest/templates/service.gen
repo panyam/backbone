@@ -1,0 +1,32 @@
+{{ $context := . }}
+
+package {{$context.ClientPackageName}}
+
+import (
+	gohttp "net/http"
+)
+
+type {{$context.ClientName}} struct {
+	service *{{$context.ServiceName}}
+	RequestDecorator func(req *gohttp.Request) (*gohttp.Request, error)
+}
+
+// Request makers for each operation
+
+{{ range $index, $operation := .ServiceType.Fields }}
+
+{{ $optype := $operation.Type.TypeData }}
+
+func (svc *{{$context.ClientName}}) Send{{$operation.Name}}({{call $context.ArgListMaker $optype.InputTypes true true}}) {{call $context.ArgListMaker $optype.OutputTypes false false}} {
+	httpreq, err := Serialize{{$operation.Name}}Request({{ range $index, $f2 := $optype.InputTypes }}{{ if gt $index 0 }}, {{end}}arg{{$index}}{{end}})
+	if err != nil { return nil, err }
+	if svc.RequestDecorator != nil {
+		httpreq, err = svc.RequestDecorator(httpreq)
+		if err != nil { return nil, err }
+	}
+	resp, err := SendHttpRequest(httpreq)
+	if err != nil { return nil, err }
+	return Deserialize{{$operation.Name}}Response(resp, httpreq)
+}
+{{ end }}
+

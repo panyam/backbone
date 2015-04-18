@@ -1,0 +1,14 @@
+
+{{ $context := . }}
+
+package {{$context.ClientPackageName}}
+
+import (
+	gohttp "net/http"
+)
+
+// Request makers for each operation
+{{ range $index, $operation := .ServiceType.Fields }}
+{{ $optype := $operation.Type.TypeData }}
+{{$operation.Name}}
+{{ end }}
