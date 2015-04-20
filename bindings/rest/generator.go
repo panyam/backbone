@@ -72,7 +72,9 @@ func NewGenerator(bindings map[string]*HttpBinding, typeSys bindings.ITypeSystem
  */
 func (g *Generator) EmitClientClass(pkgName string, serviceName string) error {
 	g.ServiceName = serviceName
-	g.ServiceType = g.TypeSystem.GetType(pkgName, serviceName).TypeData.(*bindings.RecordTypeData)
+	recType := g.TypeSystem.GetType(pkgName, serviceName)
+	fmt.Println(" ======== PkgName, ServiceName: ", pkgName, serviceName, recType)
+	g.ServiceType = recType.TypeData.(*bindings.RecordTypeData)
 
 	tmpl, err := template.New("client.gen").ParseFiles(g.TemplatesDir + "client.gen")
 	if err != nil {
@@ -115,8 +117,8 @@ func (g *Generator) EmitSendRequestMethod(output io.Writer, opName string, opTyp
 
 func (g *Generator) StartWritingMethod(output io.Writer, opName string, opType *bindings.FunctionTypeData, argPrefix string) error {
 	templ, err := template.New("writer").Parse(`
-func (svc *{{$.ClientName}}) Send{{.OpName}}Request({{call .ArgListMaker .OpType.InputTypes true }}) (resp *http.Response, error) {
-	body := bytes.NewBuffer(nil)
+func (svc *{{$.ClientName}}) Send{{.OpName}}Request({{call .ArgListMaker .OpType.InputTypes true }}) (*http.Response, error) {
+	var body *bytes.Buffer = {{ if eq .OpType.NumInputs 0 }}nil{{else}}bytes.NewBuffer(nil){{end}}
 	`)
 	if err != nil {
 		panic(err)
@@ -182,7 +184,7 @@ func WriterMethodForType(t *bindings.Type) string {
  */
 func (g *Generator) EmitObjectWriterCall(output io.Writer, key interface{}, argName string, argType *bindings.Type) error {
 	callString := WriterMethodForType(argType)
-	output.Write([]byte(callString + "(body, " + argName + ")"))
+	output.Write([]byte(callString + "(body, " + argName + ")\n"))
 	return nil
 }
 
@@ -190,14 +192,14 @@ func (g *Generator) EmitObjectWriterCall(output io.Writer, key interface{}, argN
  * Emits the code required to start a list.
  */
 func (g *Generator) StartWritingList(output io.Writer) {
-	output.Write([]byte("["))
+	output.Write([]byte("body.Write([]byte(\"[\"))\n"))
 }
 
 /**
  * Emits the code required to end a list.
  */
 func (g *Generator) EndWritingList(output io.Writer) {
-	output.Write([]byte("]"))
+	output.Write([]byte("body.Write([]byte(\"]\"))\n"))
 }
 
 /**

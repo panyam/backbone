@@ -5,8 +5,7 @@ package {{$context.ClientPackageName}}
 import (
 	"net/http"
 	"bytes"
-	"encoding/json"
-	"github.com/panyam/relay/bindings/gen/rest"
+	"github.com/panyam/relay/bindings/rest"
 )
 
 type {{$context.ClientName}} struct {

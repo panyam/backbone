@@ -3,12 +3,9 @@ package main
 import (
 	"flag"
 	"github.com/panyam/relay/bindings"
-	"github.com/panyam/relay/bindings/rest"
-	"go/ast"
-	"go/parser"
-	"go/token"
+	// "github.com/panyam/relay/bindings/rest"
+	// "os"
 	"log"
-	"os"
 )
 
 func main() {
@@ -23,30 +20,46 @@ func main() {
 		log.Println("Service required")
 	}
 
-	parsedFiles := make(map[string]*ast.File)
+	typeSystem := bindings.NewTypeSystem()
+	parsedFiles := make(map[string]*bindings.ParsedFile)
 	for _, srcFile := range flag.Args() {
-		fset := token.NewFileSet() // positions are relative to fset
-		parsedFile, err := parser.ParseFile(fset, srcFile, nil, parser.ParseComments|parser.AllErrors)
+		pf, err := bindings.NewParsedFile(srcFile)
 		if err != nil {
 			log.Println("Parsing error: ", err)
 			return
 		}
-		parsedFiles[srcFile] = parsedFile
+		parsedFiles[pf.FullPath] = pf
 	}
 
-	parsedFile := parsedFiles[flag.Args()[0]]
-	typeSystem := bindings.NewTypeSystem()
-	bindings.ParseFile(parsedFile, typeSystem)
+	// parse all files now that we have the imports kind of resolved
+	for path, parsedFile := range parsedFiles {
+		log.Println("Processing Src: ", path)
+		parsedFile.ProcessNode(typeSystem)
+	}
 
-	generator := rest.NewGenerator(nil, typeSystem, "../rest/templates/")
+	/*
+		var parsedFile *ast.File = nil
+		fset := token.NewFileSet() // positions are relative to fset
+		newPkg, err := ast.NewPackage(fset, parsedFiles, nil, nil)
+		log.Println("NP: ", newPkg, err)
+		parsedFile = ast.MergePackageFiles(newPkg, 0)
+		log.Println("Big ParsedFile: ", parsedFile)
+		log.Println("Package: ", parsedFile.Name.Name)
+		log.Println("Imports: ", parsedFile.Imports)
+		log.Println("UnResolved: ", parsedFile.Unresolved)
+	*/
 
-	generator.EmitClientClass(parsedFile.Name.Name, serviceName)
+	/*
+		generator := rest.NewGenerator(nil, typeSystem, "../rest/templates/")
 
-	// Generate code for each of the service methods
-	for _, field := range generator.ServiceType.Fields {
-		switch optype := field.Type.TypeData.(type) {
-		case *bindings.FunctionTypeData:
-			generator.EmitSendRequestMethod(os.Stdout, field.Name, optype, "arg")
+		generator.EmitClientClass(parsedFile.Name.Name, serviceName)
+
+		// Generate code for each of the service methods
+		for _, field := range generator.ServiceType.Fields {
+			switch optype := field.Type.TypeData.(type) {
+			case *bindings.FunctionTypeData:
+				generator.EmitSendRequestMethod(os.Stdout, field.Name, optype, "arg")
+			}
 		}
-	}
+	*/
 }
