@@ -8,6 +8,7 @@ import (
 	"go/parser"
 	"go/token"
 	"log"
+	"os"
 )
 
 func main() {
@@ -45,7 +46,7 @@ func main() {
 	for _, field := range generator.ServiceType.Fields {
 		switch optype := field.Type.TypeData.(type) {
 		case *bindings.FunctionTypeData:
-			generate.EmitSendRequestMethod(field.Name, optype, "arg")
+			generator.EmitSendRequestMethod(os.Stdout, field.Name, optype, "arg")
 		}
 	}
 }

@@ -9,7 +9,7 @@ const (
 	TupleType
 	RecordType
 	FunctionType
-	ArrayType
+	ListType
 	MapType
 )
 
@@ -41,7 +41,7 @@ type MapTypeData struct {
 	ValueType *Type
 }
 
-type ArrayTypeData struct {
+type ListTypeData struct {
 	// The target type this is an array of
 	TargetType *Type
 }
@@ -127,8 +127,8 @@ func (t *Type) Signature() string {
 			out += " throws" + TypeListSignature(funcTypeData.ExceptionTypes)
 		}
 		return out
-	case ArrayType:
-		return "[]" + t.TypeData.(*ArrayTypeData).TargetType.Signature()
+	case ListType:
+		return "[]" + t.TypeData.(*ListTypeData).TargetType.Signature()
 	case MapType:
 		mapTypeData := t.TypeData.(*MapTypeData)
 		return "map[" + mapTypeData.KeyType.Signature() + "]" + mapTypeData.ValueType.Signature()

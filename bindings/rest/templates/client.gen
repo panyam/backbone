@@ -3,7 +3,7 @@
 package {{$context.ClientPackageName}}
 
 import (
-	http "net/http"
+	"net/http"
 	"bytes"
 	"encoding/json"
 	"github.com/panyam/relay/bindings/gen/rest"

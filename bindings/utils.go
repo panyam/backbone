@@ -73,8 +73,8 @@ func NodeToType(node ast.Node, pkg string, typeSystem ITypeSystem) *Type {
 		typeData.ValueType = NodeToType(typeExpr.Value, pkg, typeSystem)
 		return &Type{TypeClass: MapType, TypeData: typeData}
 	case *ast.ArrayType:
-		return &Type{TypeClass: ArrayType,
-			TypeData: &ArrayTypeData{TargetType: NodeToType(typeExpr.Elt, pkg, typeSystem)}}
+		return &Type{TypeClass: ListType,
+			TypeData: &ListTypeData{TargetType: NodeToType(typeExpr.Elt, pkg, typeSystem)}}
 	case *ast.Ident:
 		t := typeSystem.GetType(pkg, typeExpr.Name)
 		if t == nil {
