@@ -1,4 +1,4 @@
-package gen
+package bindings
 
 type ITypeSystem interface {
 	AddType(pkg string, name string, t *Type) (alt *Type)

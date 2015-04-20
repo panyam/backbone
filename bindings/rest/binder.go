@@ -1,7 +1,7 @@
 package rest
 
 import (
-	"github.com/gorilla/mux"
+	// "github.com/gorilla/mux"
 	"github.com/panyam/relay/bindings"
 	"github.com/panyam/relay/utils"
 	"log"
@@ -88,7 +88,7 @@ func (hb *HttpBinding) ExtractRequest(request *http.Request) (*bindings.ServiceO
 	param := reflect.New(hb.RequestType)
 	out := bindings.ServiceOperation{Method: hb.Method, RequestParam: param}
 
-	variables = mux.Vars(request)
+	// variables = mux.Vars(request)
 	return &out, nil
 }
 
@@ -128,7 +128,7 @@ func (h *HttpInputBinder) MatchBinding(request *http.Request) *HttpBinding {
 		}
 
 		// now see if URL matches
-		variables = mux.Vars(request)
+		// variables = mux.Vars(request)
 	}
 	return nil
 }

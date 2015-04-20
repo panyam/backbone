@@ -1,4 +1,4 @@
-package gen
+package bindings
 
 import (
 	"go/ast"
@@ -128,7 +128,7 @@ func NodeToType(node ast.Node, pkg string, typeSystem ITypeSystem) *Type {
 					fieldType := NodeToType(field.Type, pkg, typeSystem)
 					log.Println("Processing field: ", index, field.Names, field.Type, reflect.TypeOf(field.Type))
 					if len(field.Names) == 0 {
-						recordData.InheritedTypes = append(recordData.InheritedTypes, fieldType)
+						recordData.Bases = append(recordData.Bases, fieldType)
 					} else {
 						for _, fieldName := range field.Names {
 							field := &Field{Name: fieldName.Name, Type: fieldType}

@@ -1,4 +1,4 @@
-package gen
+package bindings
 
 const (
 	NullType = iota
@@ -52,9 +52,17 @@ type TupleTypeData struct {
 
 type RecordTypeData struct {
 	// Type of each member in the struct
-	Name           string
-	InheritedTypes []*Type
-	Fields         []*Field
+	Name   string
+	Bases  []*Type
+	Fields []*Field
+}
+
+func (td *RecordTypeData) NumFields() int {
+	return len(td.Fields)
+}
+
+func (td *RecordTypeData) NumBases() int {
+	return len(td.Bases)
 }
 
 type Field struct {
@@ -71,6 +79,18 @@ type FunctionTypeData struct {
 
 	// Types of possible exceptions that can be thrown (not supported in all languages)
 	ExceptionTypes []*Type
+}
+
+func (td *FunctionTypeData) NumInputs() int {
+	return len(td.InputTypes)
+}
+
+func (td *FunctionTypeData) NumOutputs() int {
+	return len(td.OutputTypes)
+}
+
+func (td *FunctionTypeData) NumExceptions() int {
+	return len(td.ExceptionTypes)
 }
 
 func (t *Type) Signature() string {

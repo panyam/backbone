@@ -1,17 +1,6 @@
 package core
 
-import (
-	"a/b/c/d"
-	a "a/b/c/d"
-	. "x/y/z"
-)
-
 type ITeamService interface {
-	/**
-	 * Removes all entries.
-	 */
-	RemoveAllTeams(request *a.Request)
-
 	/**
 	 * Create or update a team.
 	 * If the ID is empty, then it is upto the backend to decide whether to
@@ -50,6 +39,11 @@ type ITeamService interface {
 	 * Lets a user leave a team or be kicked out.
 	 */
 	LeaveTeam(request *TeamMembershipRequest) error
+
+	/**
+	 * Removes all entries.
+	 */
+	RemoveAllTeams()
 }
 
 type GetTeamsRequest struct {

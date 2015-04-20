@@ -1,0 +1,17 @@
+{{ $context := . }}
+
+package {{$context.ClientPackageName}}
+
+import (
+	http "net/http"
+	"bytes"
+	"encoding/json"
+	"github.com/panyam/relay/bindings/gen/rest"
+)
+
+type {{$context.ClientName}} struct {
+	service *{{$context.ServiceName}}
+	RequestDecorator func(req *http.Request) (*http.Request, error)
+	httpBindings map[string]*rest.HttpBinding
+}
+
