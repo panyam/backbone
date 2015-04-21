@@ -2,7 +2,6 @@ package core
 
 import (
 	. "github.com/panyam/relay/utils"
-	xxx "github.com/panyam/relay/utils"
 	"time"
 )
 
@@ -67,7 +66,7 @@ type Channel struct {
 	/**
 	 * Team this channel belongs to.   Mandatory.
 	 */
-	Team *xxx.Team
+	Team *Team
 
 	/**
 	 * Creator of the group.
